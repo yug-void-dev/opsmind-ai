@@ -137,10 +137,7 @@ const listUsers = async (req, res, next) => {
       User.countDocuments(filter),
     ]);
 
-    return success(res, {
-      users,
-      pagination: { page: parseInt(page), limit: parseInt(limit), total },
-    });
+    return success(res, users);
   } catch (err) {
     next(err);
   }

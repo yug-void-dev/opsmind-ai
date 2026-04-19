@@ -1,98 +1,103 @@
 /**
  * OpsMind AI — Express Application
  *
- * Security middleware stack (in order):
+ * Middleware stack (in order):
  *  1. Helmet      — HTTP security headers
- *  2. CORS        — Cross-origin policy
+ *  2. CORS        — Cross-origin resource sharing
  *  3. Rate limits — Per-route adaptive limits
- *  4. Body parsing — with size caps
- *  5. Morgan      — HTTP access logging
- *  6. Routes
- *  7. 404 handler
- *  8. Global error handler
+ *  4. Body parsing — JSON + URL-encoded with size caps
+ *  5. Morgan      — HTTP access logging (skips /health)
+ *  6. Request ID  — UUID injected on every request
+ *  7. Health check— GET /health (unauthenticated, never rate-limited)
+ *  8. API Routes  — /api/{auth,documents,query,chats,admin}
+ *  9. 404 handler
+ * 10. Global error handler
  */
+
 const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+const cors    = require('cors');
+const helmet  = require('helmet');
+const morgan  = require('morgan');
+const crypto  = require('crypto');
 const rateLimit = require('express-rate-limit');
 
-const authRoutes = require('./routes/authRoutes');
+const authRoutes     = require('./routes/authRoutes');
 const documentRoutes = require('./routes/documentRoutes');
-const queryRoutes = require('./routes/queryRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const queryRoutes    = require('./routes/queryRoutes');
+const chatRoutes     = require('./routes/chatRoutes');
+const adminRoutes    = require('./routes/adminRoutes');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 const logger = require('./utils/logger');
 
 const app = express();
 
-// ─── 1. Security Headers (Helmet) ────────────────────────────────────────────
+// ─── 1. Security Headers ──────────────────────────────────────────────────────
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        objectSrc: ["'none'"],
+        defaultSrc : ["'self'"],
+        scriptSrc  : ["'self'"],
+        objectSrc  : ["'none'"],
         upgradeInsecureRequests: [],
       },
     },
-    hsts: { maxAge: 31536000, includeSubDomains: true },
-    noSniff: true,
-    frameguard: { action: 'deny' },
-    xssFilter: true,
+    hsts       : { maxAge: 31_536_000, includeSubDomains: true },
+    noSniff    : true,
+    frameguard : { action: 'deny' },
+    xssFilter  : true,
   })
 );
 
-// ─── 2. CORS ─────────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : '*';
+// ─── 2. CORS ──────────────────────────────────────────────────────────────────
+const rawOrigins = process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173';
+const allowedOrigins = rawOrigins === '*'
+  ? '*'
+  : rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
 
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin      : allowedOrigins,
+    methods     : ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
     exposedHeaders: ['X-Request-ID'],
-    credentials: true,
-    maxAge: 86400, // Cache preflight for 24h
+    credentials : true,
+    maxAge      : 86_400, // Cache OPTIONS preflight for 24 h
   })
 );
 
 // ─── 3. Rate Limiting ─────────────────────────────────────────────────────────
 
-// Global catch-all rate limit
+// Global — applied to everything, but /health is exempt
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 200,
+  max     : parseInt(process.env.RATE_LIMIT_MAX)        || 200,
   standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, message: 'Too many requests. Please slow down.' },
-  skip: (req) => req.path === '/health', // Never rate-limit health checks
+  legacyHeaders  : false,
+  message        : { success: false, message: 'Too many requests — please slow down.' },
+  skip           : (req) => req.path === '/health',
 });
 
-// Strict rate limit for auth endpoints (brute-force prevention)
+// Auth — strict brute-force prevention (20 attempts / 15 min, skip successes)
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
-  max: 20,                   // 20 login attempts per 15 min
-  message: { success: false, message: 'Too many auth attempts. Try again in 15 minutes.' },
-  skipSuccessfulRequests: true, // Don't count successful logins
+  windowMs             : 15 * 60 * 1000,
+  max                  : 20,
+  skipSuccessfulRequests: true,
+  message              : { success: false, message: 'Too many auth attempts — try again in 15 minutes.' },
 });
 
-// Query endpoint: generous but not unlimited
+// Query — generous but bounded (30 req / min)
 const queryLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 min
-  max: 30,             // 30 queries/min per IP
-  message: { success: false, message: 'Query rate limit reached. Please wait a moment.' },
+  windowMs: 60 * 1000,
+  max     : 30,
+  message : { success: false, message: 'Query rate limit reached — please wait a moment.' },
 });
 
-// Upload endpoint: strict (embedding is expensive)
+// Upload — expensive (embedding API costs); 25 uploads / hour
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 25,                   // 25 uploads per hour per IP
-  message: { success: false, message: 'Upload limit reached. Maximum 25 uploads per hour.' },
+  windowMs: 60 * 60 * 1000,
+  max     : 25,
+  message : { success: false, message: 'Upload limit reached — maximum 25 uploads per hour.' },
 });
 
 app.use(globalLimiter);
@@ -101,48 +106,51 @@ app.use(globalLimiter);
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
-// ─── 5. HTTP Logging ──────────────────────────────────────────────────────────
-const morganFormat =
-  process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
-
+// ─── 5. HTTP Request Logging ──────────────────────────────────────────────────
 app.use(
-  morgan(morganFormat, {
-    stream: {
-      write: (msg) => logger.http(msg.trim()),
-    },
-    skip: (req) => req.path === '/health',
+  morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
+    stream: { write: (msg) => logger.http(msg.trim()) },
+    skip  : (req) => req.path === '/health',
   })
 );
 
-// ─── Request ID ───────────────────────────────────────────────────────────────
+// ─── 6. Request ID ────────────────────────────────────────────────────────────
 app.use((req, res, next) => {
-  const id = require('crypto').randomUUID();
+  const id = crypto.randomUUID();
   req.requestId = id;
   res.setHeader('X-Request-ID', id);
   next();
 });
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'OpsMind AI',
-    version: '2.0.0',
-    timestamp: new Date().toISOString(),
+// ─── 7. Health Check ──────────────────────────────────────────────────────────
+app.get('/health', (_req, res) => {
+  const mongoose = require('mongoose');
+  const dbState  = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+
+  res.status(200).json({
+    status     : 'healthy',
+    service    : 'OpsMind AI',
+    version    : '2.0.0',
+    timestamp  : new Date().toISOString(),
+    uptime     : Math.floor(process.uptime()),
     environment: process.env.NODE_ENV || 'development',
     llmProvider: process.env.LLM_PROVIDER || 'gemini',
-    uptime: Math.floor(process.uptime()),
+    database   : dbState[mongoose.connection.readyState] || 'unknown',
+    memory     : {
+      rss       : `${Math.round(process.memoryUsage().rss / 1024 / 1024)} MB`,
+      heapUsed  : `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`,
+    },
   });
 });
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/auth', authLimiter, authRoutes);
+// ─── 8. API Routes ────────────────────────────────────────────────────────────
+app.use('/api/auth',      authLimiter,   authRoutes);
 app.use('/api/documents', uploadLimiter, documentRoutes);
-app.use('/api/query', queryLimiter, queryRoutes);
-app.use('/api/chats', chatRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api/query',     queryLimiter,  queryRoutes);
+app.use('/api/chats',                    chatRoutes);
+app.use('/api/admin',                    adminRoutes);
 
-// ─── Error Handlers ───────────────────────────────────────────────────────────
+// ─── 9–10. Error Handlers ─────────────────────────────────────────────────────
 app.use(notFoundHandler);
 app.use(errorHandler);
 

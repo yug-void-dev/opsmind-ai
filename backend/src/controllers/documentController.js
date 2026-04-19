@@ -216,15 +216,8 @@ const listDocuments = async (req, res, next) => {
       Document.countDocuments(filter),
     ]);
 
-    return success(res, {
-      documents,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / parseInt(limit)),
-      },
-    });
+    // Return flat array for simple consumption + pagination header
+    return success(res, documents, 'Documents retrieved', 200);
   } catch (err) {
     next(err);
   }
@@ -248,7 +241,7 @@ const getDocument = async (req, res, next) => {
       return notFound(res, 'Document not found');
     }
 
-    return success(res, { document: doc });
+    return success(res, doc);
   } catch (err) {
     next(err);
   }
@@ -356,7 +349,7 @@ const updateTags = async (req, res, next) => {
 
     cache.flush();
 
-    return success(res, { document: doc }, `Tags updated for "${doc.name}"`);
+    return success(res, doc, `Tags updated for "${doc.name}"`);
   } catch (err) {
     next(err);
   }

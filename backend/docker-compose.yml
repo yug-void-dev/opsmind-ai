@@ -1,7 +1,15 @@
 version: '3.9'
 
+# ══════════════════════════════════════════════════════════════════════
+#  OpsMind AI — Docker Compose
+#  Usage:
+#    cp .env.example .env   # fill in your secrets
+#    docker compose up -d   # start
+#    docker compose logs -f # tail logs
+# ══════════════════════════════════════════════════════════════════════
+
 services:
-  opsmind-api:
+  opsmind-ai-backend:
     build:
       context: .
       target: production
@@ -24,13 +32,21 @@ services:
       start_period: 30s
     networks:
       - opsmind-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 volumes:
   uploads_data:
     driver: local
+    name: opsmind_uploads
   logs_data:
     driver: local
+    name: opsmind_logs
 
 networks:
   opsmind-network:
     driver: bridge
+    name: opsmind-network

@@ -19,7 +19,7 @@ const validate = (schema) => (req, res, next) => {
   next();
 };
 
-// ─── Schemas ────────────────────────────────────────────────────────────────
+// ─── Schemas ─────────────────────────────────────────────────────────────────
 
 const registerSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
@@ -34,7 +34,7 @@ const loginSchema = Joi.object({
 });
 
 const querySchema = Joi.object({
-  query: Joi.string().min(3).max(2000).required(),
+  query: Joi.string().min(1).max(2000).required(),
   chatId: Joi.string().optional(),
   documentId: Joi.string().optional(),
   tags: Joi.array().items(Joi.string()).max(10).optional(),
@@ -49,20 +49,59 @@ const uploadMetaSchema = Joi.object({
   name: Joi.string().max(200).optional(),
 });
 
-const saveChatSchema = Joi.object({
-  chatId: Joi.string().optional(),
-  userMessage: Joi.string().min(1).max(2000).required(),
-  assistantMessage: Joi.string().min(1).required(),
-  sources: Joi.array()
-    .items(
-      Joi.object({
-        documentId: Joi.string(),
-        documentName: Joi.string(),
-        pageNumber: Joi.number(),
-        relevanceScore: Joi.number(),
-      })
-    )
-    .optional(),
+// ─── Chat Save Schema ─────────────────────────────────────────────────────────
+// Supports two formats:
+//   1. Legacy pair format: { chatId?, userMessage, assistantMessage, sources? }
+//   2. Full messages format: { title, messages[], _id? }  ← used by frontend
+const saveChatSchema = Joi.alternatives().try(
+  // Format A: full messages array (frontend sends this)
+  Joi.object({
+    _id: Joi.string().optional(),
+    title: Joi.string().max(200).required(),
+    messages: Joi.array()
+      .items(
+        Joi.object({
+          role: Joi.string().valid('user', 'assistant').required(),
+          content: Joi.string().min(1).required(),
+          sources: Joi.array()
+            .items(
+              Joi.object({
+                documentId: Joi.string(),
+                documentName: Joi.string(),
+                pageNumber: Joi.number(),
+                relevanceScore: Joi.number(),
+                confidence: Joi.string().valid('HIGH', 'MEDIUM', 'LOW'),
+                snippet: Joi.string(),
+                rerankReason: Joi.string().allow(null, ''),
+              }).unknown(true)
+            )
+            .optional(),
+          timestamp: Joi.alternatives().try(Joi.date(), Joi.string()).optional(),
+        })
+      )
+      .min(1)
+      .required(),
+  }),
+  // Format B: legacy pair format
+  Joi.object({
+    chatId: Joi.string().optional(),
+    userMessage: Joi.string().min(1).max(2000).required(),
+    assistantMessage: Joi.string().min(1).required(),
+    sources: Joi.array()
+      .items(
+        Joi.object({
+          documentId: Joi.string(),
+          documentName: Joi.string(),
+          pageNumber: Joi.number(),
+          relevanceScore: Joi.number(),
+        })
+      )
+      .optional(),
+  })
+);
+
+const updateTagsSchema = Joi.object({
+  tags: Joi.array().items(Joi.string().trim().max(50)).max(20).required(),
 });
 
 module.exports = {
@@ -73,5 +112,6 @@ module.exports = {
     query: querySchema,
     uploadMeta: uploadMetaSchema,
     saveChat: saveChatSchema,
+    updateTags: updateTagsSchema,
   },
 };
