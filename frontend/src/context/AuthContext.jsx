@@ -26,14 +26,13 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post("/api/auth/login", { email, password });
       // The backend uses success(res, {token, user}) which wraps result in 'data'
       const { token, user } = response.data.data;
-
       setToken(token);
       setUser(user);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return { success: true };
+      return { success: true, user };
     } catch (error) {
       console.error("Login error:", error);
       return {
@@ -52,9 +51,8 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      return { success: true };
+      return { success: true, user };
     } catch (error) {
       console.error("Registration error:", error);
       return {

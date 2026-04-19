@@ -19,6 +19,7 @@ import ChibiRobotScene from "../components/three/RobotScene";
 import FloatInput from "../components/auth/FloatInput";
 import FloatParticle from "../components/three/BackgroundParticles";
 import useAuth from "../hooks/useAuth";
+import showToast from "../components/ui/Toast";
 
 /* ─── Shimmer Button ─── */
 function ShimmerBtn({ children, style = {}, className = "", isLoading = false, ...props }) {
@@ -66,26 +67,6 @@ function ShimmerBtn({ children, style = {}, className = "", isLoading = false, .
   );
 }
 
-/* ─── Feedback Alert ─── */
-function Alert({ error, success }) {
-  if (!error && !success) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, height: 0, y: -10 }}
-      animate={{ opacity: 1, height: "auto", y: 0 }}
-      exit={{ opacity: 0, height: 0, y: -10 }}
-      className={`flex items-center gap-3 p-3.5 rounded-xl mb-5 border text-sm font-medium`}
-      style={{
-        background: error ? "rgba(239,68,68,0.06)" : "rgba(34,197,94,0.06)",
-        borderColor: error ? "rgba(239,68,68,0.15)" : "rgba(34,197,94,0.15)",
-        color: error ? "#e11d48" : "#15803d",
-      }}
-    >
-      {error ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
-      <span>{error || success}</span>
-    </motion.div>
-  );
-}
 
 /* ─── Typewriter ─── */
 function TW({ text }) {
@@ -167,11 +148,16 @@ export default function AuthPage() {
   const [mode, setMode] = useState("login");
   const [pw, setPw] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-
-  const { login, register } = useAuth();
+  const { login, register, user: authenticatedUser } = useAuth();
   const navigate = useNavigate();
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (authenticatedUser) {
+      if (authenticatedUser.role === "admin") navigate("/admin", { replace: true });
+      else navigate("/", { replace: true }); // Or dashboard
+    }
+  }, [authenticatedUser, navigate]);
 
   const calcStr = (p) => {
     if (!p) return 0;
@@ -227,8 +213,6 @@ export default function AuthPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccessMsg("");
     setIsLoading(true);
 
     const formData = new FormData(e.target);
@@ -238,17 +222,26 @@ export default function AuthPage() {
     setIsLoading(false);
 
     if (result.success) {
-      setSuccessMsg("Success! Redirecting...");
-      setTimeout(() => navigate("/"), 1500);
+      showToast.success("Success! Redirecting...");
+      const targetUser = result.user;
+      
+      // Delay navigation slightly so they see the success toast
+      setTimeout(() => {
+        if (targetUser?.role === "admin") {
+          navigate("/admin");
+        } else {
+          // If they land here and are NOT admin, where should they go?
+          // For now, let's say root, but App.jsx needs to handle root differently
+          navigate("/"); 
+        }
+      }, 1000);
     } else {
-      setError(result.message);
+      showToast.error(result.message);
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccessMsg("");
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
@@ -263,24 +256,30 @@ export default function AuthPage() {
     setIsLoading(false);
 
     if (result.success) {
-      setSuccessMsg("Account created! Redirecting...");
-      setTimeout(() => navigate("/"), 1500);
+      showToast.success("Account created! Redirecting...");
+      const targetUser = result.user;
+      
+      setTimeout(() => {
+        if (targetUser?.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      }, 1000);
     } else {
-      setError(result.message);
+      showToast.error(result.message);
     }
   };
 
   const handleForgot = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccessMsg("");
     setIsLoading(true);
 
     // Simulating API call for forgot password since I can't check/modify backend easily
     // but the UI should be ready for it.
     setTimeout(() => {
       setIsLoading(false);
-      setSuccessMsg("Password reset link sent to your email!");
+      showToast.success("Password reset link sent to your email!");
     }, 2000);
   };
 
@@ -558,19 +557,17 @@ export default function AuthPage() {
           <motion.div
             className="rounded-3xl p-8 relative overflow-hidden"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%)",
+              background: "rgba(255, 255, 255, 0.72)",
               backdropFilter: "blur(28px)",
               WebkitBackdropFilter: "blur(28px)",
-              border: "1px solid rgba(255, 255, 255, 0.5)",
-              boxShadow:
-                "0 20px 50px rgba(0, 0, 0, 0.05), inset 0 0 80px rgba(255, 255, 255, 0.1)",
+              border: "1px solid rgba(255, 255, 255, 0.8)",
+              boxShadow: "0 20px 50px rgba(108, 99, 255, 0.05), inset 0 0 80px rgba(255, 255, 255, 0.2)",
             }}
             animate={{
               boxShadow: [
-                "0 20px 50px rgba(0, 0, 0, 0.05)",
-                "0 25px 60px rgba(108, 99, 255, 0.1)",
-                "0 20px 50px rgba(0, 0, 0, 0.05)",
+                "0 20px 50px rgba(108, 99, 255, 0.04)",
+                "0 25px 60px rgba(108, 99, 255, 0.12)",
+                "0 20px 50px rgba(108, 99, 255, 0.04)",
               ],
             }}
             transition={{ duration: 6, repeat: Infinity }}
@@ -617,11 +614,6 @@ export default function AuthPage() {
                     </p>
                   </motion.div>
 
-                  <AnimatePresence mode="wait">
-                    {(error || successMsg) && mode === "login" && (
-                      <Alert error={error} success={successMsg} />
-                    )}
-                  </AnimatePresence>
 
                   <form
                     onSubmit={handleLogin}
@@ -752,11 +744,6 @@ export default function AuthPage() {
                     </p>
                   </motion.div>
 
-                  <AnimatePresence mode="wait">
-                    {(error || successMsg) && mode === "register" && (
-                      <Alert error={error} success={successMsg} />
-                    )}
-                  </AnimatePresence>
 
                   <form
                     onSubmit={handleRegister}

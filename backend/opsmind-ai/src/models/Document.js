@@ -50,7 +50,7 @@ const documentSchema = new mongoose.Schema(
   }
 );
 
-documentSchema.index({ name: 'text', tags: 1 });
+documentSchema.index({ name: 'text' });
 documentSchema.index({ uploadedBy: 1, status: 1 });
 documentSchema.index({ tags: 1 });
 
