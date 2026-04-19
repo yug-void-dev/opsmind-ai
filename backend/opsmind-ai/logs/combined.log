@@ -1,0 +1,549 @@
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-02.vic7w9c.mongodb.net","timestamp":"2026-04-19 19:52:25"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 19:52:25"}
+{"level":"info","message":"New user registered: yugsharma0019@gmail.com [admin]","timestamp":"2026-04-19 19:53:29"}
+{"level":"http","message":"::1 - - [19/Apr/2026:14:23:29 +0000] \"POST /api/auth/register HTTP/1.1\" 201 502 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 19:53:29"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 19:54:41"}
+{"level":"http","message":"::1 - - [19/Apr/2026:14:24:41 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 19:54:41"}
+{"level":"warn","message":"MongoDB disconnected. Attempting reconnect...","timestamp":"2026-04-19 20:34:40"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-00.vic7w9c.mongodb.net","timestamp":"2026-04-19 20:35:17"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 20:35:17"}
+{"level":"info","message":"New user registered: rajatsharma6441@gmail.com [user]","timestamp":"2026-04-19 20:39:55"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:09:55 +0000] \"POST /api/auth/register HTTP/1.1\" 201 498 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 20:39:55"}
+{"level":"info","message":"New user registered: vishusharma3212@gmail.com [user]","timestamp":"2026-04-19 20:41:39"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:11:39 +0000] \"POST /api/auth/register HTTP/1.1\" 201 498 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 20:41:39"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:30:47 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:00:47"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:31:04 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:01:04"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:31:26 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:01:26"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:32:12 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:02:12"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:32:51 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:02:51"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:33:46 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:03:46"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:34:00 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:04:00"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:34:05 +0000] \"POST /api/auth/login HTTP/1.1\" 401 94 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:04:05"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 21:04:10"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:34:10 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:04:10"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 21:04:54"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:34:54 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:04:54"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 21:05:12"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:35:12 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:05:12"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 21:05:44"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:35:44 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:05:44"}
+{"level":"info","message":"User logged in: yugsharma0019@gmail.com","timestamp":"2026-04-19 21:14:13"}
+{"level":"http","message":"::1 - - [19/Apr/2026:15:44:13 +0000] \"POST /api/auth/login HTTP/1.1\" 200 534 \"http://localhost:5173/login\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:14:13"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:06:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 153 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:36:18"}
+{"level":"error","message":"Upload failed: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fdca4cf59b3a1c11260a'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\c7d29209-caa1-468b-8e70-690b1b028237.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614858184), updatedAt: new Date(1776614858184), __v: 0 }","timestamp":"2026-04-19 21:37:38"}
+{"body":{},"level":"error","message":"[POST] /api/documents/upload → 500: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fdca4cf59b3a1c11260a'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\c7d29209-caa1-468b-8e70-690b1b028237.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614858184), updatedAt: new Date(1776614858184), __v: 0 }","stack":"MongoServerError: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fdca4cf59b3a1c11260a'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\c7d29209-caa1-468b-8e70-690b1b028237.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614858184), updatedAt: new Date(1776614858184), __v: 0 }\n    at InsertOneOperation.handleOk (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n    at tryOperation (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:214:34)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async executeOperation (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:78:16)\n    at async Collection.insertOne (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\collection.js:154:16)","timestamp":"2026-04-19 21:37:38","user":"69e4e560fe9d39adb60c75d4"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:07:38 +0000] \"POST /api/documents/upload HTTP/1.1\" 500 2180 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:37:38"}
+{"level":"error","message":"Upload failed: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fde24cf59b3a1c11260d'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\3e58221b-620c-4af7-a206-fa1717f6edf9.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614882961), updatedAt: new Date(1776614882961), __v: 0 }","timestamp":"2026-04-19 21:38:03"}
+{"body":{},"level":"error","message":"[POST] /api/documents/upload → 500: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fde24cf59b3a1c11260d'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\3e58221b-620c-4af7-a206-fa1717f6edf9.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614882961), updatedAt: new Date(1776614882961), __v: 0 }","stack":"MongoServerError: Field 'tags' of text index contains an array in document: { _id: ObjectId('69e4fde24cf59b3a1c11260d'), name: \"dsa.pdf\", originalName: \"dsa.pdf\", filePath: \"C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\uploads\\3e58221b-620c-4af7-a206-fa1717f6edf9.pdf\", fileSize: 1088734, mimeType: \"application/pdf\", pageCount: 0, chunkCount: 0, tags: [], uploadedBy: ObjectId('69e4e560fe9d39adb60c75d4'), status: \"processing\", createdAt: new Date(1776614882961), updatedAt: new Date(1776614882961), __v: 0 }\n    at InsertOneOperation.handleOk (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n    at tryOperation (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:214:34)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async executeOperation (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:78:16)\n    at async Collection.insertOne (C:\\Users\\rajat\\OneDrive\\Desktop\\Coding\\Empty\\internship\\projects\\ApsMind_AI\\opsmind-ai\\backend\\opsmind-ai\\node_modules\\mongodb\\lib\\collection.js:154:16)","timestamp":"2026-04-19 21:38:03","user":"69e4e560fe9d39adb60c75d4"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:08:03 +0000] \"POST /api/documents/upload HTTP/1.1\" 500 2180 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:38:03"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-02.vic7w9c.mongodb.net","timestamp":"2026-04-19 21:46:55"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 21:46:55"}
+{"level":"info","message":"Document created [69e500398cd1e24d9f14c5c6]: dsa.pdf","timestamp":"2026-04-19 21:48:01"}
+{"level":"info","message":"Starting PDF processing: dsa.pdf","timestamp":"2026-04-19 21:48:01"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:18:02 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 151 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:48:02"}
+{"level":"info","message":"PDF parsed: 112 pages, 154002 characters","timestamp":"2026-04-19 21:48:05"}
+{"level":"info","message":"Valid pages with content: 112/112","timestamp":"2026-04-19 21:48:05"}
+{"level":"info","message":"Generated 233 chunks from dsa.pdf","timestamp":"2026-04-19 21:48:05"}
+{"level":"info","message":"Generating embeddings for 233 chunks...","timestamp":"2026-04-19 21:48:05"}
+{"level":"debug","message":"Embedding batch 1/47","timestamp":"2026-04-19 21:48:05"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:18:05 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:48:05"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:05"}
+{"level":"error","message":"Pipeline error for [69e500398cd1e24d9f14c5c6]: Embedding generation failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:05"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:06"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:06"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:06"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent: [404 Not Found] models/text-embedding-004 is not found for API version v1beta, or is not supported for embedContent. Call ListModels to see the list of available models and their supported methods.","timestamp":"2026-04-19 21:48:06"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:18:11 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1088 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:48:11"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-01.vic7w9c.mongodb.net","timestamp":"2026-04-19 21:55:38"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 21:55:38"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:25:55 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1088 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:55:55"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:25:56 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1088 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:55:56"}
+{"level":"info","message":"SIGINT received. Starting graceful shutdown...","timestamp":"2026-04-19 21:56:03"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-02.vic7w9c.mongodb.net","timestamp":"2026-04-19 21:56:08"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 21:56:08"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:13 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1088 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:13"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:13 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1088 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:13"}
+{"level":"info","message":"Document created [69e50234297f6599125a89b8]: dsa.pdf","timestamp":"2026-04-19 21:56:28"}
+{"level":"info","message":"Starting PDF processing: dsa.pdf","timestamp":"2026-04-19 21:56:28"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:29 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 151 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:29"}
+{"level":"info","message":"PDF parsed: 112 pages, 154002 characters","timestamp":"2026-04-19 21:56:40"}
+{"level":"info","message":"Valid pages with content: 112/112","timestamp":"2026-04-19 21:56:40"}
+{"level":"info","message":"Generated 233 chunks from dsa.pdf","timestamp":"2026-04-19 21:56:41"}
+{"level":"info","message":"Generating embeddings for 233 chunks...","timestamp":"2026-04-19 21:56:41"}
+{"level":"debug","message":"Embedding batch 1/47","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Gemini embedding error: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Gemini embedding error: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Gemini embedding error: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Gemini embedding error: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Gemini embedding error: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"error","message":"Pipeline error for [69e50234297f6599125a89b8]: Embedding generation failed: genAI is not defined","timestamp":"2026-04-19 21:56:41"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:41 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" - - \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:41"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:42 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1710 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:42"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:26:43 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1710 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:56:43"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-01.vic7w9c.mongodb.net","timestamp":"2026-04-19 21:58:05"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 21:58:05"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1710 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:18"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 1710 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:18"}
+{"level":"info","message":"Document created [69e502aa16beab0bb24e85f5]: dsa.pdf","timestamp":"2026-04-19 21:58:26"}
+{"level":"info","message":"Starting PDF processing: dsa.pdf","timestamp":"2026-04-19 21:58:26"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:26 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 151 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:26"}
+{"level":"info","message":"PDF parsed: 112 pages, 154002 characters","timestamp":"2026-04-19 21:58:33"}
+{"level":"info","message":"Valid pages with content: 112/112","timestamp":"2026-04-19 21:58:33"}
+{"level":"info","message":"Generated 233 chunks from dsa.pdf","timestamp":"2026-04-19 21:58:33"}
+{"level":"info","message":"Generating embeddings for 233 chunks...","timestamp":"2026-04-19 21:58:33"}
+{"level":"debug","message":"Embedding batch 1/47","timestamp":"2026-04-19 21:58:33"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:34 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 2266 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:34"}
+{"level":"debug","message":"Embedding batch 2/47","timestamp":"2026-04-19 21:58:35"}
+{"level":"debug","message":"Embedding batch 3/47","timestamp":"2026-04-19 21:58:37"}
+{"level":"debug","message":"Embedding batch 4/47","timestamp":"2026-04-19 21:58:38"}
+{"level":"debug","message":"Embedding batch 5/47","timestamp":"2026-04-19 21:58:39"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:39 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 2266 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:39"}
+{"level":"debug","message":"Embedding batch 6/47","timestamp":"2026-04-19 21:58:40"}
+{"level":"debug","message":"Embedding batch 7/47","timestamp":"2026-04-19 21:58:41"}
+{"level":"debug","message":"Embedding batch 8/47","timestamp":"2026-04-19 21:58:42"}
+{"level":"debug","message":"Embedding batch 9/47","timestamp":"2026-04-19 21:58:44"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:44 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 2266 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:44"}
+{"level":"debug","message":"Embedding batch 10/47","timestamp":"2026-04-19 21:58:45"}
+{"level":"debug","message":"Embedding batch 11/47","timestamp":"2026-04-19 21:58:46"}
+{"level":"debug","message":"Embedding batch 12/47","timestamp":"2026-04-19 21:58:47"}
+{"level":"debug","message":"Embedding batch 13/47","timestamp":"2026-04-19 21:58:48"}
+{"level":"debug","message":"Embedding batch 14/47","timestamp":"2026-04-19 21:58:50"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:50 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 2266 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:50"}
+{"level":"debug","message":"Embedding batch 15/47","timestamp":"2026-04-19 21:58:51"}
+{"level":"debug","message":"Embedding batch 16/47","timestamp":"2026-04-19 21:58:52"}
+{"level":"debug","message":"Embedding batch 17/47","timestamp":"2026-04-19 21:58:53"}
+{"level":"debug","message":"Embedding batch 18/47","timestamp":"2026-04-19 21:58:54"}
+{"level":"debug","message":"Embedding batch 19/47","timestamp":"2026-04-19 21:58:55"}
+{"level":"debug","message":"Embedding batch 20/47","timestamp":"2026-04-19 21:58:56"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:28:56 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 2266 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:58:56"}
+{"level":"debug","message":"Embedding batch 21/47","timestamp":"2026-04-19 21:58:57"}
+{"level":"debug","message":"Embedding batch 22/47","timestamp":"2026-04-19 21:58:58"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.203488878s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-embedding-1.0\",\"location\":\"global\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"error","message":"Pipeline error for [69e502aa16beab0bb24e85f5]: Embedding generation failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.203488878s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-embedding-1.0\",\"location\":\"global\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.18996104s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-embedding-1.0\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.195971091s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-embedding-1.0\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.198367536s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-embedding-1.0\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/embed_content_free_tier_requests, limit: 100, model: gemini-embedding-1.0\nPlease retry in 57.1958957s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/embed_content_free_tier_requests\",\"quotaId\":\"EmbedContentRequestsPerMinutePerUserPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-embedding-1.0\"},\"quotaValue\":\"100\"}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"57s\"}]","timestamp":"2026-04-19 21:58:59"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:29:02 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 3500 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 21:59:02"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-01.vic7w9c.mongodb.net","timestamp":"2026-04-19 22:00:31"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 22:00:31"}
+{"level":"info","message":"Document created [69e5033adeedc83be8debfce]: dsa.pdf","timestamp":"2026-04-19 22:00:50"}
+{"level":"info","message":"Starting PDF processing: dsa.pdf","timestamp":"2026-04-19 22:00:50"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:30:51 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 151 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:00:51"}
+{"level":"info","message":"PDF parsed: 112 pages, 154002 characters","timestamp":"2026-04-19 22:00:59"}
+{"level":"info","message":"Valid pages with content: 112/112","timestamp":"2026-04-19 22:00:59"}
+{"level":"info","message":"Generated 233 chunks from dsa.pdf","timestamp":"2026-04-19 22:00:59"}
+{"level":"info","message":"Generating embeddings for 233 chunks...","timestamp":"2026-04-19 22:00:59"}
+{"level":"debug","message":"Embedding batch 1/47","timestamp":"2026-04-19 22:00:59"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:01 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:01"}
+{"level":"debug","message":"Embedding batch 2/47","timestamp":"2026-04-19 22:01:03"}
+{"level":"debug","message":"Embedding batch 3/47","timestamp":"2026-04-19 22:01:05"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:06 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:06"}
+{"level":"debug","message":"Embedding batch 4/47","timestamp":"2026-04-19 22:01:07"}
+{"level":"debug","message":"Embedding batch 5/47","timestamp":"2026-04-19 22:01:08"}
+{"level":"debug","message":"Embedding batch 6/47","timestamp":"2026-04-19 22:01:10"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:11 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:11"}
+{"level":"debug","message":"Embedding batch 7/47","timestamp":"2026-04-19 22:01:12"}
+{"level":"debug","message":"Embedding batch 8/47","timestamp":"2026-04-19 22:01:14"}
+{"level":"debug","message":"Embedding batch 9/47","timestamp":"2026-04-19 22:01:16"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:16 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:16"}
+{"level":"debug","message":"Embedding batch 10/47","timestamp":"2026-04-19 22:01:18"}
+{"level":"debug","message":"Embedding batch 11/47","timestamp":"2026-04-19 22:01:20"}
+{"level":"debug","message":"Embedding batch 12/47","timestamp":"2026-04-19 22:01:22"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:22 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:22"}
+{"level":"debug","message":"Embedding batch 13/47","timestamp":"2026-04-19 22:01:24"}
+{"level":"debug","message":"Embedding batch 14/47","timestamp":"2026-04-19 22:01:26"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:28 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:28"}
+{"level":"debug","message":"Embedding batch 15/47","timestamp":"2026-04-19 22:01:28"}
+{"level":"debug","message":"Embedding batch 16/47","timestamp":"2026-04-19 22:01:30"}
+{"level":"debug","message":"Embedding batch 17/47","timestamp":"2026-04-19 22:01:32"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 4056 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:33"}
+{"level":"debug","message":"Embedding batch 18/47","timestamp":"2026-04-19 22:01:34"}
+{"level":"warn","message":"MongoDB disconnected. Attempting reconnect...","timestamp":"2026-04-19 22:01:48"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"error","message":"Pipeline error for [69e5033adeedc83be8debfce]: Embedding generation failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"error","message":"Gemini embedding error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent: fetch failed","timestamp":"2026-04-19 22:01:52"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:31:57 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" - - \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:01:57"}
+{"level":"error","message":"Auth middleware error: read ECONNRESET","timestamp":"2026-04-19 22:01:58"}
+{"level":"error","message":"Unhandled Rejection:","reason":"38410000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n","timestamp":"2026-04-19 22:02:02"}
+{"level":"error","message":"Auth middleware error: 38410000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n","timestamp":"2026-04-19 22:02:09"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:32:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 401 90 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:02:09"}
+{"level":"error","message":"Auth middleware error: 38410000:error:0A000438:SSL routines:ssl3_read_bytes:tlsv1 alert internal error:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\rec_layer_s3.c:1605:SSL alert number 80\n","timestamp":"2026-04-19 22:02:19"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:32:19 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 401 90 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:02:19"}
+{"level":"info","message":"SIGINT received. Starting graceful shutdown...","timestamp":"2026-04-19 22:02:23"}
+{"level":"error","message":"MongoDB connection failed: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","timestamp":"2026-04-19 22:02:41"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-00.vic7w9c.mongodb.net","timestamp":"2026-04-19 22:05:31"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 22:05:32"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:35:39 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 153 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:05:39"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:35:39 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 153 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:05:39"}
+{"level":"info","message":"Document created [69e50469ecff72e9d4b30657]: progit.pdf","timestamp":"2026-04-19 22:05:54"}
+{"level":"info","message":"Starting PDF processing: progit.pdf","timestamp":"2026-04-19 22:05:54"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:35:56 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 154 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:05:56"}
+{"level":"info","message":"PDF parsed: 501 pages, 949702 characters","timestamp":"2026-04-19 22:06:07"}
+{"level":"info","message":"Valid pages with content: 500/501","timestamp":"2026-04-19 22:06:07"}
+{"level":"info","message":"Generated 1316 chunks from progit.pdf","timestamp":"2026-04-19 22:06:07"}
+{"level":"info","message":"Generating embeddings for 1316 chunks...","timestamp":"2026-04-19 22:06:07"}
+{"level":"debug","message":"Embedding batch 1/264","timestamp":"2026-04-19 22:06:07"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:08 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" - - \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:08"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:09"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:09"}
+{"level":"debug","message":"Embedding batch 2/264","timestamp":"2026-04-19 22:06:11"}
+{"level":"debug","message":"Embedding batch 3/264","timestamp":"2026-04-19 22:06:13"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:15 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:15"}
+{"level":"debug","message":"Embedding batch 4/264","timestamp":"2026-04-19 22:06:15"}
+{"level":"debug","message":"Embedding batch 5/264","timestamp":"2026-04-19 22:06:17"}
+{"level":"debug","message":"Embedding batch 6/264","timestamp":"2026-04-19 22:06:19"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:21 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:21"}
+{"level":"debug","message":"Embedding batch 7/264","timestamp":"2026-04-19 22:06:21"}
+{"level":"debug","message":"Embedding batch 8/264","timestamp":"2026-04-19 22:06:23"}
+{"level":"debug","message":"Embedding batch 9/264","timestamp":"2026-04-19 22:06:25"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:26 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:26"}
+{"level":"debug","message":"Embedding batch 10/264","timestamp":"2026-04-19 22:06:27"}
+{"level":"debug","message":"Embedding batch 11/264","timestamp":"2026-04-19 22:06:29"}
+{"level":"debug","message":"Embedding batch 12/264","timestamp":"2026-04-19 22:06:31"}
+{"level":"debug","message":"Embedding batch 13/264","timestamp":"2026-04-19 22:06:33"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:33"}
+{"level":"debug","message":"Embedding batch 14/264","timestamp":"2026-04-19 22:06:35"}
+{"level":"debug","message":"Embedding batch 15/264","timestamp":"2026-04-19 22:06:37"}
+{"level":"debug","message":"Embedding batch 16/264","timestamp":"2026-04-19 22:06:38"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:39 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:39"}
+{"level":"debug","message":"Embedding batch 17/264","timestamp":"2026-04-19 22:06:41"}
+{"level":"debug","message":"Embedding batch 18/264","timestamp":"2026-04-19 22:06:43"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:44 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:44"}
+{"level":"debug","message":"Embedding batch 19/264","timestamp":"2026-04-19 22:06:45"}
+{"level":"debug","message":"Embedding batch 20/264","timestamp":"2026-04-19 22:06:47"}
+{"level":"debug","message":"Embedding batch 21/264","timestamp":"2026-04-19 22:06:49"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:51 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:51"}
+{"level":"debug","message":"Embedding batch 22/264","timestamp":"2026-04-19 22:06:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:06:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:06:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:06:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:06:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:06:51"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:36:57 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:06:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:06:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:06:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:06:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:06:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:06:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:03 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:03"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:09"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:15 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:15"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:21 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:21"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:27 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:27"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:33"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:38 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:38"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:43 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:43"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:48 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:48"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:53 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:53"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:37:58 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:07:58"}
+{"level":"debug","message":"Embedding batch 23/264","timestamp":"2026-04-19 22:07:59"}
+{"level":"debug","message":"Embedding batch 24/264","timestamp":"2026-04-19 22:08:02"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:03 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:03"}
+{"level":"debug","message":"Embedding batch 25/264","timestamp":"2026-04-19 22:08:04"}
+{"level":"debug","message":"Embedding batch 26/264","timestamp":"2026-04-19 22:08:05"}
+{"level":"debug","message":"Embedding batch 27/264","timestamp":"2026-04-19 22:08:07"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:08 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:08"}
+{"level":"debug","message":"Embedding batch 28/264","timestamp":"2026-04-19 22:08:09"}
+{"level":"debug","message":"Embedding batch 29/264","timestamp":"2026-04-19 22:08:11"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:13 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:13"}
+{"level":"debug","message":"Embedding batch 30/264","timestamp":"2026-04-19 22:08:13"}
+{"level":"debug","message":"Embedding batch 31/264","timestamp":"2026-04-19 22:08:15"}
+{"level":"debug","message":"Embedding batch 32/264","timestamp":"2026-04-19 22:08:17"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:18"}
+{"level":"debug","message":"Embedding batch 33/264","timestamp":"2026-04-19 22:08:19"}
+{"level":"debug","message":"Embedding batch 34/264","timestamp":"2026-04-19 22:08:21"}
+{"level":"debug","message":"Embedding batch 35/264","timestamp":"2026-04-19 22:08:23"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:23 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:23"}
+{"level":"debug","message":"Embedding batch 36/264","timestamp":"2026-04-19 22:08:25"}
+{"level":"debug","message":"Embedding batch 37/264","timestamp":"2026-04-19 22:08:27"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:28 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:28"}
+{"level":"debug","message":"Embedding batch 38/264","timestamp":"2026-04-19 22:08:29"}
+{"level":"debug","message":"Embedding batch 39/264","timestamp":"2026-04-19 22:08:31"}
+{"level":"debug","message":"Embedding batch 40/264","timestamp":"2026-04-19 22:08:33"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:38:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:08:33"}
+{"level":"debug","message":"Embedding batch 41/264","timestamp":"2026-04-19 22:08:35"}
+{"level":"debug","message":"Embedding batch 42/264","timestamp":"2026-04-19 22:08:37"}
+{"level":"debug","message":"Embedding batch 43/264","timestamp":"2026-04-19 22:08:39"}
+{"level":"debug","message":"Embedding batch 44/264","timestamp":"2026-04-19 22:08:41"}
+{"level":"debug","message":"Embedding batch 45/264","timestamp":"2026-04-19 22:08:43"}
+{"level":"debug","message":"Embedding batch 46/264","timestamp":"2026-04-19 22:08:45"}
+{"level":"debug","message":"Embedding batch 47/264","timestamp":"2026-04-19 22:08:47"}
+{"level":"debug","message":"Embedding batch 48/264","timestamp":"2026-04-19 22:08:49"}
+{"level":"debug","message":"Embedding batch 49/264","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:08:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:08:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:08:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:08:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:08:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:08:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:39:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:09:33"}
+{"level":"debug","message":"Embedding batch 50/264","timestamp":"2026-04-19 22:09:59"}
+{"level":"debug","message":"Embedding batch 51/264","timestamp":"2026-04-19 22:10:01"}
+{"level":"debug","message":"Embedding batch 52/264","timestamp":"2026-04-19 22:10:03"}
+{"level":"debug","message":"Embedding batch 53/264","timestamp":"2026-04-19 22:10:05"}
+{"level":"debug","message":"Embedding batch 54/264","timestamp":"2026-04-19 22:10:07"}
+{"level":"debug","message":"Embedding batch 55/264","timestamp":"2026-04-19 22:10:09"}
+{"level":"debug","message":"Embedding batch 56/264","timestamp":"2026-04-19 22:10:11"}
+{"level":"debug","message":"Embedding batch 57/264","timestamp":"2026-04-19 22:10:13"}
+{"level":"debug","message":"Embedding batch 58/264","timestamp":"2026-04-19 22:10:15"}
+{"level":"debug","message":"Embedding batch 59/264","timestamp":"2026-04-19 22:10:17"}
+{"level":"debug","message":"Embedding batch 60/264","timestamp":"2026-04-19 22:10:19"}
+{"level":"debug","message":"Embedding batch 61/264","timestamp":"2026-04-19 22:10:21"}
+{"level":"debug","message":"Embedding batch 62/264","timestamp":"2026-04-19 22:10:23"}
+{"level":"debug","message":"Embedding batch 63/264","timestamp":"2026-04-19 22:10:25"}
+{"level":"debug","message":"Embedding batch 64/264","timestamp":"2026-04-19 22:10:27"}
+{"level":"debug","message":"Embedding batch 65/264","timestamp":"2026-04-19 22:10:29"}
+{"level":"debug","message":"Embedding batch 66/264","timestamp":"2026-04-19 22:10:31"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:40:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:10:33"}
+{"level":"debug","message":"Embedding batch 67/264","timestamp":"2026-04-19 22:10:33"}
+{"level":"debug","message":"Embedding batch 68/264","timestamp":"2026-04-19 22:10:35"}
+{"level":"debug","message":"Embedding batch 69/264","timestamp":"2026-04-19 22:10:37"}
+{"level":"debug","message":"Embedding batch 70/264","timestamp":"2026-04-19 22:10:39"}
+{"level":"debug","message":"Embedding batch 71/264","timestamp":"2026-04-19 22:10:41"}
+{"level":"debug","message":"Embedding batch 72/264","timestamp":"2026-04-19 22:10:43"}
+{"level":"debug","message":"Embedding batch 73/264","timestamp":"2026-04-19 22:10:45"}
+{"level":"debug","message":"Embedding batch 74/264","timestamp":"2026-04-19 22:10:47"}
+{"level":"debug","message":"Embedding batch 75/264","timestamp":"2026-04-19 22:10:49"}
+{"level":"debug","message":"Embedding batch 76/264","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:10:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:10:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:10:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:10:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:10:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:10:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:41:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:11:33"}
+{"level":"debug","message":"Embedding batch 77/264","timestamp":"2026-04-19 22:12:00"}
+{"level":"debug","message":"Embedding batch 78/264","timestamp":"2026-04-19 22:12:02"}
+{"level":"debug","message":"Embedding batch 79/264","timestamp":"2026-04-19 22:12:04"}
+{"level":"debug","message":"Embedding batch 80/264","timestamp":"2026-04-19 22:12:06"}
+{"level":"debug","message":"Embedding batch 81/264","timestamp":"2026-04-19 22:12:08"}
+{"level":"debug","message":"Embedding batch 82/264","timestamp":"2026-04-19 22:12:10"}
+{"level":"debug","message":"Embedding batch 83/264","timestamp":"2026-04-19 22:12:12"}
+{"level":"debug","message":"Embedding batch 84/264","timestamp":"2026-04-19 22:12:14"}
+{"level":"debug","message":"Embedding batch 85/264","timestamp":"2026-04-19 22:12:16"}
+{"level":"debug","message":"Embedding batch 86/264","timestamp":"2026-04-19 22:12:18"}
+{"level":"debug","message":"Embedding batch 87/264","timestamp":"2026-04-19 22:12:20"}
+{"level":"debug","message":"Embedding batch 88/264","timestamp":"2026-04-19 22:12:22"}
+{"level":"debug","message":"Embedding batch 89/264","timestamp":"2026-04-19 22:12:24"}
+{"level":"debug","message":"Embedding batch 90/264","timestamp":"2026-04-19 22:12:26"}
+{"level":"debug","message":"Embedding batch 91/264","timestamp":"2026-04-19 22:12:28"}
+{"level":"debug","message":"Embedding batch 92/264","timestamp":"2026-04-19 22:12:30"}
+{"level":"debug","message":"Embedding batch 93/264","timestamp":"2026-04-19 22:12:32"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:42:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:12:33"}
+{"level":"debug","message":"Embedding batch 94/264","timestamp":"2026-04-19 22:12:34"}
+{"level":"debug","message":"Embedding batch 95/264","timestamp":"2026-04-19 22:12:36"}
+{"level":"debug","message":"Embedding batch 96/264","timestamp":"2026-04-19 22:12:38"}
+{"level":"debug","message":"Embedding batch 97/264","timestamp":"2026-04-19 22:12:40"}
+{"level":"debug","message":"Embedding batch 98/264","timestamp":"2026-04-19 22:12:42"}
+{"level":"debug","message":"Embedding batch 99/264","timestamp":"2026-04-19 22:12:44"}
+{"level":"debug","message":"Embedding batch 100/264","timestamp":"2026-04-19 22:12:46"}
+{"level":"debug","message":"Embedding batch 101/264","timestamp":"2026-04-19 22:12:48"}
+{"level":"debug","message":"Embedding batch 102/264","timestamp":"2026-04-19 22:12:50"}
+{"level":"debug","message":"Embedding batch 103/264","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:12:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:12:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:12:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:12:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:12:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:12:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:43:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:13:33"}
+{"level":"debug","message":"Embedding batch 104/264","timestamp":"2026-04-19 22:14:01"}
+{"level":"debug","message":"Embedding batch 105/264","timestamp":"2026-04-19 22:14:03"}
+{"level":"debug","message":"Embedding batch 106/264","timestamp":"2026-04-19 22:14:05"}
+{"level":"debug","message":"Embedding batch 107/264","timestamp":"2026-04-19 22:14:07"}
+{"level":"debug","message":"Embedding batch 108/264","timestamp":"2026-04-19 22:14:09"}
+{"level":"debug","message":"Embedding batch 109/264","timestamp":"2026-04-19 22:14:11"}
+{"level":"debug","message":"Embedding batch 110/264","timestamp":"2026-04-19 22:14:13"}
+{"level":"debug","message":"Embedding batch 111/264","timestamp":"2026-04-19 22:14:15"}
+{"level":"debug","message":"Embedding batch 112/264","timestamp":"2026-04-19 22:14:17"}
+{"level":"debug","message":"Embedding batch 113/264","timestamp":"2026-04-19 22:14:19"}
+{"level":"debug","message":"Embedding batch 114/264","timestamp":"2026-04-19 22:14:22"}
+{"level":"debug","message":"Embedding batch 115/264","timestamp":"2026-04-19 22:14:23"}
+{"level":"debug","message":"Embedding batch 116/264","timestamp":"2026-04-19 22:14:25"}
+{"level":"debug","message":"Embedding batch 117/264","timestamp":"2026-04-19 22:14:27"}
+{"level":"debug","message":"Embedding batch 118/264","timestamp":"2026-04-19 22:14:29"}
+{"level":"debug","message":"Embedding batch 119/264","timestamp":"2026-04-19 22:14:31"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:44:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:14:33"}
+{"level":"debug","message":"Embedding batch 120/264","timestamp":"2026-04-19 22:14:33"}
+{"level":"debug","message":"Embedding batch 121/264","timestamp":"2026-04-19 22:14:35"}
+{"level":"debug","message":"Embedding batch 122/264","timestamp":"2026-04-19 22:14:38"}
+{"level":"debug","message":"Embedding batch 123/264","timestamp":"2026-04-19 22:14:40"}
+{"level":"debug","message":"Embedding batch 124/264","timestamp":"2026-04-19 22:14:42"}
+{"level":"debug","message":"Embedding batch 125/264","timestamp":"2026-04-19 22:14:44"}
+{"level":"debug","message":"Embedding batch 126/264","timestamp":"2026-04-19 22:14:46"}
+{"level":"debug","message":"Embedding batch 127/264","timestamp":"2026-04-19 22:14:48"}
+{"level":"debug","message":"Embedding batch 128/264","timestamp":"2026-04-19 22:14:50"}
+{"level":"debug","message":"Embedding batch 129/264","timestamp":"2026-04-19 22:14:51"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:14:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:14:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:14:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:14:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 6s (attempt 1/5)...","timestamp":"2026-04-19 22:14:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:14:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:14:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:14:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:14:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 2/5)...","timestamp":"2026-04-19 22:14:58"}
+{"level":"warn","message":"MongoDB disconnected. Attempting reconnect...","timestamp":"2026-04-19 22:15:02"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:45:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:15:33"}
+{"level":"debug","message":"Embedding batch 130/264","timestamp":"2026-04-19 22:15:59"}
+{"level":"debug","message":"Embedding batch 131/264","timestamp":"2026-04-19 22:16:01"}
+{"level":"debug","message":"Embedding batch 132/264","timestamp":"2026-04-19 22:16:03"}
+{"level":"debug","message":"Embedding batch 133/264","timestamp":"2026-04-19 22:16:05"}
+{"level":"debug","message":"Embedding batch 134/264","timestamp":"2026-04-19 22:16:07"}
+{"level":"debug","message":"Embedding batch 135/264","timestamp":"2026-04-19 22:16:09"}
+{"level":"debug","message":"Embedding batch 136/264","timestamp":"2026-04-19 22:16:11"}
+{"level":"debug","message":"Embedding batch 137/264","timestamp":"2026-04-19 22:16:13"}
+{"level":"debug","message":"Embedding batch 138/264","timestamp":"2026-04-19 22:16:15"}
+{"level":"debug","message":"Embedding batch 139/264","timestamp":"2026-04-19 22:16:17"}
+{"level":"debug","message":"Embedding batch 140/264","timestamp":"2026-04-19 22:16:20"}
+{"level":"debug","message":"Embedding batch 141/264","timestamp":"2026-04-19 22:16:22"}
+{"level":"debug","message":"Embedding batch 142/264","timestamp":"2026-04-19 22:16:24"}
+{"level":"debug","message":"Embedding batch 143/264","timestamp":"2026-04-19 22:16:26"}
+{"level":"debug","message":"Embedding batch 144/264","timestamp":"2026-04-19 22:16:28"}
+{"level":"debug","message":"Embedding batch 145/264","timestamp":"2026-04-19 22:16:30"}
+{"level":"debug","message":"Embedding batch 146/264","timestamp":"2026-04-19 22:16:32"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:46:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:16:33"}
+{"level":"debug","message":"Embedding batch 147/264","timestamp":"2026-04-19 22:16:34"}
+{"level":"debug","message":"Embedding batch 148/264","timestamp":"2026-04-19 22:16:36"}
+{"level":"debug","message":"Embedding batch 149/264","timestamp":"2026-04-19 22:16:38"}
+{"level":"debug","message":"Embedding batch 150/264","timestamp":"2026-04-19 22:16:40"}
+{"level":"debug","message":"Embedding batch 151/264","timestamp":"2026-04-19 22:16:42"}
+{"level":"debug","message":"Embedding batch 152/264","timestamp":"2026-04-19 22:16:44"}
+{"level":"debug","message":"Embedding batch 153/264","timestamp":"2026-04-19 22:16:46"}
+{"level":"debug","message":"Embedding batch 154/264","timestamp":"2026-04-19 22:16:48"}
+{"level":"debug","message":"Embedding batch 155/264","timestamp":"2026-04-19 22:16:50"}
+{"level":"debug","message":"Embedding batch 156/264","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 5s (attempt 1/5)...","timestamp":"2026-04-19 22:16:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:16:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:16:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:16:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:16:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:16:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:47:33 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:17:33"}
+{"level":"debug","message":"Embedding batch 157/264","timestamp":"2026-04-19 22:18:00"}
+{"level":"debug","message":"Embedding batch 158/264","timestamp":"2026-04-19 22:18:02"}
+{"level":"debug","message":"Embedding batch 159/264","timestamp":"2026-04-19 22:18:04"}
+{"level":"debug","message":"Embedding batch 160/264","timestamp":"2026-04-19 22:18:06"}
+{"level":"debug","message":"Embedding batch 161/264","timestamp":"2026-04-19 22:18:08"}
+{"level":"debug","message":"Embedding batch 162/264","timestamp":"2026-04-19 22:18:10"}
+{"level":"warn","message":"Rate limit hit. Retrying in 47s (attempt 1/5)...","timestamp":"2026-04-19 22:18:10"}
+{"level":"warn","message":"Rate limit hit. Retrying in 47s (attempt 1/5)...","timestamp":"2026-04-19 22:18:10"}
+{"level":"warn","message":"Rate limit hit. Retrying in 47s (attempt 1/5)...","timestamp":"2026-04-19 22:18:10"}
+{"level":"warn","message":"Rate limit hit. Retrying in 47s (attempt 1/5)...","timestamp":"2026-04-19 22:18:10"}
+{"level":"warn","message":"Rate limit hit. Retrying in 47s (attempt 1/5)...","timestamp":"2026-04-19 22:18:10"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-01.vic7w9c.mongodb.net","timestamp":"2026-04-19 22:18:51"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 22:18:51"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:48:54 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:18:54"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:00 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:00"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:06 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:06"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:12 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:12"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:18"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:24 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:24"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:29 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:29"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:36 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:36"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:41 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:41"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:48 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:48"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:54 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:54"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:49:59 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:19:59"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:06 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:06"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:11 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:11"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:18"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:24 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:24"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:30 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:30"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:35 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:35"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:42 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:42"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:48 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 715 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:48"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:53 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:53"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:50:58 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:20:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:51:03 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:21:03"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:51:08 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:21:08"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:51:13 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:21:13"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:51:18 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:21:18"}
+{"level":"info","message":"SIGINT received. Starting graceful shutdown...","timestamp":"2026-04-19 22:21:19"}
+{"level":"info","message":"MongoDB Atlas connected: ac-nl4u2ck-shard-00-02.vic7w9c.mongodb.net","timestamp":"2026-04-19 22:22:08"}
+{"level":"info","message":"\n╔════════════════════════════════════════╗\n║          OpsMind AI Backend            ║\n║     Enterprise SOP Knowledge Agent     ║\n╠════════════════════════════════════════╣\n║  Port    : 3000                        ║\n║  Env     : development             ║\n║  LLM     : gemini                  ║\n╚════════════════════════════════════════╝\n      ","timestamp":"2026-04-19 22:22:08"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 153 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:09"}
+{"level":"info","message":"Document created [69e508439a58a9fce22f1edb]: dsa.pdf","timestamp":"2026-04-19 22:22:20"}
+{"level":"info","message":"Starting PDF processing: dsa.pdf","timestamp":"2026-04-19 22:22:20"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:20 +0000] \"POST /api/documents/upload HTTP/1.1\" 202 151 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:20"}
+{"level":"info","message":"PDF parsed: 112 pages, 154002 characters","timestamp":"2026-04-19 22:22:27"}
+{"level":"info","message":"Valid pages with content: 112/112","timestamp":"2026-04-19 22:22:27"}
+{"level":"info","message":"Generated 233 chunks from dsa.pdf","timestamp":"2026-04-19 22:22:27"}
+{"level":"info","message":"Generating embeddings for 233 chunks...","timestamp":"2026-04-19 22:22:27"}
+{"level":"debug","message":"Embedding batch 1/47","timestamp":"2026-04-19 22:22:27"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:28 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:28"}
+{"level":"warn","message":"Rate limit hit. Retrying in 29s (attempt 1/5)...","timestamp":"2026-04-19 22:22:28"}
+{"level":"warn","message":"Rate limit hit. Retrying in 29s (attempt 1/5)...","timestamp":"2026-04-19 22:22:28"}
+{"level":"warn","message":"Rate limit hit. Retrying in 29s (attempt 1/5)...","timestamp":"2026-04-19 22:22:28"}
+{"level":"warn","message":"Rate limit hit. Retrying in 29s (attempt 1/5)...","timestamp":"2026-04-19 22:22:28"}
+{"level":"warn","message":"Rate limit hit. Retrying in 29s (attempt 1/5)...","timestamp":"2026-04-19 22:22:28"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:34 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:34"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:40 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:40"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:46 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:46"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:52 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:52"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:22:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:22:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:22:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:52:58 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:22:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:22:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 2/5)...","timestamp":"2026-04-19 22:22:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:04 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:04"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:10 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:10"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:16 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:16"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:22 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:22"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:28 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:28"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:34 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:34"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:40 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:40"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:45 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:45"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:51 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:51"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:53:57 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:23:57"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 3/5)...","timestamp":"2026-04-19 22:23:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 3/5)...","timestamp":"2026-04-19 22:23:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 3/5)...","timestamp":"2026-04-19 22:23:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 3/5)...","timestamp":"2026-04-19 22:23:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 3/5)...","timestamp":"2026-04-19 22:23:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:03 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:03"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 200 708 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:09"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:14 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:14"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:19 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:19"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:24 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:24"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:29 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:29"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:34 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:34"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:39 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:39"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:44 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:44"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:49 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:49"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:54 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:54"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 4/5)...","timestamp":"2026-04-19 22:24:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 4/5)...","timestamp":"2026-04-19 22:24:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 60s (attempt 4/5)...","timestamp":"2026-04-19 22:24:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 4/5)...","timestamp":"2026-04-19 22:24:58"}
+{"level":"warn","message":"Rate limit hit. Retrying in 59s (attempt 4/5)...","timestamp":"2026-04-19 22:24:58"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:54:59 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:24:59"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:04 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:04"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:09 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:09"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:14 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:14"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:19 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:19"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:24 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:24"}
+{"level":"http","message":"::1 - - [19/Apr/2026:16:55:29 +0000] \"GET /api/documents?limit=5 HTTP/1.1\" 429 80 \"http://localhost:5173/admin/upload\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36\"","timestamp":"2026-04-19 22:25:29"}
+{"level":"info","message":"SIGINT received. Starting graceful shutdown...","timestamp":"2026-04-19 22:25:33"}
