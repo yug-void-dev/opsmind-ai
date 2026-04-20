@@ -913,7 +913,6 @@ export function AdminDocuments() {
           items={items}
           perPage={5}
           onDelete={handleDelete}
-          onView={(item) => console.log("Viewing:", item)}
         />
       )}
 
