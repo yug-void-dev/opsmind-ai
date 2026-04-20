@@ -50,6 +50,39 @@ export const showToast = {
       className: "glass-toast warning",
     });
   },
+  loading: (message, options = {}) => {
+    return toast.loading(message, {
+      ...toastConfig,
+      ...options,
+      icon: <Info className="text-sky-500 animate-pulse" size={20} />,
+      className: "glass-toast info",
+    });
+  },
+  updateSuccess: (id, message, options = {}) => {
+    toast.update(id, {
+      render: message,
+      type: "success",
+      isLoading: false,
+      autoClose: 4000,
+      icon: <CheckCircle2 className="text-emerald-500" size={20} />,
+      className: "glass-toast success",
+      ...options,
+    });
+  },
+  updateError: (id, message, options = {}) => {
+    toast.update(id, {
+      render: message,
+      type: "error",
+      isLoading: false,
+      autoClose: 4000,
+      icon: <XCircle className="text-rose-500" size={20} />,
+      className: "glass-toast error",
+      ...options,
+    });
+  },
+  dismiss: (id) => {
+    toast.dismiss(id);
+  },
 };
 
 export default showToast;

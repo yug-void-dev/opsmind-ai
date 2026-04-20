@@ -12,6 +12,15 @@ const { authenticate, authorize }                    = require('../middlewares/a
 const { upload, handleUploadError, validateUploadedFile } = require('../middlewares/upload');
 const { validate, schemas }                          = require('../middlewares/validate');
 
+const rateLimit = require('express-rate-limit');
+
+// Upload — expensive (embedding API costs); 25 uploads / hour
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max     : 25,
+  message : { success: false, message: 'Upload limit reached — maximum 25 uploads per hour.' },
+});
+
 // All document routes require authentication
 router.use(authenticate);
 
@@ -19,6 +28,7 @@ router.use(authenticate);
 // upload.single → handleUploadError (multer) → validateUploadedFile (magic bytes) → controller
 router.post(
   '/upload',
+  uploadLimiter,
   upload.single('file'),
   handleUploadError,
   validateUploadedFile,

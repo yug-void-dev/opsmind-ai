@@ -9,7 +9,7 @@ module.exports = {
 
   // ─── MongoDB Atlas Vector Search ────────────────────────────────────────────
   vectorIndexName: process.env.VECTOR_INDEX_NAME || 'vector_index',
-  embeddingDimensions: 768, // Gemini text-embedding-004 → 768 dims
+  embeddingDimensions: 3072, // gemini-embedding-001 → 3072 dims
 
   // ─── Chunking ────────────────────────────────────────────────────────────────
   chunkSize: parseInt(process.env.CHUNK_SIZE) || 1000,

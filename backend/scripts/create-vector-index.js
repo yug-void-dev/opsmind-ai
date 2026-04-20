@@ -38,7 +38,7 @@ const vectorIndexDefinition = {
       {
         type: 'vector',
         path: 'embedding',
-        numDimensions: 768, // Gemini text-embedding-004
+        numDimensions: 3072, // gemini-embedding-001 → 3072 dims
         similarity: 'cosine',
       },
       {

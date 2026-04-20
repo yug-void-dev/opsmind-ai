@@ -23,7 +23,7 @@ const getGeminiClient = () => {
 // ─── Retry Utility ──────────────────────────────────────────────────────────
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const withRetry = async (fn, { maxRetries = 3, baseDelayMs = 500, label = 'operation' } = {}) => {
+const withRetry = async (fn, { maxRetries = 7, baseDelayMs = 500, label = 'operation' } = {}) => {
   let lastError;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -38,8 +38,15 @@ const withRetry = async (fn, { maxRetries = 3, baseDelayMs = 500, label = 'opera
 
       if (!isRetryable || attempt === maxRetries) break;
 
-      const delay = baseDelayMs * Math.pow(2, attempt - 1); // exponential backoff
-      logger.warn(`[Embedding] ${label} attempt ${attempt} failed: ${err.message}. Retrying in ${delay}ms...`);
+      let delay = baseDelayMs * Math.pow(2, attempt - 1); // exponential backoff
+      
+      // Google API intelligently tells us exactly how long to wait on 429!
+      const retryMatch = err.message?.match(/Please retry in ([\d\.]+)s/);
+      if (retryMatch && retryMatch[1]) {
+        delay = Math.ceil(parseFloat(retryMatch[1]) * 1000) + 1000; // Add 1s safety buffer
+      }
+
+      logger.warn(`[Embedding] ${label} attempt ${attempt} failed (Rate Limit/Error). Retrying in ${delay}ms...`);
       await sleep(delay);
     }
   }
@@ -67,7 +74,8 @@ const generateEmbedding = async (text, taskType = 'RETRIEVAL_DOCUMENT') => {
   return withRetry(
     async () => {
       const genAI = getGeminiClient();
-      const model = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+      const modelName = process.env.EMBEDDING_MODEL || 'gemini-embedding-001';
+      const model = genAI.getGenerativeModel({ model: modelName });
 
       const result = await model.embedContent({
         content: { parts: [{ text: truncated }], role: 'user' },
@@ -93,16 +101,23 @@ const generateQueryEmbedding = (text) => generateEmbedding(text, 'RETRIEVAL_QUER
 
 /**
  * Batch generate embeddings for multiple texts.
- * Processes in small batches with inter-batch delay to respect rate limits.
+ * Uses `batchEmbedContents` for efficiency. Each request in the batch MUST include the model name.
+ * Batch size is capped at 50 so a single batch only consumes 50 of the 100/min quota,
+ * leaving a safe margin. A 65-second pause between batches fully resets the quota window.
  *
  * @param {string[]} texts
- * @param {number} batchSize - concurrent requests per batch
+ * @param {number} _ignored - kept for backward compatibility
  * @param {'RETRIEVAL_DOCUMENT'|'RETRIEVAL_QUERY'} taskType
  * @returns {number[][]} embeddings in same order as input texts
  */
-const batchGenerateEmbeddings = async (texts, batchSize = 5, taskType = 'RETRIEVAL_DOCUMENT') => {
+const batchGenerateEmbeddings = async (texts, _ignored = 5, taskType = 'RETRIEVAL_DOCUMENT') => {
+  const batchSize = 50; // 50 texts per batch → uses 50/100 quota, safe margin above limit
   const results = new Array(texts.length);
   const totalBatches = Math.ceil(texts.length / batchSize);
+
+  const genAI = getGeminiClient();
+  const modelName = process.env.EMBEDDING_MODEL || 'gemini-embedding-001';
+  const model = genAI.getGenerativeModel({ model: modelName });
 
   for (let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
     const start = batchIdx * batchSize;
@@ -111,22 +126,39 @@ const batchGenerateEmbeddings = async (texts, batchSize = 5, taskType = 'RETRIEV
 
     logger.debug(`[Embedding] Batch ${batchIdx + 1}/${totalBatches} (${batch.length} texts)`);
 
-    // Process batch concurrently
-    const batchResults = await Promise.all(
-      batch.map((text, i) =>
-        generateEmbedding(text, taskType).catch((err) => {
-          logger.error(`[Embedding] Failed for chunk ${start + i}: ${err.message}`);
-          // Return zero-vector on failure to not block the entire pipeline
-          return new Array(768).fill(0);
-        })
-      )
-    );
+    try {
+      const batchResult = await withRetry(async () => {
+        const response = await model.batchEmbedContents({
+          requests: batch.map(text => ({
+            model: `models/${modelName}`, // REQUIRED: each sub-request must specify the model
+            content: { parts: [{ text: text.trim().slice(0, 8000) }], role: 'user' },
+            taskType
+          }))
+        });
 
-    batchResults.forEach((vec, i) => { results[start + i] = vec; });
+        if (!response.embeddings || response.embeddings.length === 0) {
+          throw new Error('batchEmbedContents returned empty embeddings array');
+        }
 
-    // Inter-batch delay to avoid rate limiting (skip after last batch)
+        // SDK returns { embeddings: [{ values: [...] }] }
+        return response.embeddings.map(e => e.values || []);
+      }, { label: `batch ${batchIdx + 1}` });
+
+      batchResult.forEach((vec, i) => { results[start + i] = vec; });
+
+      const batchSuccess = batchResult.filter(v => v && v.length > 0 && v.some(x => x !== 0)).length;
+      logger.info(`[Embedding] Batch ${batchIdx + 1} complete: ${batchSuccess}/${batch.length} valid embeddings`);
+    } catch (err) {
+      logger.error(`[Embedding] Entire batch ${batchIdx + 1} failed: ${err.message}`);
+      for (let i = 0; i < batch.length; i++) {
+        results[start + i] = new Array(3072).fill(0); // match gemini-embedding-001 dimensionality
+      }
+    }
+
+    // Wait 65s between batches to fully reset the 60-second quota window
     if (batchIdx < totalBatches - 1) {
-      await sleep(300);
+      logger.info(`[Embedding] Quota pause: waiting 65s before next batch to reset rate limit window...`);
+      await sleep(65000);
     }
   }
 
@@ -158,9 +190,12 @@ const cosineSimilarity = (a, b) => {
 };
 
 /**
- * Validate that an embedding is non-zero and correct dimensionality
+ * Validate that an embedding is non-zero and correct dimensionality.
+ * gemini-embedding-001 returns 3072-dim vectors (NOT 768).
  */
-const isValidEmbedding = (vec, expectedDim = 768) => {
+const EMBEDDING_DIM = 3072;
+
+const isValidEmbedding = (vec, expectedDim = EMBEDDING_DIM) => {
   return Array.isArray(vec) &&
     vec.length === expectedDim &&
     vec.some((v) => v !== 0);

@@ -71,7 +71,7 @@ app.use(
 // Global — applied to everything, but /health is exempt
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max     : parseInt(process.env.RATE_LIMIT_MAX)        || 200,
+  max     : parseInt(process.env.RATE_LIMIT_MAX)        || 500,
   standardHeaders: true,
   legacyHeaders  : false,
   message        : { success: false, message: 'Too many requests — please slow down.' },
@@ -145,7 +145,7 @@ app.get('/health', (_req, res) => {
 
 // ─── 8. API Routes ────────────────────────────────────────────────────────────
 app.use('/api/auth',      authLimiter,   authRoutes);
-app.use('/api/documents', uploadLimiter, documentRoutes);
+app.use('/api/documents',                documentRoutes);
 app.use('/api/query',     queryLimiter,  queryRoutes);
 app.use('/api/chats',                    chatRoutes);
 app.use('/api/admin',                    adminRoutes);

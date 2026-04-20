@@ -10,7 +10,6 @@ import {
   Upload, Eye, RefreshCw, ChevronRight, ChevronLeft,
 } from "lucide-react";
 import * as THREE from "three";
-import { StatusBadge } from "../components/ui/Badge";
 import { PaginatedList } from "../components/admin/PaginatedList";
 import { UploadDropzone } from "../components/admin/UploadDropzone";
 import { DocumentList } from "../components/admin/DocumentList";
@@ -749,8 +748,8 @@ const mapDocumentToItem = (doc) => {
   }
 
   const mb = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) + " MB" : "";
-  const sub = doc.status === "failed" 
-    ? (doc.processingError || "Processing failed") 
+  const sub = doc.status === "failed"
+    ? (doc.processingError || "Processing failed")
     : `${doc.chunkCount || 0} chunks ${mb ? `· ${mb}` : ""}`;
 
   return {
@@ -766,65 +765,71 @@ const mapDocumentToItem = (doc) => {
 export function AdminUpload() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const initialFetch = useRef(true);
 
   const fetchRecent = async () => {
+    // Only show the loading spinner on the very first fetch
+    if (initialFetch.current) setLoading(true);
     try {
-      const res = await axios.get("/api/documents?limit=5");
-      const mapped = res.data.data.documents.map(mapDocumentToItem);
+      const res = await axios.get("/api/documents?limit=100");
+      const docsArray = Array.isArray(res.data.data) ? res.data.data : (res.data.data?.documents || []);
+      const mapped = docsArray.map(mapDocumentToItem);
       setItems(mapped);
     } catch (err) {
-      console.error(err);
+      if (err.response?.status !== 429) console.error(err);
     } finally {
-      setLoading(false);
+      if (initialFetch.current) {
+        setLoading(false);
+        initialFetch.current = false;
+      }
     }
   };
 
   useEffect(() => { fetchRecent(); }, []);
 
-  // Poll if processing
+  // Always poll — documents can take minutes to embed
   useEffect(() => {
     const hasProcessing = items.some(i => i.rawStatus === "processing" || i.rawStatus === "reindexing");
-    if (!hasProcessing) return;
-    const interval = setInterval(fetchRecent, 5000);
+    // Poll faster when something is processing, slower otherwise for background refresh
+    const interval = setInterval(fetchRecent, hasProcessing ? 5000 : 30000);
     return () => clearInterval(interval);
   }, [items]);
 
   const handleFiles = async (files) => {
     if (!files || !files.length) return;
-    
+
     for (let f of files) {
-      showToast.info(`Uploading ${f.name}...`);
+      const toastId = showToast.loading(`Uploading ${f.name}...`);
       const fd = new FormData();
       fd.append("file", f);
       try {
         await axios.post("/api/documents/upload", fd, {
           headers: { "Content-Type": "multipart/form-data" }
         });
-        showToast.success(`Uploaded: ${f.name}`);
+        showToast.updateSuccess(toastId, `${f.name} uploaded — embedding in progress...`);
         await fetchRecent();
       } catch (err) {
         console.error(err);
-        showToast.error(`Failed to upload ${f.name}`);
+        const errMsg = err.response?.data?.message || `Failed to upload ${f.name}`;
+        showToast.updateError(toastId, errMsg);
       }
     }
   };
 
-
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <UploadDropzone onFilesSelected={handleFiles} />
-      
+
       {loading ? (
         <div className="flex justify-center p-8"><Activity className="animate-spin text-[#7c6fff]" /></div>
       ) : (
-        <DocumentList 
-          title="Recent Uploads" 
-          icon={FileUp} 
+        <DocumentList
+          title="Uploaded Documents"
+          icon={FileUp}
           color="#7c6fff"
-          description="Monitor your recent document additions. These files are processed through the RAG pipeline automatically."
+          description="Monitor your uploaded documents. These files are processed through the RAG pipeline automatically."
           items={items}
-          perPage={4}
+          perPage={5}
         />
       )}
     </motion.div>
@@ -835,21 +840,36 @@ export function AdminDocuments() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({ open: false, item: null });
+  const initialFetch = useRef(true);
 
   const fetchDocs = async () => {
-    setLoading(true);
+    // Only block UI with spinner on the first load; background refreshes are silent
+    if (initialFetch.current) setLoading(true);
     try {
       const res = await axios.get("/api/documents?limit=100");
-      setItems(res.data.data.documents.map(mapDocumentToItem));
+      const docsArray = Array.isArray(res.data.data) ? res.data.data : (res.data.data?.documents || []);
+      setItems(docsArray.map(mapDocumentToItem));
     } catch (err) {
-      console.error(err);
-      showToast.error("Failed to load documents");
+      if (err.response?.status !== 429) {
+        console.error(err);
+        if (initialFetch.current) showToast.error("Failed to load documents");
+      }
     } finally {
-      setLoading(false);
+      if (initialFetch.current) {
+        setLoading(false);
+        initialFetch.current = false;
+      }
     }
   };
 
   useEffect(() => { fetchDocs(); }, []);
+
+  // Auto-poll: fast when processing, slow otherwise for background auto-update
+  useEffect(() => {
+    const hasProcessing = items.some(i => i.rawStatus === "processing" || i.rawStatus === "reindexing");
+    const interval = setInterval(fetchDocs, hasProcessing ? 5000 : 30000);
+    return () => clearInterval(interval);
+  }, [items]);
 
   const handleDelete = (item) => {
     setDeleteModal({ open: true, item });
@@ -859,7 +879,7 @@ export function AdminDocuments() {
     const doc = deleteModal.item;
     setDeleteModal({ open: false, item: null });
     if (!doc.id) return;
-    
+
     try {
       await axios.delete(`/api/documents/${doc.id}`);
       showToast.success(`${doc.title} deleted successfully`);
@@ -885,9 +905,9 @@ export function AdminDocuments() {
       {loading ? (
         <div className="flex justify-center p-12"><Activity className="animate-spin text-[#34d4e0] w-8 h-8" /></div>
       ) : (
-        <DocumentList 
-          title="Document Library" 
-          icon={Files} 
+        <DocumentList
+          title="Document Library"
+          icon={Files}
           color="#34d4e0"
           description="Browse all indexed SOP documents. Manage your vector search index settings and document lifecycle here."
           items={items}
@@ -897,7 +917,7 @@ export function AdminDocuments() {
         />
       )}
 
-      <DeleteConfirmModal 
+      <DeleteConfirmModal
         isOpen={deleteModal.open}
         onClose={() => setDeleteModal({ open: false, item: null })}
         onConfirm={confirmDelete}
@@ -935,7 +955,7 @@ export function AdminPipeline() {
       <SectionHeader title="Pipeline Real-time Status" color="#34d4e0" />
       <div className="grid gap-4">
         {items.map((item, i) => (
-          <EmbeddingProgress 
+          <EmbeddingProgress
             key={i}
             badge={item.badge}
             progress={item.progress}
@@ -943,7 +963,7 @@ export function AdminPipeline() {
           />
         ))}
       </div>
-      
+
       <div className="mt-10">
         <PaginatedList title="Job History" icon={Activity} color="#c084fc"
           description="Detailed log of all historical embedding jobs and pipeline performance metrics."

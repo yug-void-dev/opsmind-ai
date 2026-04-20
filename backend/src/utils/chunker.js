@@ -81,8 +81,8 @@ const hardSplit = (text, chunkSize, overlap) => {
   while (start < text.length) {
     const end = Math.min(start + chunkSize, text.length);
     results.push(text.slice(start, end).trim());
+    if (end === text.length) break;
     start = end - overlap;
-    if (start >= text.length) break;
   }
   return results;
 };

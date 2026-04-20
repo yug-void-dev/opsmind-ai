@@ -1,7 +1,7 @@
 import { LayoutDashboard, Brain, TrendingUp, Zap, LogOut } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-
+import { motion } from "framer-motion";
 export default function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#f5f3ff] p-8" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <header className="mb-10 flex justify-between items-start">
         <div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-bold text-[#2d2b55]"
@@ -24,7 +24,7 @@ export default function DashboardPage() {
           </motion.h1>
           <p className="text-[#5a5880] mt-2">Here is what is happening with your OpsMind AI today.</p>
         </div>
-        
+
         <motion.button
           onClick={handleLogout}
           whileHover={{ scale: 1.05, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
@@ -64,7 +64,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
