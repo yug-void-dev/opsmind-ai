@@ -50,6 +50,7 @@ function renderContent(text, onCitationClick) {
 export default function ChatMessage({ message, onCitationClick }) {
   const isUser = message.role === "user";
   const isError = message.isError;
+  const isHallucinationBlocked = message.answered === false;
   const displayText = isUser ? message.content : formatMessageWithCitations(message.content);
 
   return (
@@ -70,6 +71,12 @@ export default function ChatMessage({ message, onCitationClick }) {
                 WebkitBackdropFilter: "blur(12px)",
                 border: "1px solid rgba(255,255,255,0.12)",
               }
+            : isHallucinationBlocked
+            ? {
+                background: "rgba(245,158,11,0.15)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(245,158,11,0.25)",
+              }
             : isError
             ? {
                 background: "rgba(239,68,68,0.1)",
@@ -86,6 +93,8 @@ export default function ChatMessage({ message, onCitationClick }) {
       >
         {isUser ? (
           <User size={15} style={{ color: "rgba(255,255,255,0.65)" }} />
+        ) : isHallucinationBlocked ? (
+          <AlertCircle size={15} className="text-amber-400" />
         ) : isError ? (
           <AlertCircle size={15} className="text-red-400" />
         ) : (
@@ -107,6 +116,14 @@ export default function ChatMessage({ message, onCitationClick }) {
                   borderTopRightRadius: "4px",
                   color: "rgba(255,255,255,0.92)",
                   boxShadow: "0 4px 24px rgba(139,92,246,0.15)",
+                }
+              : isHallucinationBlocked
+              ? {
+                  background: "rgba(245,158,11,0.08)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(245,158,11,0.22)",
+                  borderTopLeftRadius: "4px",
+                  color: "rgba(252,211,77,0.9)",
                 }
               : isError
               ? {
@@ -130,6 +147,12 @@ export default function ChatMessage({ message, onCitationClick }) {
             <p>{message.content}</p>
           ) : (
             <div>
+              {isHallucinationBlocked && (
+                <div className="flex items-center gap-1.5 mb-1 opacity-60">
+                  <AlertCircle size={11} className="text-amber-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Security Guard</span>
+                </div>
+              )}
               {message.content ? (
                 <p className="whitespace-pre-wrap">
                   {renderContent(displayText, onCitationClick)}

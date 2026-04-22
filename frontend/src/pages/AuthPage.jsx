@@ -143,12 +143,40 @@ function Blob({ color, size, top, left, delay = 0 }) {
   );
 }
 
+/* ─── Local Alert Component ─── */
+function Alert({ error, success }) {
+  if (!error && !success) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      className={`rounded-xl p-3 flex items-start gap-3 text-sm font-medium ${
+        error 
+          ? "bg-red-50 border border-red-100 text-red-600" 
+          : "bg-green-50 border border-green-100 text-green-600"
+      }`}
+    >
+      {error ? <AlertCircle size={18} className="shrink-0" /> : <CheckCircle2 size={18} className="shrink-0" />}
+      <p>{error || success}</p>
+    </motion.div>
+  );
+}
+
 /* ════════════════ MAIN PAGE ════════════════ */
 export default function AuthPage() {
   const [mode, setMode] = useState("login");
   const [pw, setPw] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, register, user: authenticatedUser } = useAuth();
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  
+  // Forgot Password Steps
+  const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [otp, setOtp] = useState("");
+
+  const { login, register, forgotPassword, verifyOTP, resetPassword, user: authenticatedUser } = useAuth();
   const navigate = useNavigate();
 
   // Auto-redirect if already logged in
@@ -274,13 +302,66 @@ export default function AuthPage() {
   const handleForgot = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+    setSuccessMsg("");
 
-    // Simulating API call for forgot password since I can't check/modify backend easily
-    // but the UI should be ready for it.
-    setTimeout(() => {
-      setIsLoading(false);
-      showToast.success("Password reset link sent to your email!");
-    }, 2000);
+    const res = await forgotPassword(forgotEmail);
+    setIsLoading(false);
+
+    if (res.success) {
+      setSuccessMsg("Verification code sent to your email!");
+      setForgotStep(2);
+    } else {
+      setError(res.message);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccessMsg("");
+
+    const res = await verifyOTP(forgotEmail, otp);
+    setIsLoading(false);
+
+    if (res.success) {
+      setSuccessMsg("Code verified! Please set your new password.");
+      setForgotStep(3);
+    } else {
+      setError(res.message);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const { newPass, confirmPass } = Object.fromEntries(formData);
+
+    if (newPass !== confirmPass) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setSuccessMsg("");
+
+    const res = await resetPassword(forgotEmail, otp, newPass);
+    setIsLoading(false);
+
+    if (res.success) {
+      showToast.success("Password reset successfully! Plese login.");
+      // Reset flow and go to login
+      setTimeout(() => {
+        setForgotStep(1);
+        setMode("login");
+        setForgotEmail("");
+        setOtp("");
+      }, 1500);
+    } else {
+      setError(res.message);
+    }
   };
 
   return (
@@ -936,14 +1017,19 @@ export default function AuthPage() {
                         color: "#2d2b55",
                       }}
                     >
-                      <TW text="Reset Password 🔐" />
+                      <TW text={
+                        forgotStep === 1 ? "Reset Password 🔐" : 
+                        forgotStep === 2 ? "Verify Email 📧" : 
+                        "Choose New Password 🔑"
+                      } />
                     </h2>
                     <p
                       className="text-sm leading-relaxed"
                       style={{ color: "#8b8aae" }}
                     >
-                      Enter your registered email. We'll send a secure reset
-                      link valid for 15 minutes.
+                      {forgotStep === 1 && "Enter your registered email. We'll send a 6-digit verification code."}
+                      {forgotStep === 2 && `Enter the code sent to ${forgotEmail}.`}
+                      {forgotStep === 3 && "Create a strong password to secure your account."}
                     </p>
                   </motion.div>
                   <AnimatePresence mode="wait">
@@ -952,31 +1038,100 @@ export default function AuthPage() {
                     )}
                   </AnimatePresence>
 
-                  <form
-                    onSubmit={handleForgot}
-                    className="space-y-4"
-                  >
-                    <motion.div variants={si}>
-                      <FloatInput
-                        icon={Mail}
-                        type="email"
-                        name="forgotEmail"
-                        label="Registered email"
-                        required
-                      />
-                    </motion.div>
-                    <motion.div variants={si}>
-                      <ShimmerBtn type="submit" isLoading={isLoading}>
-                        <span>Send Reset Link</span>
-                        <motion.div
-                          animate={{ x: [0, 4, 0] }}
-                          transition={{ duration: 1.2, repeat: Infinity }}
-                        >
+                  <AnimatePresence mode="wait">
+                    {forgotStep === 1 && (
+                      <motion.form
+                        key="step1"
+                        variants={si}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        onSubmit={handleForgot}
+                        className="space-y-4"
+                      >
+                        <FloatInput
+                          icon={Mail}
+                          type="email"
+                          name="forgotEmail"
+                          label="Registered email"
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          required
+                        />
+                        <ShimmerBtn type="submit" isLoading={isLoading}>
+                          <span>Send Code</span>
                           <ArrowRight size={16} />
-                        </motion.div>
-                      </ShimmerBtn>
-                    </motion.div>
-                  </form>
+                        </ShimmerBtn>
+                      </motion.form>
+                    )}
+
+                    {forgotStep === 2 && (
+                      <motion.form
+                        key="step2"
+                        variants={si}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        onSubmit={handleVerifyOTP}
+                        className="space-y-4"
+                      >
+                        <FloatInput
+                          icon={Zap}
+                          type="text"
+                          name="otp"
+                          label="6-Digit Code"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          maxLength={6}
+                          required
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setForgotStep(1)}
+                            className="flex-1 py-3 reset-btn text-sm font-semibold rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                          >
+                            Back
+                          </button>
+                          <ShimmerBtn className="flex-[2]" type="submit" isLoading={isLoading}>
+                            <span>Verify Code</span>
+                            <CheckCircle2 size={16} />
+                          </ShimmerBtn>
+                        </div>
+                      </motion.form>
+                    )}
+
+                    {forgotStep === 3 && (
+                      <motion.form
+                        key="step3"
+                        variants={si}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        onSubmit={handleResetPassword}
+                        className="space-y-4"
+                      >
+                        <FloatInput
+                          icon={Lock}
+                          type="password"
+                          name="newPass"
+                          label="New Password"
+                          required
+                        />
+                        <FloatInput
+                          icon={Lock}
+                          type="password"
+                          name="confirmPass"
+                          label="Confirm Password"
+                          required
+                        />
+                        <ShimmerBtn type="submit" isLoading={isLoading}>
+                          <span>Update Password</span>
+                          <Sparkles size={16} />
+                        </ShimmerBtn>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
                   <motion.div variants={si}>
                     <motion.div
                       className="rounded-2xl p-4 flex items-start gap-3"

@@ -238,12 +238,108 @@ const listAllDocuments = async (req, res, next) => {
   }
 };
 
+/**
+ * PATCH /api/admin/users/:id/role
+ */
+const updateUserRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    if (!['user', 'admin'].includes(role)) {
+      return badRequest(res, 'Invalid role. Must be "user" or "admin".');
+    }
+
+    const User = require('../models/User');
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) return notFound(res, 'User not found');
+
+    logger.info(`[Admin] Role updated for ${user.email} to ${role}`);
+    return success(res, user, `User role updated to ${role}`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/admin/users/:id/reset-password
+ */
+const resetUserPassword = async (req, res, next) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findById(req.params.id);
+    if (!user) return notFound(res, 'User not found');
+
+    // Default reset password
+    const defaultPass = 'Welcome@123';
+    user.password = defaultPass;
+    await user.save();
+
+    logger.info(`[Admin] Password reset for user ${user.email}`);
+    return success(res, null, `Password has been reset to default: ${defaultPass}`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * DELETE /api/admin/users/:id
+ */
+const deleteUser = async (req, res, next) => {
+  try {
+    if (req.params.id === req.user._id.toString()) {
+      return badRequest(res, 'You cannot delete your own administrative account.');
+    }
+
+    const User = require('../models/User');
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return notFound(res, 'User not found');
+
+    logger.info(`[Admin] User deleted: ${user.email}`);
+    return success(res, { id: user._id }, `User ${user.email} permanently deleted`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/admin/activities
+ * Fetches recent system activities for the dashboard
+ */
+const listActivities = async (req, res, next) => {
+  try {
+    const activities = await Analytics.find()
+      .populate('userId', 'name email avatar')
+      .populate('documentId', 'name originalName')
+      .sort({ createdAt: -1 })
+      .limit(30) // Fetch more then filter
+      .lean();
+
+    // Filter out 'upload' events that have a null documentId (document was deleted or is dummy)
+    const filtered = activities.filter(act => {
+      if (act.eventType === 'upload' && !act.documentId) return false;
+      return true;
+    }).slice(0, 10); // Return only the top 10 valid ones
+
+    return success(res, filtered);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getAnalytics,
   getStats,
+  listActivities,
   reindexAll,
   listUsers,
   toggleUser,
+  updateUserRole,
+  resetUserPassword,
+  deleteUser,
   clearCache,
   getFailedQueries,
   listAllDocuments,

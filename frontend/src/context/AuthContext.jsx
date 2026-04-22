@@ -70,7 +70,46 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common["Authorization"];
   }
 
-  const value = { user, token, loading, login, register, logout }
+  const forgotPassword = async (email) => {
+    try {
+      const response = await axios.post("/api/auth/forgot-password", { email });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Something went wrong"
+      };
+    }
+  };
+
+  const verifyOTP = async (email, otp) => {
+    try {
+      const response = await axios.post("/api/auth/verify-otp", { email, otp });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Invalid or expired OTP"
+      };
+    }
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    try {
+      const response = await axios.post("/api/auth/reset-password", { email, otp, newPassword });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      console.error("Password reset error:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Reset failed"
+      };
+    }
+  };
+
+  const value = { user, token, loading, login, register, logout, forgotPassword, verifyOTP, resetPassword }
 
   return (
     <AuthContext.Provider value={value}>

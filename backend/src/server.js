@@ -12,6 +12,7 @@ require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/database');
 const logger = require('./utils/logger');
+const socketService = require('./services/socketService');
 
 const PORT = parseInt(process.env.PORT) || 5000;
 
@@ -81,6 +82,10 @@ const startServer = async () => {
 ║  Health   : http://localhost:${PORT}/health${' '.repeat(Math.max(0, 13 - String(PORT).length))}║
 ╚═══════════════════════════════════════════╝`;
     logger.info(banner);
+
+    // Initialize Socket.io
+    socketService.init(server);
+    logger.info('🚀 Socket.io initialized');
   });
 
   // ─── Process Handlers ──────────────────────────────────────────────────

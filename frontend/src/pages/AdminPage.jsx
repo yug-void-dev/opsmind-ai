@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate, useOutletContext } from "react-router-dom";
 
 import {
   LayoutDashboard, FileUp, Files, MessageSquare,
@@ -17,7 +17,12 @@ import { DeleteConfirmModal } from "../components/admin/DeleteConfirmModal";
 import { EmbeddingProgress } from "../components/admin/EmbeddingProgress";
 import showToast from "../components/ui/Toast";
 import useAuth from "../hooks/useAuth";
+import { UserCardGrid } from "../components/admin/UserCard";
 import axios from "axios";
+import useAdmin from "../hooks/useAdmin";
+import { NotificationContext } from "../context/NotificationContext";
+import { useContext } from "react";
+
 
 /* ══════════════════════════════════════════════════
    LIGHT THEME PALETTE
@@ -35,7 +40,6 @@ const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Overview", path: "/admin", end: true },
   { icon: FileUp, label: "Upload PDFs", path: "/admin/upload" },
   { icon: Files, label: "Documents", path: "/admin/documents" },
-  { icon: MessageSquare, label: "Chat Logs", path: "/admin/chatlogs" },
   { icon: Activity, label: "Pipeline Status", path: "/admin/pipeline" },
   { icon: TrendingUp, label: "Analytics", path: "/admin/analytics" },
   { icon: Users, label: "Users", path: "/admin/users" },
@@ -54,10 +58,7 @@ const STATUS_CONFIG = {
   Complete: { bg: "rgba(34,197,94,0.12)", text: "#16a34a", border: "rgba(34,197,94,0.25)", dot: "#22c55e", pulse: false },
   Running: { bg: "rgba(124,111,255,0.12)", text: "#6c63ff", border: "rgba(124,111,255,0.28)", dot: "#7c6fff", pulse: true },
   Queued: { bg: "rgba(245,158,11,0.12)", text: "#b45309", border: "rgba(245,158,11,0.28)", dot: "#f59e0b", pulse: false },
-  // Chat log statuses
-  Resolved: { bg: "rgba(34,197,94,0.12)", text: "#16a34a", border: "rgba(34,197,94,0.25)", dot: "#22c55e", pulse: false },
-  Blocked: { bg: "rgba(239,68,68,0.12)", text: "#dc2626", border: "rgba(239,68,68,0.28)", dot: "#ef4444", pulse: false },
-  Timeout: { bg: "rgba(245,158,11,0.12)", text: "#b45309", border: "rgba(245,158,11,0.28)", dot: "#f59e0b", pulse: false },
+  Pending: { bg: "rgba(245,158,11,0.12)", text: "#b45309", border: "rgba(245,158,11,0.28)", dot: "#f59e0b", pulse: true },
   // User statuses
   Active: { bg: "rgba(34,197,94,0.12)", text: "#16a34a", border: "rgba(34,197,94,0.25)", dot: "#22c55e", pulse: false },
   Pending: { bg: "rgba(245,158,11,0.12)", text: "#b45309", border: "rgba(245,158,11,0.28)", dot: "#f59e0b", pulse: true },
@@ -238,6 +239,33 @@ const SectionHeader = ({ title, color = "#7c6fff" }) => (
   </div>
 );
 
+/* ════════ HELPERS ════════ */
+const formatRelativeTime = (date) => {
+  if (!date) return "Long ago";
+  const now = new Date();
+  const diff = now - new Date(date);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+};
+
+const getActivityConfig = (act) => {
+  switch (act.eventType) {
+    case 'query': return { icon: MessageSquare, color: "#34d4e0", title: `Query by ${act.userId?.name || 'User'}`, sub: act.query };
+    case 'no_answer': return { icon: AlertCircle, color: "#f59e0b", title: "Unanswered Query", sub: act.query };
+    case 'upload': return { icon: FileUp, color: "#7c6fff", title: `Document Uploaded`, sub: act.documentId?.name || act.documentId?.originalName || 'Unnamed Document' };
+    case 'failed_query': return { icon: Shield, color: "#ef4444", title: "Pipeline Error", sub: act.errorMessage || "An unexpected error occurred" };
+    case 'reindex': return { icon: RefreshCw, color: "#c084fc", title: "System Reindex", sub: "Knowledge base refreshed" };
+    default: return { icon: Activity, color: "#7c6fff", title: "System Event", sub: act.eventType };
+  }
+};
+
 /* ════════ ACTIVITY ROW ════════ */
 function ActivityRow({ icon: Icon, color, title, sub, time, delay = 0 }) {
   return (
@@ -264,43 +292,41 @@ function ActivityRow({ icon: Icon, color, title, sub, time, delay = 0 }) {
 /* ════════ ADMIN OVERVIEW ════════ */
 function AdminOverview() {
   const navigate = useNavigate();
-  const [sysStats, setSysStats] = useState(null);
+  const { stats, activities, loading } = useAdmin();
 
-  useEffect(() => {
-    axios.get("/api/admin/stats")
-      .then(res => setSysStats(res.data.data))
-      .catch(console.error);
-  }, []);
-
-  const stats = [
-    { icon: Files, label: "Documents indexed", value: sysStats?.documents || 0, delta: "", color: "#7c6fff", delay: 0 },
-    { icon: Database, label: "Vector chunks", value: sysStats?.chunks?.toLocaleString() || 0, delta: "", color: "#34d4e0", delay: 0.08 },
-    { icon: MessageSquare, label: "Queries today", value: sysStats?.totalQueries?.toLocaleString() || 0, delta: "", color: "#c084fc", delay: 0.16 },
-    { icon: Users, label: "Active users", value: sysStats?.users || 0, delta: "", color: "#f472b6", delay: 0.24 },
+  const statConfig = [
+    { icon: Files, label: "Documents indexed", value: stats?.documents?.total || 0, delta: "", color: "#7c6fff", delay: 0 },
+    { icon: Database, label: "Vector chunks", value: stats?.chunks || 0, delta: "", color: "#34d4e0", delay: 0.08 },
+    { icon: MessageSquare, label: "Total Queries", value: stats?.queries?.total || 0, delta: "", color: "#c084fc", delay: 0.16 },
+    { icon: Users, label: "Active users", value: stats?.users || 0, delta: "", color: "#f472b6", delay: 0.24 },
   ];
   const quickActions = [
     { icon: FileUp, title: "Upload SOP", desc: "Process new documents", path: "/admin/upload" },
-    { icon: MessageSquare, title: "View Logs", desc: "Audit AI responses", path: "/admin/chatlogs" },
     { icon: Activity, title: "Pipeline Status", desc: "Monitor ingestion", path: "/admin/pipeline" },
+    { icon: TrendingUp, title: "View Analytics", desc: "Audit AI performance", path: "/admin/analytics" },
     { icon: Settings, title: "System Settings", desc: "Configure guardrails", path: "/admin/settings" },
   ];
-  const activity = [
-    { icon: FileUp, color: "#7c6fff", title: "HR_Policy_2025.pdf uploaded", sub: "48 chunks · 2.3 MB", time: "2 min ago" },
-    { icon: MessageSquare, color: "#34d4e0", title: "New query by priya@zaalima.com", sub: '"How do I apply for leave?"', time: "15 min ago" },
-    { icon: Shield, color: "#c084fc", title: "Embedding pipeline completed", sub: "Refund_Policy.pdf — ready", time: "1 hour ago" },
-    { icon: Users, color: "#f472b6", title: "New user registered", sub: "arjun@zaalima.com joined", time: "2 hours ago" },
-    { icon: Zap, color: "#7c6fff", title: "RAG retrieval success", sub: "Query resolved in 1.2s", time: "3 hours ago" },
-  ];
+  const mappedActivities = activities?.length > 0 
+    ? activities.map(a => {
+        const config = getActivityConfig(a);
+        return {
+          ...config,
+          time: formatRelativeTime(a.createdAt)
+        };
+      })
+    : [
+        { icon: AlertCircle, color: "#9ca3af", title: "No recent activity", sub: "Real-time logs will appear here", time: "-" }
+      ];
   const health = [
-    { label: "MongoDB Atlas", pct: 98, color: "#7c6fff" },
+    { label: "Database (MongoDB)", pct: 100, color: "#7c6fff" },
     { label: "Gemini Embedding", pct: 100, color: "#34d4e0" },
-    { label: "RAG Pipeline", pct: 95, color: "#c084fc" },
-    { label: "Vector Search Index", pct: 100, color: "#f472b6" },
+    { label: "RAG Answer Rate", pct: parseFloat(stats?.queries?.answerRate) || 100, color: "#c084fc" },
+    { label: "Cache Efficiency", pct: stats?.cache?.hits > 0 ? Math.round((stats.cache.hits / (stats.cache.hits + stats.cache.misses)) * 100) : 100, color: "#f472b6" },
   ];
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-10">
-    <div>
+      <div>
         <motion.h1 initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="text-3xl font-bold mb-1.5"
@@ -311,7 +337,7 @@ function AdminOverview() {
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
-        {stats.map(s => <StatCard key={s.label} {...s} />)}
+        {statConfig.map(s => <StatCard key={s.label} {...s} />)}
       </div>
 
       <div>
@@ -328,7 +354,7 @@ function AdminOverview() {
           <SectionHeader title="Recent Activity" />
           <div className="rounded-3xl p-2 space-y-1"
             style={{ background: "rgba(255,255,255,0.35)", backdropFilter: "blur(10px)", border: "1.5px solid rgba(255,255,255,0.6)" }}>
-            {activity.map((a, i) => <ActivityRow key={i} {...a} delay={0.2 + i * 0.05} />)}
+            {mappedActivities.map((a, i) => <ActivityRow key={i} {...a} delay={0.2 + i * 0.05} />)}
           </div>
         </div>
         <div>
@@ -368,13 +394,12 @@ export default function AdminPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const notifRef = useRef(null);
-  const profileRef = useRef(null);
 
   const { user, logout: authLogout } = useAuth();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useContext(NotificationContext);
 
   const handleLogout = () => {
     authLogout();
@@ -384,7 +409,6 @@ export default function AdminPage() {
   useEffect(() => {
     const h = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
-      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
@@ -406,11 +430,7 @@ export default function AdminPage() {
   const currentNav = NAV_ITEMS.find(n => n.end ? location.pathname === n.path : location.pathname.startsWith(n.path));
   const pageTitle = currentNav?.label || "Dashboard";
 
-  const notifications = [
-    { title: "New PDF indexed", sub: "HR_Policy_2025.pdf is ready", time: "2m", dot: "#7c6fff" },
-    { title: "Embedding complete", sub: "Refund_Policy.pdf — 48 chunks", time: "12m", dot: "#34d4e0" },
-    { title: "New user registered", sub: "arjun@zaalima.com joined", time: "1h", dot: "#c084fc" },
-  ];
+  // Replaced dummy data with NotificationContext
 
   /* ── Hamburger ── */
   const HamburgerIcon = ({ open }) => (
@@ -629,9 +649,13 @@ export default function AdminPage() {
               <motion.div animate={{ rotate: notifOpen ? [0, -12, 12, -8, 8, 0] : 0 }} transition={{ duration: 0.5 }}>
                 <Bell size={15} />
               </motion.div>
-              <motion.span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-white flex items-center justify-center"
-                style={{ background: "#f472b6", fontSize: 9, fontWeight: 700 }}
-                animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>3</motion.span>
+              {unreadCount > 0 && (
+                <motion.span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-white flex items-center justify-center"
+                  style={{ background: "#f472b6", fontSize: 9, fontWeight: 700 }}
+                  animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+                  {unreadCount}
+                </motion.span>
+              )}
             </motion.button>
             <AnimatePresence>
               {notifOpen && (
@@ -640,71 +664,43 @@ export default function AdminPage() {
                   className="absolute right-0 top-12 w-72 rounded-2xl p-3 z-50"
                   style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(24px)", border: "1.5px solid rgba(255,255,255,0.9)", boxShadow: "0 16px 50px rgba(0,0,0,0.1)" }}>
                   <div className="absolute top-0 left-4 right-4 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(108,99,255,0.25),transparent)" }} />
-                  <p className="text-xs font-bold px-2 mb-3" style={{ color: "#7c6fff", fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.08em" }}>NOTIFICATIONS</p>
-                  {notifications.map((n, i) => (
-                    <motion.div key={i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.06 }} whileHover={{ backgroundColor: "rgba(124,111,255,0.07)" }}
-                      className="flex items-start gap-2.5 px-2.5 py-2.5 rounded-xl transition-colors cursor-pointer">
-                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ background: n.dot, boxShadow: `0 0 6px ${n.dot}` }} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold" style={{ color: "#2d2b55" }}>{n.title}</p>
-                        <p className="text-xs mt-0.5" style={{ color: "#5a5880" }}>{n.sub}</p>
+                  <div className="flex justify-between items-center px-2 mb-3">
+                    <p className="text-xs font-bold" style={{ color: "#7c6fff", fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.08em" }}>NOTIFICATIONS</p>
+                    {unreadCount > 0 && (
+                      <button onClick={markAllAsRead} className="text-[10px] font-bold hover:underline" style={{ color: "#5a5880" }}>Clear all</button>
+                    )}
+                  </div>
+                  <div className="max-h-[320px] overflow-y-auto no-scrollbar">
+                    {notifications.length > 0 ? (
+                      notifications.map((n, i) => {
+                        const dotColor = n.type === 'document_indexed' ? '#7c6fff' : n.type === 'user_registered' ? '#c084fc' : n.type === 'document_failed' ? '#ef4444' : '#34d4e0';
+                        return (
+                          <motion.div key={n._id || i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.06 }} 
+                            whileHover={{ backgroundColor: "rgba(124,111,255,0.07)" }}
+                            onClick={() => !n.isRead && markAsRead(n._id)}
+                            className="flex items-start gap-2.5 px-2.5 py-2.5 rounded-xl transition-colors cursor-pointer relative">
+                            {!n.isRead && <div className="absolute right-2 top-3 w-1.5 h-1.5 rounded-full" style={{ background: "#f472b6" }} />}
+                            <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ background: dotColor, boxShadow: `0 0 6px ${dotColor}` }} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold" style={{ color: n.isRead ? "#5a5880" : "#2d2b55" }}>{n.title}</p>
+                              <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: n.isRead ? "#9ca3af" : "#5a5880" }}>{n.message}</p>
+                              <p className="text-[10px] mt-1 uppercase" style={{ color: "#9ca3af" }}>{formatRelativeTime(n.createdAt)}</p>
+                            </div>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <div className="py-8 text-center">
+                        <p className="text-xs" style={{ color: "#9ca3af" }}>No notifications yet</p>
                       </div>
-                      <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: "#9ca3af" }}>{n.time}</span>
-                    </motion.div>
-                  ))}
+                    )}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Profile */}
-          <div ref={profileRef} className="relative">
-            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
-              onClick={() => setProfileOpen(o => !o)}
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl"
-              style={{ background: "rgba(108,99,255,0.07)", border: "1.5px solid rgba(108,99,255,0.12)" }}>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                style={{ background: "linear-gradient(135deg,#7c6fff,#34d4e0)", boxShadow: "0 0 10px rgba(124,111,255,0.4)" }}>
-                {(user?.name || "A").charAt(0).toUpperCase()}
-              </div>
-              <div className="hidden sm:block text-left">
-                <p className="text-xs font-semibold leading-tight" style={{ color: "#2d2b55" }}>{user?.name || "Admin"}</p>
-                <p className="text-xs leading-tight" style={{ color: "#5a5880" }}>Admin</p>
-              </div>
-              <motion.div animate={{ rotate: profileOpen ? 180 : 0 }} transition={{ duration: 0.25 }}>
-                <ChevronDown size={12} style={{ color: "#3d3b56" }} />
-              </motion.div>
-            </motion.button>
-            <AnimatePresence>
-              {profileOpen && (
-                <motion.div initial={{ opacity: 0, y: 10, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.94 }} transition={{ duration: 0.2 }}
-                  className="absolute right-0 top-12 w-48 rounded-2xl p-2 z-50"
-                  style={{ background: "rgba(255,255,255,0.97)", backdropFilter: "blur(24px)", border: "1.5px solid rgba(255,255,255,0.9)", boxShadow: "0 16px 50px rgba(0,0,0,0.1)" }}>
-                  <div className="absolute top-0 left-4 right-4 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(108,99,255,0.25),transparent)" }} />
-                  {[
-                    { label: "My profile", icon: Users, path: "/admin/settings" },
-                    { label: "Settings", icon: Settings, path: "/admin/settings" },
-                  ].map(({ label, icon: Icon, path }) => (
-                    <motion.button key={label} onClick={() => { navigate(path); setProfileOpen(false); }}
-                      whileHover={{ backgroundColor: "rgba(124,111,255,0.08)", x: 3 }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-left" style={{ color: "#6b6987" }}>
-                      <Icon size={14} style={{ color: "#7c6fff" }} />
-                      {label}
-                    </motion.button>
-                  ))}
-                  <div style={{ borderTop: "1px solid rgba(0,0,0,0.05)", margin: "4px 0" }} />
-                  <motion.button onClick={handleLogout}
-                    whileHover={{ backgroundColor: "rgba(244,114,182,0.08)", x: 3 }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-left" style={{ color: "#f472b6" }}>
-                    <LogOut size={14} />
-                    Log out
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </motion.header>
 
         {/* Page content */}
@@ -715,7 +711,7 @@ export default function AdminPage() {
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-              <Outlet />
+              <Outlet context={{ searchVal }} />
             </motion.div>
           </AnimatePresence>
         </main>
@@ -816,6 +812,8 @@ export function AdminUpload() {
     }
   };
 
+  const { searchVal } = useOutletContext();
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <UploadDropzone onFilesSelected={handleFiles} />
@@ -830,6 +828,7 @@ export function AdminUpload() {
           description="Monitor your uploaded documents. These files are processed through the RAG pipeline automatically."
           items={items}
           perPage={5}
+          searchQuery={searchVal}
         />
       )}
     </motion.div>
@@ -841,6 +840,7 @@ export function AdminDocuments() {
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState({ open: false, item: null });
   const initialFetch = useRef(true);
+  const { searchVal } = useOutletContext();
 
   const fetchDocs = async () => {
     // Only block UI with spinner on the first load; background refreshes are silent
@@ -911,7 +911,7 @@ export function AdminDocuments() {
           color="#34d4e0"
           description="Browse all indexed SOP documents. Manage your vector search index settings and document lifecycle here."
           items={items}
-          perPage={5}
+          searchQuery={searchVal}
           onDelete={handleDelete}
         />
       )}
@@ -926,81 +926,300 @@ export function AdminDocuments() {
   );
 }
 
-export function AdminChatLogs() {
-  const items = [
-    { icon: MessageSquare, title: "priya@zaalima.com", sub: '"How do I apply for leave?" — answered in 1.4s', badge: "Resolved" },
-    { icon: MessageSquare, title: "arjun@zaalima.com", sub: '"What is the refund window?" — 3 sources cited', badge: "Resolved" },
-    { icon: AlertCircle, title: "ravi@zaalima.com", sub: '"What is the CEO salary?" — hallucination blocked', badge: "Blocked" },
-    { icon: MessageSquare, title: "meena@zaalima.com", sub: '"How to reset password?" — answered in 0.9s', badge: "Resolved" },
-    { icon: Clock, title: "dev@zaalima.com", sub: '"List all IT policies" — streaming timeout', badge: "Timeout" },
-    { icon: MessageSquare, title: "sanjay@zaalima.com", sub: '"Refund process steps?" — answered in 1.1s', badge: "Resolved" },
-    { icon: MessageSquare, title: "anita@zaalima.com", sub: '"Leave balance query?" — answered in 0.7s', badge: "Resolved" },
-  ];
-  return <PaginatedList title="Chat Logs" icon={MessageSquare} color="#c084fc"
-    description="Review all employee queries, AI responses, retrieved SOP source chunks, and hallucination guard activations. Export logs for compliance audits."
-    items={items} perPage={5} />;
-}
+
 
 export function AdminPipeline() {
-  const items = [
-    { icon: CheckCircle2, title: "HR_Policy_2025.pdf", sub: "48 chunks embedded · Gemini text-embedding-004", badge: "Complete", progress: 100 },
-    { icon: CheckCircle2, title: "Refund_Policy_v3.pdf", sub: "62 chunks embedded · 1.8s pipeline time", badge: "Complete", progress: 100 },
-    { icon: RefreshCw, title: "Onboarding_Handbook.pdf", sub: "Processing chunk 14 / 55…", badge: "Running", progress: 45 },
-    { icon: Clock, title: "IT_Security_Guidelines.pdf", sub: "Queued — starts after current job", badge: "Queued", progress: 0 },
-  ];
+  const { searchVal } = useOutletContext();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDocs = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/admin/documents?limit=100");
+      const docsArray = res.data.data?.documents || res.data.data || [];
+      
+      const processing = docsArray
+        .filter(d => d.status === "processing" || d.status === "failed" || d.status === "reindexing")
+        .map(d => ({
+          icon: d.status === "failed" ? AlertCircle : RefreshCw,
+          title: d.name || d.originalName,
+          sub: d.status === "failed" ? d.processingError : `Processing...`,
+          badge: d.status.charAt(0).toUpperCase() + d.status.slice(1),
+          progress: d.status === "ready" ? 100 : d.status === "failed" ? 0 : 45
+        }));
+      
+      setItems(processing);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDocs();
+    const interval = setInterval(fetchDocs, 10000);
+    return () => clearInterval(interval);
+  }, [fetchDocs]);
+
+  const filtered = items.filter(item => {
+    if (!searchVal) return true;
+    const q = searchVal.toLowerCase();
+    return item.title.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q);
+  });
 
   return (
     <div className="space-y-6">
-      <SectionHeader title="Pipeline Real-time Status" color="#34d4e0" />
+      <SectionHeader title="Ingestion Pipeline" color="#34d4e0" />
       <div className="grid gap-4">
-        {items.map((item, i) => (
-          <EmbeddingProgress
-            key={i}
-            badge={item.badge}
-            progress={item.progress}
-            fileName={item.title}
-          />
-        ))}
+        {loading ? (
+           <div className="flex justify-center py-10"><Activity className="animate-spin text-teal-500" /></div>
+        ) : filtered.length === 0 ? (
+          <p className="text-center py-10 text-sm text-gray-500">No active background tasks</p>
+        ) : (
+          filtered.map((item, i) => (
+            <EmbeddingProgress
+              key={i}
+              badge={item.badge}
+              progress={item.progress}
+              fileName={item.title}
+            />
+          ))
+        )}
       </div>
 
       <div className="mt-10">
-        <PaginatedList title="Job History" icon={Activity} color="#c084fc"
-          description="Detailed log of all historical embedding jobs and pipeline performance metrics."
-          items={items} perPage={4} />
+        <h3 className="text-xl font-bold mb-4" style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55" }}>System Background Tasks</h3>
+        <p className="text-sm text-gray-500 mb-6">These are the background jobs currently handled by the embedding engine.</p>
+        {!loading && items.length === 0 && (
+           <div className="p-8 rounded-3xl bg-white/40 border border-teal-100 text-center text-sm text-teal-600">
+             Pipeline is currently idle. All documents are synchronized.
+           </div>
+        )}
       </div>
     </div>
   );
 }
 
 export function AdminAnalytics() {
-  const items = [
-    { icon: TrendingUp, title: "Total queries this week", sub: "2,148 queries across 28 users", badge: "+18%" },
-    { icon: CheckCircle2, title: "Avg RAG response time", sub: "1.24s median · 3.1s p99", badge: "Healthy" },
-    { icon: Shield, title: "Hallucination guard trips", sub: "3 blocked this week (0.14%)", badge: "Low" },
-    { icon: Database, title: "Most queried document", sub: "HR_Policy_2025.pdf — 412 hits", badge: "Top Doc" },
-    { icon: Zap, title: "Token usage (Gemini Flash)", sub: "1.2M tokens · within free tier limit", badge: "On Track" },
+  const { metrics, loading } = useAdmin();
+  const { searchVal } = useOutletContext();
+
+  if (loading) return <div className="flex justify-center p-20"><Activity className="animate-spin text-pink-500" /></div>;
+
+  const summaryItems = [
+    { icon: TrendingUp, title: "Total Queries", sub: `${metrics?.overview?.totalQueries || 0} total requests`, badge: metrics?.overview?.answerRate || "0%" },
+    { icon: CheckCircle2, title: "Avg Latency", sub: `${metrics?.performance?.avgResponseMs || 0}ms average response`, badge: "Ready" },
+    { icon: Zap, title: "Total Tokens", sub: `${metrics?.tokenUsage?.totalTokensConsumed?.toLocaleString() || 0} consumed`, badge: "Verified" },
+    { icon: Shield, title: "Hallucinations Blocked", sub: `${metrics?.overview?.unansweredQueries || 0} requests failed threshold`, badge: "Safe" },
   ];
-  return <PaginatedList title="Analytics" icon={TrendingUp} color="#f472b6"
-    description="Query volume, RAG response latency, hallucination guard activations, top documents, and token usage metrics for the OpsMind AI pipeline."
-    items={items} perPage={4} />;
+
+  return (
+    <div className="space-y-10">
+      <PaginatedList title="Performance Overview" icon={TrendingUp} color="#f472b6"
+        description="Real-time RAG pipeline performance, token costs, and safety metrics."
+        items={summaryItems} perPage={4} searchQuery={searchVal} />
+
+      <div>
+        <SectionHeader title="Top Unanswered Queries" color="#c084fc" />
+        <p className="text-sm text-gray-500 mb-6 -mt-4">These queries triggered the Hallucination Guard. Use them to improve your SOP knowledge base.</p>
+        <div className="grid gap-4">
+          {(() => {
+            const queries = metrics?.topUnansweredQueries || [];
+            const filtered = queries.filter(q => 
+              !searchVal || q._id?.toLowerCase().includes(searchVal.toLowerCase())
+            );
+
+            if (filtered.length > 0) {
+              return filtered.map((q, i) => (
+                <div key={i} className="p-4 rounded-2xl bg-white/50 border border-lilac-100 flex justify-between items-center group hover:bg-white transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                      <AlertCircle size={16} />
+                    </div>
+                    <span className="text-sm font-bold text-[#2d2b55]">{q._id}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[11px] font-black text-orange-500 bg-orange-50 px-2 py-1 rounded-md uppercase">{q.count} hits</span>
+                    <span className="text-[11px] text-[#9ca3af]">{new Date(q.lastSeen).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ));
+            }
+
+            return (
+              <div className="p-10 text-center text-sm text-gray-400 bg-white/30 rounded-3xl border border-dashed border-gray-200">
+                {searchVal ? `No results matching "${searchVal}"` : "No hallucination events recorded yet."}
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function AdminUsers() {
-  const items = [
-    { icon: Users, title: "priya@zaalima.com", sub: "Employee · 48 queries this week", badge: "Active" },
-    { icon: Users, title: "arjun@zaalima.com", sub: "Employee · 22 queries this week", badge: "Active" },
-    { icon: Users, title: "ravi@zaalima.com", sub: "Employee · 5 queries this week", badge: "Active" },
-    { icon: Users, title: "meena@zaalima.com", sub: "Employee · 0 queries — invited", badge: "Pending" },
-    { icon: Shield, title: "admin@opsmind.ai", sub: "Admin · Full system access", badge: "Admin" },
-    { icon: Users, title: "sanjay@zaalima.com", sub: "Employee · 12 queries this week", badge: "Active" },
-    { icon: Users, title: "anita@zaalima.com", sub: "Employee · 8 queries this week", badge: "Active" },
-  ];
-  return <PaginatedList title="User Management" icon={Users} color="#f472b6"
-    description="Manage employee accounts, assign roles (Employee / Admin), invite new users, revoke access, and monitor per-user query activity."
-    items={items} perPage={4} />;
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const limit = 6; // 6 users per page (works great with the 3-column grid)
+  const initialFetch = useRef(true);
+  const { searchVal } = useOutletContext();
+
+  const fetchUsers = useCallback(async (pageNum, signal) => {
+    if (initialFetch.current || pageNum !== page) setLoading(true);
+    try {
+      const res = await axios.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
+      const rawUsers = res.data.data || [];
+      
+      // Map backend User model to UserCard prop structure
+      const mapped = rawUsers
+        .filter(u => u.role !== 'admin')
+        .map(u => ({
+          id: u._id,
+          name: u.name,
+          email: u.email,
+          role: 'employee',
+          status: u.isActive ? 'active' : 'inactive',
+          queries: u.queryCount || 0,
+          joinedAt: u.createdAt,
+          lastActive: u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : "Never",
+          avatar: u.avatar || null
+        }));
+      
+      setUsers(mapped);
+      setHasMore(rawUsers.length === limit);
+    } catch (err) {
+      if (axios.isCancel(err)) return;
+      console.error("Failed to fetch users:", err);
+      showToast.error("Failed to load users");
+    } finally {
+      setLoading(false);
+      initialFetch.current = false;
+    }
+  }, [page]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchUsers(page, controller.signal);
+    
+    // Auto-refresh interval (scoped within the effect)
+    const interval = setInterval(() => {
+      fetchUsers(page, controller.signal);
+    }, 60000);
+
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [fetchUsers, page]);
+
+  const handleToggleStatus = async (userId) => {
+    try {
+      await axios.patch(`/api/admin/users/${userId}/toggle`);
+      showToast.success("User status updated");
+      fetchUsers(page);
+    } catch (err) {
+      console.error(err);
+      showToast.error(err.response?.data?.message || "Failed to update status");
+    }
+  };
+
+  return (
+    <div className="space-y-8 pb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <SectionHeader title="User Management" color="#f472b6" />
+          <p className="text-sm -mt-4 max-w-2xl" style={{ color: "#5a5880" }}>
+            Manage employee accounts, assign roles, monitor activity, and control system access.
+          </p>
+        </div>
+        <motion.button 
+          onClick={() => fetchUsers(page)} disabled={loading}
+          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white border border-pink-100 shadow-sm text-pink-500"
+        >
+          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          Refresh
+        </motion.button>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center p-24">
+          <Activity className="animate-spin text-[#f472b6] w-12 h-12" />
+        </div>
+      ) : (
+        <>
+          <UserCardGrid 
+            users={users} 
+            onStatusToggle={handleToggleStatus}
+            onViewActivity={(id) => navigate(`/admin/analytics?user=${id}`)}
+            onDelete={async (id) => {
+               if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+               try {
+                 await axios.delete(`/api/admin/users/${id}`);
+                 showToast.success("User deleted successfully");
+                 fetchUsers(page);
+               } catch (err) {
+                 showToast.error(err.response?.data?.message || "Failed to delete user");
+               }
+            }}
+            onRoleChange={async (id, newRole) => {
+              try {
+                await axios.patch(`/api/admin/users/${id}/role`, { role: newRole });
+                showToast.success(`User role updated to ${newRole}`);
+                fetchUsers(page);
+              } catch (err) {
+                showToast.error("Failed to update role");
+              }
+            }}
+            onResetPassword={async (id) => {
+              try {
+                const res = await axios.post(`/api/admin/users/${id}/reset-password`);
+                showToast.success(res.data.message);
+              } catch (err) {
+                showToast.error("Failed to reset password");
+              }
+            }}
+            searchQuery={searchVal}
+          />
+
+          {/* Simple Professional Pagination */}
+          {(page > 1 || hasMore) && (
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <motion.button
+                whileHover={{ scale: 1.1, x: -4 }} whileTap={{ scale: 0.9 }}
+                disabled={page === 1 || loading}
+                onClick={() => setPage(p => p - 1)}
+                className="p-3 rounded-2xl bg-white border border-pink-100 shadow-sm text-pink-500 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={20} />
+              </motion.button>
+              
+              <div className="px-6 py-2 rounded-2xl bg-white/50 backdrop-blur-md border border-pink-100 text-sm font-bold text-pink-500 shadow-sm">
+                Page {page}
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.1, x: 4 }} whileTap={{ scale: 0.9 }}
+                disabled={!hasMore || loading}
+                onClick={() => setPage(p => p + 1)}
+                className="p-3 rounded-2xl bg-white border border-pink-100 shadow-sm text-pink-500 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={20} />
+              </motion.button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 }
 
 export function AdminSettings() {
+  const { searchVal } = useOutletContext();
   const items = [
     { icon: Database, title: "MongoDB Atlas", sub: "Vector Search · Cluster M0 Free Tier", badge: "Connected" },
     { icon: Brain, title: "Gemini 1.5 Flash", sub: "LLM · text-embedding-004 · Google AI Studio", badge: "Active" },
@@ -1010,5 +1229,5 @@ export function AdminSettings() {
   ];
   return <PaginatedList title="Settings" icon={Settings} color="#7c6fff"
     description="Configure RAG pipeline parameters, chunk size & overlap, embedding model, hallucination guard, Stripe subscription, and system preferences."
-    items={items} perPage={4} />;
+    items={items} perPage={4} searchQuery={searchVal} />;
 }

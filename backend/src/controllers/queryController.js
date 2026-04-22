@@ -158,6 +158,13 @@ const query = async (req, res, next) => {
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('X-Accel-Buffering', 'no');
         res.flushHeaders();
+
+        // Send metadata first to signal blocked hallucination
+        sseWrite(res, 'metadata', {
+          answered: false,
+          chunksRetrieved: 0,
+        });
+
         sseWrite(res, 'sources', { sources: [] });
         sseWrite(res, 'chunk', { content: NO_ANSWER_TEXT });
         sseWrite(res, 'done', {

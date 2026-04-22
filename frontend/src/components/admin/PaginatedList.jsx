@@ -3,13 +3,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pagination } from "./Pagination";
 import { StatusBadge } from "../ui/Badge";
 
-export function PaginatedList({ title, icon: Icon, color, description, items, perPage = 4 }) {
+export function PaginatedList({ title, icon: Icon, color, description, items, perPage = 4, searchQuery = "" }) {
   const [page, setPage] = useState(1);
   const [retried, setRetried] = useState({});
 
-  const totalItems = items.length;
+  // Professional filtering logic for global search
+  const filteredItems = items.filter(item => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title?.toLowerCase().includes(q) ||
+      item.sub?.toLowerCase().includes(q) ||
+      item.badge?.toLowerCase().includes(q)
+    );
+  });
+
+  const totalItems = filteredItems.length;
   const start = (page - 1) * perPage;
-  const pageItems = items.slice(start, start + perPage);
+  const pageItems = filteredItems.slice(start, start + perPage);
 
   const handleRetry = (index) => {
     setRetried(prev => ({ ...prev, [start + index]: true }));
@@ -63,14 +74,19 @@ export function PaginatedList({ title, icon: Icon, color, description, items, pe
           >
             {pageItems.length === 0 ? (
               <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                className="flex flex-col items-center justify-center py-16 rounded-2xl"
-                style={{ background: "rgba(255,255,255,0.5)", border: "1.5px dashed rgba(0,0,0,0.1)" }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center py-20 rounded-2xl"
+                style={{ background: "rgba(255,255,255,0.4)", border: "1.5px dashed rgba(108,99,255,0.15)" }}
               >
-                <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-                  <Icon size={36} style={{ color: `${color}80` }} />
-                </motion.div>
-                <p className="mt-3 text-sm font-medium" style={{ color: "#5a5880" }}>No data yet</p>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "rgba(108,99,255,0.05)" }}>
+                  <Search size={28} className="text-[#7c6fff] opacity-40" />
+                </div>
+                <p className="text-sm font-bold" style={{ color: "#2d2b55" }}>
+                  {searchQuery ? "No matching results" : "No data yet"}
+                </p>
+                <p className="text-xs mt-1" style={{ color: "#5a5880" }}>
+                  {searchQuery ? `Try searching for something else` : `Items will appear here once available`}
+                </p>
               </motion.div>
             ) : (
               pageItems.map((item, i) => {

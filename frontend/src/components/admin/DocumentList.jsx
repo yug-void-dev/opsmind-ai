@@ -11,13 +11,26 @@ export function DocumentList({
   description, 
   items = [], 
   perPage = 5,
+  searchQuery = "",
   onDelete,
   onView
 }) {
   const [page, setPage] = useState(1);
-  const totalItems = items.length;
+  
+  // Filter items based on searchQuery
+  const filteredItems = items.filter(item => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title?.toLowerCase().includes(q) ||
+      item.sub?.toLowerCase().includes(q) ||
+      item.badge?.toLowerCase().includes(q)
+    );
+  });
+
+  const totalItems = filteredItems.length;
   const start = (page - 1) * perPage;
-  const pageItems = items.slice(start, start + perPage);
+  const pageItems = filteredItems.slice(start, start + perPage);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>

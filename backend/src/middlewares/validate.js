@@ -104,6 +104,21 @@ const updateTagsSchema = Joi.object({
   tags: Joi.array().items(Joi.string().trim().max(50)).max(20).required(),
 });
 
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+const verifyOTPSchema = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.string().length(6).required(),
+});
+
+const resetPasswordSchema = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.string().length(6).required(),
+  newPassword: Joi.string().min(8).max(72).required(),
+});
+
 module.exports = {
   validate,
   schemas: {
@@ -113,5 +128,8 @@ module.exports = {
     uploadMeta: uploadMetaSchema,
     saveChat: saveChatSchema,
     updateTags: updateTagsSchema,
+    forgotPassword: forgotPasswordSchema,
+    verifyOTP: verifyOTPSchema,
+    resetPassword: resetPasswordSchema,
   },
 };

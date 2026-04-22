@@ -123,7 +123,13 @@ export function useChat() {
 
         let accumulated = "";
         for await (const chunk of parseSSEStream(response)) {
-          if (chunk.type === "text" || chunk.content) {
+          if (chunk.type === "metadata") {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
+              )
+            );
+          } else if (chunk.type === "text" || chunk.content) {
             accumulated += chunk.content ?? chunk;
             setMessages((prev) =>
               prev.map((m) =>
@@ -136,6 +142,12 @@ export function useChat() {
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === assistantMsg.id ? { ...m, sources: chunk.sources } : m
+              )
+            );
+          } else if (chunk.type === "done") {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
               )
             );
           } else if (chunk.type === "error") {

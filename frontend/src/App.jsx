@@ -5,14 +5,16 @@ import AuthPage from "./pages/AuthPage";
 import AdminPage, {
   AdminOverview,
   AdminDocuments,
-  AdminChatLogs,
   AdminPipeline,
   AdminAnalytics,
   AdminUsers,
   AdminSettings,
   AdminUpload,
 } from "./pages/AdminPage";
+import { AdminProvider } from "./context/AdminContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import DashboardPage from "./pages/DashboardPage";
+import ChatPage from "./pages/ChatPage";
 
 import useAuth from "./hooks/useAuth";
 
@@ -52,11 +54,18 @@ export default function App() {
         <Route path="/forgot-password" element={<AuthPage />} />
 
         {/* Admin — nested layout with Outlet */}
-        <Route path="/admin" element={<ProtectedRoute adminOnly={true}><AdminPage /></ProtectedRoute>}>
+        <Route path="/admin" element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminProvider>
+              <NotificationProvider>
+                <AdminPage />
+              </NotificationProvider>
+            </AdminProvider>
+          </ProtectedRoute>
+        }>
           <Route index element={<AdminOverview />} />
           <Route path="upload" element={<AdminUpload />} />
           <Route path="documents" element={<AdminDocuments />} />
-          <Route path="chatlogs" element={<AdminChatLogs />} />
           <Route path="pipeline" element={<AdminPipeline />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="users" element={<AdminUsers />} />
@@ -65,6 +74,7 @@ export default function App() {
 
         {/* Default */}
         <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

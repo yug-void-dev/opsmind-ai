@@ -20,6 +20,7 @@ const { sanitizeFilename, sanitizeTags } = require('../utils/sanitizer');
 const cache = require('../utils/cache');
 const { success, created, notFound, badRequest, error } = require('../utils/apiResponse');
 const logger = require('../utils/logger');
+const socketService = require('../services/socketService');
 
 // ─── Upload Handler ───────────────────────────────────────────────────────────
 
@@ -181,12 +182,28 @@ const runProcessingPipeline = async (docRecord, tags, userId, startTime) => {
 
     await logUpload({ userId, documentId: docRecord._id, responseTime: Date.now() - startTime });
 
+    // Notify admins of success
+    await socketService.notifyAdmins({
+      title: 'New PDF indexed',
+      message: `"${docRecord.name}" is ready for querying (${totalChunks} chunks).`,
+      type: 'document_indexed',
+      metadata: { documentId: docRecord._id, name: docRecord.name }
+    });
+
   } catch (err) {
     logger.error(`[Pipeline] ❌ Failed [${docRecord._id}]: ${err.message}`);
     await Document.findByIdAndUpdate(docRecord._id, {
       status: 'failed',
       processingError: err.message,
     }).catch(() => {});
+
+    // Notify admins of failure
+    await socketService.notifyAdmins({
+      title: 'PDF indexing failed',
+      message: `Failed to process "${docRecord.name}": ${err.message}`,
+      type: 'document_failed',
+      metadata: { documentId: docRecord._id, name: docRecord.name, error: err.message }
+    });
   }
 };
 

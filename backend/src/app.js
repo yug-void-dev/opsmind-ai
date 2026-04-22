@@ -26,6 +26,7 @@ const documentRoutes = require('./routes/documentRoutes');
 const queryRoutes    = require('./routes/queryRoutes');
 const chatRoutes     = require('./routes/chatRoutes');
 const adminRoutes    = require('./routes/adminRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 const logger = require('./utils/logger');
 
@@ -149,6 +150,7 @@ app.use('/api/documents',                documentRoutes);
 app.use('/api/query',     queryLimiter,  queryRoutes);
 app.use('/api/chats',                    chatRoutes);
 app.use('/api/admin',                    adminRoutes);
+app.use('/api/notifications',            notificationRoutes);
 
 // ─── 9–10. Error Handlers ─────────────────────────────────────────────────────
 app.use(notFoundHandler);
