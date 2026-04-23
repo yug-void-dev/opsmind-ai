@@ -1,22 +1,39 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, BookOpen, Sparkles, Settings, AlertTriangle, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Brain, BookOpen, Sparkles, AlertTriangle, X } from "lucide-react";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatMessage from "../components/chat/ChatMessage";
 import ChatInput from "../components/chat/ChatInput";
 import SourcesPanel from "../components/chat/SourcesPanel"; 
 import { useChat } from "../hooks/useChat";
+import { useDocuments } from "../hooks/useDocuments";
+import useAuth from "../hooks/useAuth";
 import * as THREE from "three";
 
-const STARTER_PROMPTS = [
+const DEFAULT_PROMPTS = [
   { icon: "📋", text: "How do I process a customer refund?" },
   { icon: "🔒", text: "What is the data security policy for remote work?" },
   { icon: "🧾", text: "Walk me through the employee onboarding checklist." },
   { icon: "🚨", text: "What are the incident response procedures?" },
 ];
 
-function EmptyState({ onPrompt }) {
+function EmptyState({ onPrompt, documents = [], loading = false }) {
+  const prompts = useMemo(() => {
+    if (loading) return DEFAULT_PROMPTS; // Keep defaults while loading to avoid flicker
+    if (documents && documents.length > 0) {
+      const icons = ["📊", "🔍", "💡", "🛡️"];
+      return documents.slice(0, 4).map((doc, i) => {
+        const name = doc.name || doc.originalName || "Document";
+        return {
+          icon: icons[i % icons.length],
+          text: `Tell me about ${name}`,
+          fullQuery: `Can you give me a summary and key points from the document "${name}"?`
+        };
+      });
+    }
+    return DEFAULT_PROMPTS;
+  }, [documents]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,7 +61,7 @@ function EmptyState({ onPrompt }) {
       </p>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-md">
-        {STARTER_PROMPTS.map((p, i) => (
+        {prompts.map((p, i) => (
           <motion.button
             key={i}
             initial={{ opacity: 0, y: 10 }}
@@ -52,7 +69,7 @@ function EmptyState({ onPrompt }) {
             transition={{ delay: 0.1 + i * 0.07 }}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onPrompt(p.text)}
+            onClick={() => onPrompt(p.fullQuery || p.text)}
             className="flex items-start gap-2.5 p-3.5 rounded-xl text-left text-xs transition-all shadow-sm"
             style={{
               background: "rgba(255,255,255,0.7)",
@@ -192,7 +209,6 @@ function MeshBackground() {
 }
 
 export default function ChatPage() {
-  const navigate = useNavigate();
   const { 
     sessions, 
     activeSessionId, 
@@ -207,13 +223,35 @@ export default function ChatPage() {
     clearChat,
     clearError
   } = useChat();
+  const { user } = useAuth();
+  const [docs, setDocs] = useState([]);
+  const [docsLoading, setDocsLoading] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showSources, setShowSources] = useState(false);
   const [activeSources, setActiveSources] = useState([]);
   const [activeCitation, setActiveCitation] = useState(null);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { 
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); 
+  }, [messages]);
+
+  useEffect(() => {
+    const fetchStarterDocs = async () => {
+      setDocsLoading(true);
+      try {
+        // Fetch most recent documents to generate suggestions
+        const res = await api.get("/api/documents?limit=8");
+        const documents = Array.isArray(res) ? res : (res?.documents || []);
+        setDocs(documents.filter(d => d.status === 'ready' || d.status === 'indexed'));
+      } catch (err) {
+        console.error("Failed to fetch suggestions:", err);
+      } finally {
+        setDocsLoading(false);
+      }
+    };
+    fetchStarterDocs();
+  }, []);
 
   // Track sources from the LAST assistant message (always the current one)
   useEffect(() => {
@@ -314,16 +352,8 @@ export default function ChatPage() {
                   ? { background: "rgba(124,111,255,0.15)", border: "1.5px solid rgba(124,111,255,0.3)", color: "#7c6fff" }
                   : { background: "rgba(255,255,255,0.8)", border: "1.5px solid rgba(124,111,255,0.1)", color: "#5a5880" }}
               >
-<<<<<<< HEAD
                 <BookOpen size={14} />Sources
                 {activeSources.length > 0 && <span className="ml-1 w-4 h-4 bg-[#7c6fff] rounded-full text-[9px] flex items-center justify-center text-white">{activeSources.length}</span>}
-=======
-                <BookOpen size={13} />Sources
-                {activeSources.length > 0 && <span className="ml-0.5 w-4 h-4 bg-violet-600 rounded-full text-[9px] flex items-center justify-center text-white">{activeSources.length}</span>}
-              </button>
-              <button onClick={() => navigate("/admin/settings")} className="p-2 rounded-lg" style={{ color: "rgba(255,255,255,0.3)" }}>
-                <Settings size={15} />
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
               </button>
             </div>
           </header>
@@ -349,7 +379,7 @@ export default function ChatPage() {
                 <p className="text-xs font-bold uppercase tracking-widest text-[#9ca3af]">Loading Messages...</p>
               </div>
             ) : messages.length === 0 ? (
-              <EmptyState onPrompt={(text) => sendMessage(text)} />
+              <EmptyState onPrompt={(text) => sendMessage(text)} documents={docs} loading={docsLoading} />
             ) : (
               <>{messages.map((msg) => <ChatMessage key={msg.id} message={msg} onCitationClick={handleCitationClick} />)}<div ref={messagesEndRef} /></>
             )}

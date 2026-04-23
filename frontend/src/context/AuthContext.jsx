@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect } from "react"
 import api from "../utils/api"
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../utils/firebase";
 
 export const AuthContext = createContext(null)
 
@@ -20,11 +22,39 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
+  const loginWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const firebaseToken = await result.user.getIdToken();
+      
+      // Send Firebase token to our backend
+      const response = await api.post("/api/auth/google-login", { 
+        token: firebaseToken,
+        email: result.user.email,
+        name: result.user.displayName,
+        photoURL: result.user.photoURL
+      });
+
+      const { token, user } = response;
+      setToken(token);
+      setUser(user);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      return { success: true, user };
+    } catch (error) {
+      console.error("Google Login error:", error);
+      return {
+        success: false,
+        message: error.message || "Google Login failed"
+      };
+    }
+  }
+
   const login = async ({ email, password }) => {
     try {
-      // api interceptor unwraps { success, data, message } → response.data = inner data
+      // api interceptor unwraps { success, data, message } → response = inner data
       const response = await api.post("/api/auth/login", { email, password });
-      const { token, user } = response.data;
+      const { token, user } = response;
       setToken(token);
       setUser(user);
       localStorage.setItem("token", token);
@@ -42,22 +72,14 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData, autoLogin = true) => {
     try {
       const response = await api.post("/api/auth/register", formData);
-      const { token, user } = response.data;
+      const { token, user } = response;
 
-<<<<<<< HEAD
       if (autoLogin) {
         setToken(token);
         setUser(user);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       }
-=======
-      setToken(token);
-      setUser(user);
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
       return { success: true, user };
     } catch (error) {
       console.error("Registration error:", error);
@@ -78,7 +100,7 @@ export const AuthProvider = ({ children }) => {
   const forgotPassword = async (email) => {
     try {
       const response = await api.post("/api/auth/forgot-password", { email });
-      return { success: true, message: response.data?._message || "OTP sent" };
+      return { success: true, message: response?._message || "OTP sent" };
     } catch (error) {
       console.error("Forgot password error:", error);
       return {
@@ -91,7 +113,7 @@ export const AuthProvider = ({ children }) => {
   const verifyOTP = async (email, otp) => {
     try {
       const response = await api.post("/api/auth/verify-otp", { email, otp });
-      return { success: true, message: response.data?._message || "OTP verified" };
+      return { success: true, message: response?._message || "OTP verified" };
     } catch (error) {
       console.error("OTP verification error:", error);
       return {
@@ -104,7 +126,7 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email, otp, newPassword) => {
     try {
       const response = await api.post("/api/auth/reset-password", { email, otp, newPassword });
-      return { success: true, message: response.data?._message || "Password reset" };
+      return { success: true, message: response?._message || "Password reset" };
     } catch (error) {
       console.error("Password reset error:", error);
       return {
@@ -114,7 +136,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const value = { user, token, loading, login, register, logout, forgotPassword, verifyOTP, resetPassword }
+  const value = { user, token, loading, login, loginWithGoogle, register, logout, forgotPassword, verifyOTP, resetPassword }
 
   return (
     <AuthContext.Provider value={value}>

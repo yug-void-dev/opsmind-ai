@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail, Users, MessageSquare, Clock,
-  Trash2, Activity, ChevronDown, 
-  Search, Eye, Crown, AlertCircle, RefreshCw, Shield
+  Activity, ChevronDown, 
+  Search, Crown
 } from "lucide-react";
 
 /* ── Status config ── */
@@ -36,67 +36,15 @@ function getInitials(name = "") {
   return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() || "??";
 }
 
-const CARD_PARTICLES = Array.from({ length: 6 }, (_, i) => ({
-  id: i,
-  x: 10 + Math.random() * 80,
-  y: 10 + Math.random() * 80,
-  size: 2 + Math.random() * 2,
-  dur: 3 + Math.random() * 4,
-  delay: Math.random() * 3,
-}));
-
-function ConfirmPopup({ message, onConfirm, onCancel, danger = false }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.88, y: 8 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.88, y: 8 }}
-      transition={{ duration: 0.2 }}
-      className="absolute right-0 top-12 w-64 rounded-2xl p-4 z-50 text-left"
-      style={{
-        background: "rgba(255,255,255,0.97)",
-        backdropFilter: "blur(24px)",
-        border: "1.5px solid rgba(255,255,255,0.9)",
-        boxShadow: "0 16px 48px rgba(0,0,0,0.14)",
-      }}
-    >
-      <p className="text-xs font-semibold mb-3 leading-relaxed" style={{ color: "#2d2b55" }}>{message}</p>
-      <div className="flex gap-2">
-        <button onClick={onCancel} className="flex-1 py-1.5 rounded-xl text-xs font-bold" style={{ background: "rgba(0,0,0,0.04)", color: "#5a5880" }}>Cancel</button>
-        <button onClick={onConfirm} className="flex-1 py-1.5 rounded-xl text-xs font-bold text-white" 
-          style={{ background: danger ? "#ef4444" : "#7c6fff" }}>Confirm</button>
-      </div>
-    </motion.div>
-  );
-}
-
-export default function UserCard({ user, onDelete, onStatusToggle, onViewActivity, onRoleChange, onResetPassword, delay = 0 }) {
-  const [confirmData, setConfirmData] = useState(null);
+export default function UserCard({ user, delay = 0 }) {
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const menuRef = useRef(null);
 
   const sc = STATUS_CFG[user.status] || STATUS_CFG.active;
   const rc = ROLE_CFG[user.role] || ROLE_CFG.employee;
   const RoleIcon = rc.icon;
   const [gradFrom, gradTo] = getAvatarGradient(user.name);
   const initials = getInitials(user.name);
-
-  useEffect(() => {
-    const h = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setConfirmData(null);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-
-  const handleDelete = () => {
-    setConfirmData({
-      message: `Permanently delete ${user.name}? This action cannot be undone.`,
-      onConfirm: () => { setConfirmData(null); onDelete?.(user.id); },
-      danger: true
-    });
-  };
 
   const queryBar = Math.min((user.queries || 0) / 100, 1);
 
@@ -134,29 +82,10 @@ export default function UserCard({ user, onDelete, onStatusToggle, onViewActivit
             <p className="text-xs truncate" style={{ color: "#5a5880" }}>{user.email}</p>
           </div>
 
-          <div className="flex flex-col items-end gap-2" ref={menuRef}>
+          <div className="flex flex-col items-end gap-2">
             <span className="px-2.5 py-1 rounded-full text-[11px] font-bold" style={{ background: sc.bg, color: sc.text }}>
               {sc.label}
             </span>
-            <div className="relative">
-              <button 
-                onClick={handleDelete}
-                className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
-                style={{ background: "rgba(239,68,68,0.06)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}
-              >
-                <Trash2 size={16} />
-              </button>
-              <AnimatePresence>
-                {confirmData && (
-                  <ConfirmPopup
-                    message={confirmData.message}
-                    onConfirm={confirmData.onConfirm}
-                    onCancel={() => setConfirmData(null)}
-                    danger={confirmData.danger}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
 
@@ -189,48 +118,8 @@ export default function UserCard({ user, onDelete, onStatusToggle, onViewActivit
               <DetailRow label="Joined" value={formatDate(user.joinedAt, true)} />
               <DetailRow label="Status" value={sc.label} />
               <DetailRow label="Last Active" value={user.lastActive ?? "Never"} />
-              <div className="flex flex-wrap gap-2 pt-2">
-                {onStatusToggle && (
-                  <button
-                    onClick={() => onStatusToggle(user.id)}
-                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
-                    style={{ background: user.status === "active" ? "rgba(239,68,68,0.08)" : "rgba(34,197,94,0.08)", color: user.status === "active" ? "#dc2626" : "#16a34a", border: `1px solid ${user.status === "active" ? "rgba(239,68,68,0.2)" : "rgba(34,197,94,0.2)"}` }}
-                  >
-                    {user.status === "active" ? "Deactivate" : "Activate"}
-                  </button>
-                )}
-                {onViewActivity && (
-                  <button
-                    onClick={() => onViewActivity(user.id)}
-                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
-                    style={{ background: "rgba(52,212,224,0.08)", color: "#0891b2", border: "1px solid rgba(52,212,224,0.2)" }}
-                  >
-                    Activity
-                  </button>
-                )}
-                {onRoleChange && (
-                  <button
-                    onClick={() => onRoleChange(user.id, user.role === "admin" ? "user" : "admin")}
-                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
-                    style={{ background: "rgba(124,111,255,0.08)", color: "#6c63ff", border: "1px solid rgba(124,111,255,0.2)" }}
-                  >
-                    Make {user.role === "admin" ? "Employee" : "Admin"}
-                  </button>
-                )}
-                {onResetPassword && (
-                  <button
-                    onClick={() => setConfirmData({
-                      message: `Send a password reset email to ${user.name}?`,
-                      onConfirm: () => { setConfirmData(null); onResetPassword(user.id); },
-                      danger: false,
-                    })}
-                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
-                    style={{ background: "rgba(245,158,11,0.08)", color: "#b45309", border: "1px solid rgba(245,158,11,0.2)" }}
-                  >
-                    Reset Password
-                  </button>
-                )}
-              </div>
+              <DetailRow label="Email" value={user.email} />
+              <DetailRow label="Role" value={rc.label} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -265,7 +154,7 @@ function formatDate(iso, long = false) {
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: long ? "numeric" : "2-digit" });
 }
 
-export function UserCardGrid({ users = [], onDelete, onStatusToggle, onViewActivity, onRoleChange, onResetPassword, searchQuery = "" }) {
+export function UserCardGrid({ users = [], searchQuery = "" }) {
   const filteredUsers = users.filter(u => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
@@ -288,11 +177,6 @@ export function UserCardGrid({ users = [], onDelete, onStatusToggle, onViewActiv
           key={u.id}
           user={u}
           delay={i * 0.05}
-          onDelete={onDelete}
-          onStatusToggle={onStatusToggle}
-          onViewActivity={onViewActivity}
-          onRoleChange={onRoleChange}
-          onResetPassword={onResetPassword}
         />
       ))}
     </div>

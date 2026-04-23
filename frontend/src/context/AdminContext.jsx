@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import { createContext, useState, useEffect, useCallback, useContext, useRef } from 'react';
-import axios from 'axios';
-=======
-import { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
 import showToast from '../components/ui/Toast';
 import { NotificationContext } from './NotificationContext';
 
@@ -26,7 +21,7 @@ export const AdminProvider = ({ children }) => {
   const fetchStats = useCallback(async (signal) => {
     try {
       const res = await api.get('/api/admin/stats', { signal });
-      setStats(res.data);
+      setStats(res); // api utility already unwraps response.data.data
     } catch (err) {
       if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin stats:', err);
@@ -36,7 +31,7 @@ export const AdminProvider = ({ children }) => {
   const fetchMetrics = useCallback(async (days = 30, signal) => {
     try {
       const res = await api.get(`/api/admin/analytics?days=${days}`, { signal });
-      setMetrics(res.data);
+      setMetrics(res);
     } catch (err) {
       if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin analytics:', err);
@@ -45,14 +40,9 @@ export const AdminProvider = ({ children }) => {
 
   const fetchActivities = useCallback(async (page = 1, limit = 10, signal) => {
     try {
-<<<<<<< HEAD
-      const res = await axios.get(`/api/admin/activities?page=${page}&limit=${limit}`, { signal });
-      setActivities(res.data.data.activities || []);
-      setActivityPagination(res.data.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
-=======
-      const res = await api.get('/api/admin/activities', { signal });
-      setActivities(res.data);
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
+      const res = await api.get(`/api/admin/activities?page=${page}&limit=${limit}`, { signal });
+      setActivities(res.activities || []);
+      setActivityPagination(res.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 });
     } catch (err) {
       if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin activities:', err);

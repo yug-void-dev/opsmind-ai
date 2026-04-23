@@ -14,7 +14,7 @@ import AdminPage, {
 import { AdminProvider } from "./context/AdminContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import ChatPage from "./pages/ChatPage";
-
+import NotFoundPage from "./pages/NotFoundPage";
 import useAuth from "./hooks/useAuth";
 
 /* ── ProtectedRoute ──
@@ -88,7 +88,7 @@ export default function App() {
           </ProtectedRoute>
         } />
         <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

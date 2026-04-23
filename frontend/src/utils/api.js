@@ -81,13 +81,24 @@ api.interceptors.response.use(
       typeof response.data === "object" &&
       "success" in response.data
     ) {
-      // Preserve backend message for toast notifications without breaking data access
-      response.data._message = response.data.message;
-      return response.data.data; // Return the inner data directly
+      // Preserve backend metadata for toast notifications
+      const data = response.data.data;
+      if (data && (typeof data === "object" || Array.isArray(data))) {
+        data._message = response.data.message;
+        data._success = response.data.success;
+      }
+      return data; // Return the inner data directly (now with metadata attached)
     }
     return response.data; // Fallback to just data if envelope not present
   },
   (error) => {
+    // ─── Handle Request Cancellation ──────────────────────────────────────────
+    // If the request was aborted via AbortController/CancelToken, don't wrap it.
+    // This allows components to check for 'CanceledError' or 'AbortError'.
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     // Network error — no response received from server at all
     if (!error.response) {
       return Promise.reject(

@@ -16,10 +16,12 @@ export function useDocuments() {
     setError(null);
     try {
       const res = await documentsApi.list(params);
-      const docs = Array.isArray(res.data) ? res.data : (res.data?.documents || []);
+      const docs = Array.isArray(res) ? res : (res?.documents || []);
       setDocuments(docs);
       return docs;
     } catch (err) {
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return [];
+      if (err.statusCode === 429) return [];
       setError(err.message);
       showToast.error("Failed to load documents");
       return [];

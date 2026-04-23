@@ -192,10 +192,63 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /api/auth/google-login
+ */
+const googleLogin = async (req, res, next) => {
+  try {
+    const { email, name, photoURL } = req.body;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // First-time user: Create account
+      // Note: We don't need a password for Google-only accounts
+      // but the model might require one, so we'll generate a random one
+      const randomPassword = crypto.randomBytes(16).toString('hex');
+      
+      const userCount = await User.countDocuments();
+      const role = userCount === 0 ? 'admin' : 'user';
+
+      user = await User.create({ 
+        name, 
+        email, 
+        password: randomPassword, 
+        role,
+        isActive: true 
+      });
+
+      logger.info(`New user registered via Google: ${email} [${role}]`);
+
+      // Notify admins
+      if (role === 'user') {
+        await socketService.notifyAdmins({
+          title: 'New Google Registration',
+          message: `${name} joined via Google.`,
+          type: 'user_registered',
+          metadata: { userId: user._id, email }
+        });
+      }
+    } else {
+      if (!user.isActive) return unauthorized(res, 'Account deactivated. Contact admin.');
+      
+      user.lastLogin = new Date();
+      await user.save({ validateBeforeSave: false });
+      logger.info(`User logged in via Google: ${email}`);
+    }
+
+    const token = signToken(user._id);
+    return success(res, { token, user }, 'Google login successful');
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = { 
   register, 
   login, 
   getMe, 
+  googleLogin,
   createAdminUser,
   forgotPassword,
   verifyOTP,

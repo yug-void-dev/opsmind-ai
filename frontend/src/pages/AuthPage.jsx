@@ -176,7 +176,7 @@ export default function AuthPage() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [otp, setOtp] = useState("");
 
-  const { login, register, forgotPassword, verifyOTP, resetPassword, user: authenticatedUser } = useAuth();
+  const { login, loginWithGoogle, register, forgotPassword, verifyOTP, resetPassword, user: authenticatedUser } = useAuth();
   const navigate = useNavigate();
 
   // Auto-redirect if already logged in
@@ -238,6 +238,23 @@ export default function AuthPage() {
       style: { left: "93%", bottom: "22%", dur: 8, delay: 0.2 },
     },
   ];
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    const result = await loginWithGoogle();
+    setIsLoading(false);
+
+    if (result.success) {
+      showToast.success("Google Login successful!");
+      const targetUser = result.user;
+      setTimeout(() => {
+        if (targetUser?.role === "admin") navigate("/admin");
+        else navigate("/chat");
+      }, 1000);
+    } else {
+      showToast.error(result.message);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -755,12 +772,14 @@ export default function AuthPage() {
                     <motion.div variants={si}>
                       <motion.button
                         type="button"
+                        onClick={handleGoogleLogin}
+                        disabled={isLoading}
                         whileHover={{
                           scale: 1.02,
                           boxShadow: "0 4px 20px rgba(108,99,255,0.14)",
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2.5 transition-all duration-200"
+                        className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2.5 transition-all duration-200 disabled:opacity-50"
                         style={{
                           background: "rgba(108,99,255,0.05)",
                           border: "1.5px solid rgba(108,99,255,0.14)",

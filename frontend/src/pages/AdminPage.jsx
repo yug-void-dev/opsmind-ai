@@ -769,35 +769,38 @@ export default function AdminPage() {
 export { AdminOverview };
 
 const mapDocumentToItem = (doc) => {
+  if (!doc) return null;
   let icon = Files;
   let badge = "Indexed";
 
-  if (doc.status === "processing") {
+  const status = doc.status?.toLowerCase() || "unknown";
+
+  if (status === "processing") {
     icon = Database;
     badge = "Processing";
-  } else if (doc.status === "failed") {
+  } else if (status === "failed") {
     icon = AlertCircle;
     badge = "Failed";
-  } else if (doc.status === "ready") {
+  } else if (status === "ready") {
     icon = Files;
     badge = "Ready";
-  } else if (doc.status === "reindexing") {
+  } else if (status === "reindexing") {
     icon = RefreshCw;
     badge = "Syncing";
   }
 
   const mb = doc.fileSize ? (doc.fileSize / (1024 * 1024)).toFixed(2) + " MB" : "";
-  const sub = doc.status === "failed"
+  const sub = status === "failed"
     ? (doc.processingError || "Processing failed")
     : `${doc.chunkCount || 0} chunks ${mb ? `· ${mb}` : ""}`;
 
   return {
     id: doc._id,
     icon,
-    title: doc.name || doc.originalName,
+    title: doc.name || doc.originalName || "Unnamed Document",
     sub,
     badge,
-    rawStatus: doc.status
+    rawStatus: status
   };
 };
 
@@ -806,32 +809,40 @@ export function AdminUpload() {
   const [loading, setLoading] = useState(true);
   const initialFetch = useRef(true);
 
-  const fetchRecent = async () => {
-    // Only show the loading spinner on the very first fetch
-    if (initialFetch.current) setLoading(true);
+  const fetchRecent = async (signal) => {
+    // Show spinner if: initial load OR manual refresh (no signal)
+    if (initialFetch.current || !signal) setLoading(true);
     try {
-      const res = await api.get("/api/documents?limit=100");
-      const docsArray = Array.isArray(res.data) ? res.data : (res.data?.documents || []);
-      const mapped = docsArray.map(mapDocumentToItem);
+      // Use admin endpoint for full visibility
+      const res = await api.get("/api/admin/documents?limit=10", { signal });
+      const docsArray = res?.documents || (Array.isArray(res) ? res : []);
+      const mapped = docsArray.map(mapDocumentToItem).filter(Boolean);
       setItems(mapped);
     } catch (err) {
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       if (err.statusCode !== 429) console.error(err);
     } finally {
-      if (initialFetch.current) {
-        setLoading(false);
-        initialFetch.current = false;
-      }
+      setLoading(false);
+      initialFetch.current = false;
     }
   };
 
-  useEffect(() => { fetchRecent(); }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchRecent(controller.signal);
+    return () => controller.abort();
+  }, []);
 
   // Always poll — documents can take minutes to embed
   useEffect(() => {
+    const controller = new AbortController();
     const hasProcessing = items.some(i => i.rawStatus === "processing" || i.rawStatus === "reindexing");
     // Poll faster when something is processing, slower otherwise for background refresh
-    const interval = setInterval(fetchRecent, hasProcessing ? 5000 : 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => fetchRecent(controller.signal), hasProcessing ? 5000 : 30000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [items]);
 
   const handleFiles = async (files) => {
@@ -885,33 +896,41 @@ export function AdminDocuments() {
   const initialFetch = useRef(true);
   const { searchVal } = useOutletContext();
 
-  const fetchDocs = async () => {
-    // Only block UI with spinner on the first load; background refreshes are silent
-    if (initialFetch.current) setLoading(true);
+  const fetchDocs = async (signal) => {
+    // Show spinner if: initial load OR manual refresh (no signal)
+    if (initialFetch.current || !signal) setLoading(true);
     try {
-      const res = await api.get("/api/documents?limit=100");
-      const docsArray = Array.isArray(res.data) ? res.data : (res.data?.documents || []);
-      setItems(docsArray.map(mapDocumentToItem));
+      // Use admin endpoint for full visibility and consistent response format
+      const res = await api.get("/api/admin/documents?limit=100", { signal });
+      const docsArray = res?.documents || (Array.isArray(res) ? res : []);
+      setItems(docsArray.map(mapDocumentToItem).filter(Boolean));
     } catch (err) {
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       if (err.statusCode !== 429) {
         console.error(err);
         if (initialFetch.current) showToast.error("Failed to load documents");
       }
     } finally {
-      if (initialFetch.current) {
-        setLoading(false);
-        initialFetch.current = false;
-      }
+      setLoading(false);
+      initialFetch.current = false;
     }
   };
 
-  useEffect(() => { fetchDocs(); }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchDocs(controller.signal);
+    return () => controller.abort();
+  }, []);
 
   // Auto-poll: fast when processing, slow otherwise for background auto-update
   useEffect(() => {
+    const controller = new AbortController();
     const hasProcessing = items.some(i => i.rawStatus === "processing" || i.rawStatus === "reindexing");
-    const interval = setInterval(fetchDocs, hasProcessing ? 5000 : 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => fetchDocs(controller.signal), hasProcessing ? 5000 : 30000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [items]);
 
   const handleDelete = (item) => {
@@ -936,7 +955,7 @@ export function AdminDocuments() {
   return (
     <div className="space-y-6">
       <div className="flex justify-end mb-4">
-        <motion.button onClick={fetchDocs} disabled={loading}
+        <motion.button onClick={() => fetchDocs()} disabled={loading}
           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold bg-white border border-gray-200 shadow-sm text-gray-700"
         >
@@ -973,20 +992,15 @@ export function AdminDocuments() {
 
 export function AdminPipeline() {
   const { searchVal } = useOutletContext();
+  const { stats, activities, fetchStats, fetchActivities, loading: globalLoading } = useAdmin();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDocs = useCallback(async () => {
     try {
-<<<<<<< HEAD
-      const res = await axios.get("/api/admin/documents?limit=100");
-      const docsArray = res.data.data?.documents || res.data.data || [];
-
-=======
+      // Sync local processing items
       const res = await api.get("/api/admin/documents?limit=100");
-      const docsArray = res.data?.documents || res.data || [];
-      
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
+      const docsArray = res.documents || res || [];
       const processing = docsArray
         .filter(d => d.status === "processing" || d.status === "failed" || d.status === "reindexing")
         .map(d => ({
@@ -998,12 +1012,18 @@ export function AdminPipeline() {
         }));
 
       setItems(processing);
+
+      // Also refresh global stats/activities for the status grid and history
+      await Promise.all([
+        fetchStats(),
+        fetchActivities(1, 8)
+      ]);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchStats, fetchActivities]);
 
   useEffect(() => {
     fetchDocs();
@@ -1011,41 +1031,92 @@ export function AdminPipeline() {
     return () => clearInterval(interval);
   }, [fetchDocs]);
 
-  const filtered = items.filter(item => {
+  const filteredItems = items.filter(item => {
     if (!searchVal) return true;
     const q = searchVal.toLowerCase();
     return item.title.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q);
   });
 
-  return (
-    <div className="space-y-6">
-      <SectionHeader title="Ingestion Pipeline" color="#34d4e0" />
-      <div className="grid gap-4">
-        {loading ? (
-          <div className="flex justify-center py-10"><Activity className="animate-spin text-teal-500" /></div>
-        ) : filtered.length === 0 ? (
-          <p className="text-center py-10 text-sm text-gray-500">No active background tasks</p>
-        ) : (
-          filtered.map((item, i) => (
-            <EmbeddingProgress
-              key={i}
-              badge={item.badge}
-              progress={item.progress}
-              fileName={item.title}
-            />
-          ))
-        )}
-      </div>
+  // Filter activities for pipeline-related events
+  const pipelineActivities = (activities || [])
+    .filter(a => ['upload', 'reindex', 'failed_query'].includes(a.eventType))
+    .slice(0, 8);
 
-      <div className="mt-10">
-        <h3 className="text-xl font-bold mb-4" style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55" }}>System Background Tasks</h3>
-        <p className="text-sm text-gray-500 mb-6">These are the background jobs currently handled by the embedding engine.</p>
-        {!loading && items.length === 0 && (
-          <div className="p-8 rounded-3xl bg-white/40 border border-teal-100 text-center text-sm text-teal-600">
-            Pipeline is currently idle. All documents are synchronized.
+  const pipelineStats = [
+    { label: "Ready", value: stats?.documents?.ready || 0, color: "#34d4e0" },
+    { label: "Processing", value: stats?.documents?.processing || 0, color: "#7c6fff" },
+    { label: "Reindexing", value: stats?.documents?.reindexing || 0, color: "#c084fc" },
+    { label: "Failed", value: stats?.documents?.failed || 0, color: "#ef4444" },
+  ];
+
+  return (
+    <div className="space-y-10">
+      <section>
+        <SectionHeader title="Ingestion Pipeline" color="#34d4e0" />
+        <div className="grid gap-4">
+          {loading ? (
+            <div className="flex justify-center py-10"><Activity className="animate-spin text-teal-500" /></div>
+          ) : filteredItems.length === 0 ? (
+            <div className="p-8 rounded-3xl bg-white/40 border border-teal-100 text-center text-sm text-teal-600">
+              <CheckCircle2 size={32} className="mx-auto mb-3 opacity-50" />
+              Pipeline is currently idle. All documents are synchronized.
+            </div>
+          ) : (
+            filteredItems.map((item, i) => (
+              <EmbeddingProgress
+                key={i}
+                badge={item.badge}
+                progress={item.progress}
+                fileName={item.title}
+              />
+            ))
+          )}
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <div>
+          <h3 className="text-xl font-bold" style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55" }}>System Background Tasks</h3>
+          <p className="text-sm text-gray-500">Summary of the embedding engine status and recent task history.</p>
+        </div>
+
+        {/* Status Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {pipelineStats.map((stat, i) => (
+            <motion.div 
+              key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="p-4 rounded-2xl bg-white/50 border border-white/80 shadow-sm"
+            >
+              <p className="text-[10px] font-black uppercase tracking-wider mb-1" style={{ color: "#9ca3af" }}>{stat.label}</p>
+              <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Task History */}
+        <div className="bg-white/40 backdrop-blur-md rounded-3xl border border-white/50 p-4 shadow-xl">
+          <h4 className="text-[11px] font-black uppercase tracking-widest text-[#9ca3af] mb-4 px-2">Recent Task History</h4>
+          <div className="space-y-1">
+            {pipelineActivities.length > 0 ? (
+              pipelineActivities.map((act, i) => {
+                const config = getActivityConfig(act);
+                return (
+                  <ActivityRow 
+                    key={i} 
+                    {...config} 
+                    time={formatRelativeTime(act.createdAt)} 
+                    delay={i * 0.05} 
+                  />
+                );
+              })
+            ) : (
+              <div className="py-10 text-center text-xs text-gray-400 font-medium">
+                No recent background tasks found
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -1118,17 +1189,11 @@ export function AdminUsers() {
   const { searchVal } = useOutletContext();
 
   const fetchUsers = useCallback(async (pageNum, signal) => {
-    if (initialFetch.current || pageNum !== page) setLoading(true);
+    // Show spinner if: initial load OR page change OR manual refresh (no signal)
+    if (initialFetch.current || pageNum !== page || !signal) setLoading(true);
     try {
-<<<<<<< HEAD
-      const res = await axios.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
-      const rawUsers = res.data.data || [];
-
-=======
       const res = await api.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
-      const rawUsers = res.data || [];
-      
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
+      const rawUsers = res || [];
       // Map backend User model to UserCard prop structure
       const mapped = rawUsers
         .filter(u => u.role !== 'admin')
@@ -1148,6 +1213,7 @@ export function AdminUsers() {
       setHasMore(rawUsers.length === limit);
     } catch (err) {
       if (err.name === 'CanceledError' || err.name === 'AbortError') return;
+      if (err.statusCode === 429) return; // Silence rate limit toasts
       console.error("Failed to fetch users:", err);
       showToast.error("Failed to load users");
     } finally {
@@ -1170,17 +1236,6 @@ export function AdminUsers() {
       clearInterval(interval);
     };
   }, [fetchUsers, page]);
-
-  const handleToggleStatus = async (userId) => {
-    try {
-      await api.patch(`/api/admin/users/${userId}/toggle`);
-      showToast.success("User status updated");
-      fetchUsers(page);
-    } catch (err) {
-      console.error(err);
-      showToast.error(err.message || "Failed to update status");
-    }
-  };
 
   return (
     <div className="space-y-8 pb-12">
@@ -1209,46 +1264,6 @@ export function AdminUsers() {
         <>
           <UserCardGrid
             users={users}
-            onStatusToggle={handleToggleStatus}
-            onViewActivity={(id) => navigate(`/admin/analytics?user=${id}`)}
-            onDelete={async (id) => {
-<<<<<<< HEAD
-              if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-              try {
-                await axios.delete(`/api/admin/users/${id}`);
-                showToast.success("User deleted successfully");
-                fetchUsers(page);
-              } catch (err) {
-                showToast.error(err.response?.data?.message || "Failed to delete user");
-              }
-=======
-               if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-               try {
-                 await api.delete(`/api/admin/users/${id}`);
-                 showToast.success("User deleted successfully");
-                 fetchUsers(page);
-               } catch (err) {
-                 showToast.error(err.message || "Failed to delete user");
-               }
->>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
-            }}
-            onRoleChange={async (id, newRole) => {
-              try {
-                await api.patch(`/api/admin/users/${id}/role`, { role: newRole });
-                showToast.success(`User role updated to ${newRole}`);
-                fetchUsers(page);
-              } catch (err) {
-                showToast.error(err.message || "Failed to update role");
-              }
-            }}
-            onResetPassword={async (id) => {
-              try {
-                const res = await api.post(`/api/admin/users/${id}/reset-password`);
-                showToast.success(res.data?._message || "Password reset email sent");
-              } catch (err) {
-                showToast.error(err.message || "Failed to reset password");
-              }
-            }}
             searchQuery={searchVal}
           />
 

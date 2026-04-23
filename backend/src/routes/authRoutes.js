@@ -7,13 +7,15 @@ const {
   createAdminUser,
   forgotPassword,
   verifyOTP,
-  resetPassword 
+  resetPassword,
+  googleLogin
 } = require('../controllers/authController');
 const { authenticate, authorize } = require('../middlewares/auth');
 const { validate, schemas } = require('../middlewares/validate');
 
 router.post('/register', validate(schemas.register), register);
 router.post('/login', validate(schemas.login), login);
+router.post('/google-login', googleLogin);
 router.get('/me', authenticate, getMe);
 router.post('/admin/create', authenticate, authorize('admin'), validate(schemas.register), createAdminUser);
 
