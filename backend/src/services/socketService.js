@@ -80,8 +80,18 @@ const notifyAdmins = async ({ title, message, type, metadata = {} }) => {
   }
 };
 
+/**
+ * Emit a real-time activity event to admins
+ */
+const emitActivity = (activity) => {
+  if (io) {
+    io.to('admin').emit('new_activity', activity);
+  }
+};
+
 module.exports = {
   init,
   getIO,
   notifyAdmins,
+  emitActivity,
 };

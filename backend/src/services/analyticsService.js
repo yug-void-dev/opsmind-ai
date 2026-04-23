@@ -13,6 +13,7 @@
  */
 const Analytics = require('../models/Analytics');
 const logger = require('../utils/logger');
+const socketService = require('./socketService');
 
 // ─── Event Loggers ─────────────────────────────────────────────────────────
 
@@ -21,7 +22,7 @@ const logger = require('../utils/logger');
  */
 const logQuery = async (data) => {
   try {
-    await Analytics.create({
+    const activity = await Analytics.create({
       eventType: data.answered ? 'query' : 'no_answer',
       userId: data.userId,
       query: data.query,
@@ -35,6 +36,13 @@ const logQuery = async (data) => {
       ipAddress: data.ipAddress,
       userAgent: data.userAgent,
     });
+
+    // Populate and emit for real-time dashboard
+    const populated = await Analytics.findById(activity._id)
+      .populate('userId', 'name email avatar')
+      .lean();
+    socketService.emitActivity(populated);
+
   } catch (err) {
     logger.warn(`[Analytics] logQuery failed: ${err.message}`);
   }
@@ -45,7 +53,7 @@ const logQuery = async (data) => {
  */
 const logFailure = async (data) => {
   try {
-    await Analytics.create({
+    const activity = await Analytics.create({
       eventType: 'failed_query',
       userId: data.userId,
       query: data.query,
@@ -53,6 +61,12 @@ const logFailure = async (data) => {
       responseTime: data.responseTime,
       ipAddress: data.ipAddress,
     });
+
+    const populated = await Analytics.findById(activity._id)
+      .populate('userId', 'name email avatar')
+      .lean();
+    socketService.emitActivity(populated);
+
   } catch (err) {
     logger.warn(`[Analytics] logFailure failed: ${err.message}`);
   }
@@ -63,13 +77,20 @@ const logFailure = async (data) => {
  */
 const logUpload = async (data) => {
   try {
-    await Analytics.create({
+    const activity = await Analytics.create({
       eventType: 'upload',
       userId: data.userId,
       documentId: data.documentId,
       responseTime: data.responseTime,
       ipAddress: data.ipAddress,
     });
+
+    const populated = await Analytics.findById(activity._id)
+      .populate('userId', 'name email avatar')
+      .populate('documentId', 'name originalName')
+      .lean();
+    socketService.emitActivity(populated);
+
   } catch (err) {
     logger.warn(`[Analytics] logUpload failed: ${err.message}`);
   }

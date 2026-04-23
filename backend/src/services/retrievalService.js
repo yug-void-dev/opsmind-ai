@@ -237,6 +237,10 @@ const rerankWithLLM = async (query, candidates) => {
  */
 const applyThresholdGate = (chunks, threshold = appConfig.similarityThreshold) => {
   return chunks.filter((c) => {
+    // If reranking ran and gave a very low score, reject regardless of vector similarity
+    // (This prevents MongoDB chunks being returned for unrelated questions)
+    if (c.rerankScore !== undefined && c.rerankScore < 0.15) return false;
+
     const score = c.vectorScore ?? c._bestScore ?? c.hybridScore ?? 0;
     return score >= threshold;
   });

@@ -114,8 +114,9 @@ const buildRewritePrompt = (query) =>
 
 const generateWithGemini = async (prompt, opts = {}) => {
   const genAI = getGeminiClient();
+  const modelName = opts.model || appConfig.llmModel;
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: modelName,
     generationConfig: {
       temperature: opts.temperature ?? appConfig.llmTemperature,
       topP: opts.topP ?? appConfig.llmTopP,
@@ -146,8 +147,9 @@ const generateWithGemini = async (prompt, opts = {}) => {
 
 const streamWithGemini = async (prompt, onChunk) => {
   const genAI = getGeminiClient();
+  const modelName = appConfig.llmModel;
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: modelName,
     generationConfig: {
       temperature: appConfig.llmTemperature,
       topP: appConfig.llmTopP,
@@ -188,7 +190,7 @@ const generateWithGroq = async (prompt, opts = {}) => {
 
   // Groq uses chat format — wrap prompt as user message
   const completion = await groq.chat.completions.create({
-    model: 'llama3-70b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       // System message enforces rules at the API level
       {
@@ -217,7 +219,7 @@ const streamWithGroq = async (prompt, onChunk) => {
   const groq = getGroqClient();
 
   const stream = await groq.chat.completions.create({
-    model: 'llama3-70b-8192',
+    model: 'llama-3.1-8b-instant',
     messages: [
       { role: 'system', content: 'You are OpsMind AI. Follow all instructions EXACTLY.' },
       { role: 'user', content: prompt },

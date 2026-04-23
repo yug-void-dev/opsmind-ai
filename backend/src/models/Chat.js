@@ -10,12 +10,17 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  answered: {
+    type: Boolean,
+    default: true,
+  },
   sources: [
     {
-      documentId: mongoose.Schema.Types.ObjectId,
-      documentName: String,
-      pageNumber: Number,
-      relevanceScore: Number,
+      documentId: String,
+      filename: String,
+      page: Number,
+      score: Number,
+      snippet: String,
     },
   ],
   timestamp: {

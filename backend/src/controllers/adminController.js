@@ -305,26 +305,39 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-/**
- * GET /api/admin/activities
- * Fetches recent system activities for the dashboard
- */
 const listActivities = async (req, res, next) => {
   try {
-    const activities = await Analytics.find()
-      .populate('userId', 'name email avatar')
-      .populate('documentId', 'name originalName')
-      .sort({ createdAt: -1 })
-      .limit(30) // Fetch more then filter
-      .lean();
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Filter out 'upload' events that have a null documentId (document was deleted or is dummy)
-    const filtered = activities.filter(act => {
-      if (act.eventType === 'upload' && !act.documentId) return false;
-      return true;
-    }).slice(0, 10); // Return only the top 10 valid ones
+    // Filter out 'upload' events that have a null documentId
+    const filter = {
+      $or: [
+        { eventType: { $ne: 'upload' } },
+        { eventType: 'upload', documentId: { $ne: null } }
+      ]
+    };
 
-    return success(res, filtered);
+    const [activities, total] = await Promise.all([
+      Analytics.find(filter)
+        .populate('userId', 'name email avatar')
+        .populate('documentId', 'name originalName')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      Analytics.countDocuments(filter),
+    ]);
+
+    return success(res, {
+      activities,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit)),
+      },
+    });
   } catch (err) {
     next(err);
   }

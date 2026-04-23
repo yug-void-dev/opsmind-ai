@@ -10,6 +10,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "predev": "npx -y kill-port 3000",
     "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:ci": "jest --forceExit --detectOpenHandles --ci --coverage",

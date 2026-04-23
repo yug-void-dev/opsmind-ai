@@ -32,6 +32,7 @@ const saveChat = async (req, res, next) => {
     } else if (format === 'pair') {
       return await _savePair(req, res);
     } else {
+      logger.warn(`[Chat] Invalid save format from user ${req.user?._id}. Body keys: ${Object.keys(req.body).join(', ')}`);
       return badRequest(res, 'Invalid chat save format. Provide either "messages" array or "userMessage"/"assistantMessage".');
     }
   } catch (err) {
@@ -48,16 +49,19 @@ const _saveFull = async (req, res) => {
 
   if (_id) {
     // Update existing chat — replace full messages array
+    const updateFields = { messages, updatedAt: new Date() };
+    if (title) updateFields.title = title; // Only update title if provided
+
     const chat = await Chat.findOneAndUpdate(
       { _id, userId: req.user._id },
-      { title, messages, updatedAt: new Date() },
+      updateFields,
       { new: true, upsert: false }
     );
     if (!chat) {
-      // Chat not found by _id — create a new one (handles race conditions)
+      // Chat not found by _id — create a new one
       const newChat = await Chat.create({
         userId: req.user._id,
-        title: title || 'New Chat',
+        title: title || (messages[0]?.content?.slice(0, 60) + '...') || 'New Chat',
         messages,
       });
       logger.info(`[Chat] Created new chat (upsert fallback) for user ${req.user._id}`);
@@ -78,10 +82,14 @@ const _saveFull = async (req, res) => {
       updatedAt: chat.updatedAt,
     });
   } else {
-    // Create new chat
+    // Create new chat — derive title from first user message if not given
+    const derivedTitle = title ||
+      (messages.find(m => m.role === 'user')?.content?.slice(0, 60) + '...') ||
+      'New Chat';
+
     const chat = await Chat.create({
       userId: req.user._id,
-      title: title || (messages[0]?.content?.slice(0, 60) + '...') || 'New Chat',
+      title: derivedTitle,
       messages,
     });
     logger.info(`[Chat] Created chat "${chat.title}" for user ${req.user._id}`);

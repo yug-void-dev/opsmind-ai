@@ -57,27 +57,33 @@ const saveChatSchema = Joi.alternatives().try(
   // Format A: full messages array (frontend sends this)
   Joi.object({
     _id: Joi.string().optional(),
-    title: Joi.string().max(200).required(),
+    title: Joi.string().max(200).optional().allow('', null),
     messages: Joi.array()
       .items(
         Joi.object({
           role: Joi.string().valid('user', 'assistant').required(),
           content: Joi.string().min(1).required(),
+          answered: Joi.boolean().optional(),
           sources: Joi.array()
             .items(
               Joi.object({
-                documentId: Joi.string(),
-                documentName: Joi.string(),
-                pageNumber: Joi.number(),
-                relevanceScore: Joi.number(),
-                confidence: Joi.string().valid('HIGH', 'MEDIUM', 'LOW'),
-                snippet: Joi.string(),
-                rerankReason: Joi.string().allow(null, ''),
+                // New field names
+                documentId: Joi.string().optional().allow('', null),
+                filename: Joi.string().optional().allow('', null),
+                page: Joi.number().optional().allow(null),
+                score: Joi.number().optional().allow(null),
+                snippet: Joi.string().optional().allow('', null),
+                // Legacy field names (backwards compat)
+                documentName: Joi.string().optional().allow('', null),
+                pageNumber: Joi.number().optional().allow(null),
+                relevanceScore: Joi.number().optional().allow(null),
+                confidence: Joi.string().valid('HIGH', 'MEDIUM', 'LOW').optional(),
+                rerankReason: Joi.string().allow(null, '').optional(),
               }).unknown(true)
             )
             .optional(),
           timestamp: Joi.alternatives().try(Joi.date(), Joi.string()).optional(),
-        })
+        }).unknown(true)
       )
       .min(1)
       .required(),
@@ -90,11 +96,14 @@ const saveChatSchema = Joi.alternatives().try(
     sources: Joi.array()
       .items(
         Joi.object({
-          documentId: Joi.string(),
-          documentName: Joi.string(),
-          pageNumber: Joi.number(),
-          relevanceScore: Joi.number(),
-        })
+          documentId: Joi.string().optional(),
+          documentName: Joi.string().optional(),
+          filename: Joi.string().optional(),
+          pageNumber: Joi.number().optional(),
+          page: Joi.number().optional(),
+          relevanceScore: Joi.number().optional(),
+          score: Joi.number().optional(),
+        }).unknown(true)
       )
       .optional(),
   })

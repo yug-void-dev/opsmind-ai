@@ -56,10 +56,10 @@ const buildCitations = (chunks) => {
 
     citations.push({
       documentId: chunk.documentId,
-      documentName: chunk.documentName,
-      pageNumber: chunk.pageNumber,
+      filename: chunk.documentName,
+      page: chunk.pageNumber,
       snippet: chunk.text.slice(0, 250).trim() + (chunk.text.length > 250 ? '...' : ''),
-      relevanceScore: parseFloat(normalizedScore.toFixed(4)),
+      score: parseFloat(normalizedScore.toFixed(4)),
       confidence,
       rerankReason: chunk.rerankReason || null,
     });
@@ -67,9 +67,9 @@ const buildCitations = (chunks) => {
 
   // Sort by relevance, remove duplicates (keep highest-scored per doc+page)
   const deduped = new Map();
-  citations.sort((a, b) => b.relevanceScore - a.relevanceScore);
+  citations.sort((a, b) => b.score - a.score);
   for (const cit of citations) {
-    const key = `${cit.documentId}:${cit.pageNumber}`;
+    const key = `${cit.documentId}:${cit.page}`;
     if (!deduped.has(key)) deduped.set(key, cit);
   }
 
@@ -225,10 +225,11 @@ const query = async (req, res, next) => {
 
       // 4. Send completion event with full answer for client-side state
       const responseTime = Date.now() - startTime;
+      const isAnswered = fullAnswer && !fullAnswer.startsWith("I don't know");
       sseWrite(res, 'done', {
         answer: fullAnswer,
-        sources,
-        answered: true,
+        sources: isAnswered ? sources : [],
+        answered: isAnswered,
         responseTimeMs: responseTime,
         tokenUsage,
       });
