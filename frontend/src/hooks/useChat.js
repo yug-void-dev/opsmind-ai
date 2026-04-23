@@ -1,5 +1,24 @@
+<<<<<<< HEAD
 import { useState, useCallback, useRef, useEffect } from "react";
 import { streamQuery, chatsApi } from "../utils/api";
+=======
+import { useState, useCallback, useRef } from "react";
+import { extractCitations, streamQuery as apiStreamQuery } from "../utils/api";
+
+const STORAGE_KEY = "opsmind_chat_sessions";
+
+function loadSessions() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveSessions(sessions) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+}
+>>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -133,6 +152,7 @@ export function useChat() {
       let finalSources = [];
       let wasAnswered = true;
 
+<<<<<<< HEAD
       const abort = streamQuery(
         text.trim(),
         {},
@@ -251,15 +271,103 @@ export function useChat() {
       );
 
       abortRef.current = abort;
+=======
+        let accumulated = "";
+
+        const abort = apiStreamQuery(
+          text,
+          {},
+          {
+            onMetadata: (event) => {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, answered: event.answered ?? true }
+                    : m
+                )
+              );
+            },
+            onSources: (sources) => {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id ? { ...m, sources } : m
+                )
+              );
+            },
+            onChunk: (content) => {
+              accumulated += content;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? {
+                        ...m,
+                        content: accumulated,
+                        citations: extractCitations(accumulated),
+                      }
+                    : m
+                )
+              );
+            },
+            onDone: (event) => {
+              setMessages((prev) => {
+                const finalMsgs = prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? {
+                        ...m,
+                        isStreaming: false,
+                        answered: event.answered ?? true,
+                      }
+                    : m
+                );
+                persistMessages(sessionId, finalMsgs);
+                return finalMsgs;
+              });
+              setIsStreaming(false);
+            },
+            onError: (msg) => {
+              setError(msg);
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, content: msg, isError: true, isStreaming: false }
+                    : m
+                )
+              );
+              setIsStreaming(false);
+            },
+          }
+        );
+
+        // Store abort so stopStreaming() can cancel mid-stream
+        abortRef.current = { abort };
+      } catch (err) {
+        if (err.name === "AbortError") return;
+
+        const errMsg = err.message || "Something went wrong. Please try again.";
+        setError(errMsg);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsg.id
+              ? { ...m, content: errMsg, isError: true, isStreaming: false }
+              : m
+          )
+        );
+        setIsStreaming(false);
+      }
+>>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
     },
     [isStreaming, refreshSessions]
   );
 
   const stopStreaming = useCallback(() => {
+<<<<<<< HEAD
     if (abortRef.current) {
       abortRef.current();
       abortRef.current = null;
     }
+=======
+    if (abortRef.current?.abort) abortRef.current.abort();
+>>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
     setIsStreaming(false);
     setMessages((prev) =>
       prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m))

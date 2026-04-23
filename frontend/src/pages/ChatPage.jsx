@@ -314,8 +314,16 @@ export default function ChatPage() {
                   ? { background: "rgba(124,111,255,0.15)", border: "1.5px solid rgba(124,111,255,0.3)", color: "#7c6fff" }
                   : { background: "rgba(255,255,255,0.8)", border: "1.5px solid rgba(124,111,255,0.1)", color: "#5a5880" }}
               >
+<<<<<<< HEAD
                 <BookOpen size={14} />Sources
                 {activeSources.length > 0 && <span className="ml-1 w-4 h-4 bg-[#7c6fff] rounded-full text-[9px] flex items-center justify-center text-white">{activeSources.length}</span>}
+=======
+                <BookOpen size={13} />Sources
+                {activeSources.length > 0 && <span className="ml-0.5 w-4 h-4 bg-violet-600 rounded-full text-[9px] flex items-center justify-center text-white">{activeSources.length}</span>}
+              </button>
+              <button onClick={() => navigate("/admin/settings")} className="p-2 rounded-lg" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <Settings size={15} />
+>>>>>>> d2edd9f1d4444e8172e5ae18061a76c26fd07a48
               </button>
             </div>
           </header>

@@ -70,7 +70,7 @@ function ConfirmPopup({ message, onConfirm, onCancel, danger = false }) {
   );
 }
 
-export default function UserCard({ user, onDelete, delay = 0 }) {
+export default function UserCard({ user, onDelete, onStatusToggle, onViewActivity, onRoleChange, onResetPassword, delay = 0 }) {
   const [confirmData, setConfirmData] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -189,6 +189,48 @@ export default function UserCard({ user, onDelete, delay = 0 }) {
               <DetailRow label="Joined" value={formatDate(user.joinedAt, true)} />
               <DetailRow label="Status" value={sc.label} />
               <DetailRow label="Last Active" value={user.lastActive ?? "Never"} />
+              <div className="flex flex-wrap gap-2 pt-2">
+                {onStatusToggle && (
+                  <button
+                    onClick={() => onStatusToggle(user.id)}
+                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
+                    style={{ background: user.status === "active" ? "rgba(239,68,68,0.08)" : "rgba(34,197,94,0.08)", color: user.status === "active" ? "#dc2626" : "#16a34a", border: `1px solid ${user.status === "active" ? "rgba(239,68,68,0.2)" : "rgba(34,197,94,0.2)"}` }}
+                  >
+                    {user.status === "active" ? "Deactivate" : "Activate"}
+                  </button>
+                )}
+                {onViewActivity && (
+                  <button
+                    onClick={() => onViewActivity(user.id)}
+                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
+                    style={{ background: "rgba(52,212,224,0.08)", color: "#0891b2", border: "1px solid rgba(52,212,224,0.2)" }}
+                  >
+                    Activity
+                  </button>
+                )}
+                {onRoleChange && (
+                  <button
+                    onClick={() => onRoleChange(user.id, user.role === "admin" ? "user" : "admin")}
+                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
+                    style={{ background: "rgba(124,111,255,0.08)", color: "#6c63ff", border: "1px solid rgba(124,111,255,0.2)" }}
+                  >
+                    Make {user.role === "admin" ? "Employee" : "Admin"}
+                  </button>
+                )}
+                {onResetPassword && (
+                  <button
+                    onClick={() => setConfirmData({
+                      message: `Send a password reset email to ${user.name}?`,
+                      onConfirm: () => { setConfirmData(null); onResetPassword(user.id); },
+                      danger: false,
+                    })}
+                    className="flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-colors"
+                    style={{ background: "rgba(245,158,11,0.08)", color: "#b45309", border: "1px solid rgba(245,158,11,0.2)" }}
+                  >
+                    Reset Password
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -223,7 +265,7 @@ function formatDate(iso, long = false) {
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: long ? "numeric" : "2-digit" });
 }
 
-export function UserCardGrid({ users = [], onDelete, searchQuery = "" }) {
+export function UserCardGrid({ users = [], onDelete, onStatusToggle, onViewActivity, onRoleChange, onResetPassword, searchQuery = "" }) {
   const filteredUsers = users.filter(u => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
@@ -242,7 +284,16 @@ export function UserCardGrid({ users = [], onDelete, searchQuery = "" }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 items-start">
       {filteredUsers.map((u, i) => (
-        <UserCard key={u.id} user={u} delay={i * 0.05} onDelete={onDelete} />
+        <UserCard
+          key={u.id}
+          user={u}
+          delay={i * 0.05}
+          onDelete={onDelete}
+          onStatusToggle={onStatusToggle}
+          onViewActivity={onViewActivity}
+          onRoleChange={onRoleChange}
+          onResetPassword={onResetPassword}
+        />
       ))}
     </div>
   );

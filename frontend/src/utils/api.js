@@ -545,3 +545,6 @@ export const healthCheck = () => api.get("/health");
 
 // ─── Default Export ───────────────────────────────────────────────────────────
 export default api;
+
+// ─── Re-exports from streamParser (keep imports DRY for consumers) ────────────
+export { extractCitations, formatMessageWithCitations } from "./streamParser";
