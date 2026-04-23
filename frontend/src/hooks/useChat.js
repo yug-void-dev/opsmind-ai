@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { parseSSEStream, extractCitations } from "../utils/streamParser";
-import api from "../utils/api";
+import { extractCitations, streamQuery as apiStreamQuery } from "../utils/api";
 
 const STORAGE_KEY = "opsmind_chat_sessions";
 
@@ -111,58 +110,74 @@ export function useChat() {
       try {
         abortRef.current = new AbortController();
 
-        const response = await api.post(
-          "/chat/stream",
+        let accumulated = "";
+
+        const abort = apiStreamQuery(
+          text,
+          {},
           {
-            message: text,
-            sessionId,
-            history: messages.map((m) => ({ role: m.role, content: m.content })),
-          },
-          { signal: abortRef.current.signal, responseType: "stream" }
+            onMetadata: (event) => {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, answered: event.answered ?? true }
+                    : m
+                )
+              );
+            },
+            onSources: (sources) => {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id ? { ...m, sources } : m
+                )
+              );
+            },
+            onChunk: (content) => {
+              accumulated += content;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? {
+                        ...m,
+                        content: accumulated,
+                        citations: extractCitations(accumulated),
+                      }
+                    : m
+                )
+              );
+            },
+            onDone: (event) => {
+              setMessages((prev) => {
+                const finalMsgs = prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? {
+                        ...m,
+                        isStreaming: false,
+                        answered: event.answered ?? true,
+                      }
+                    : m
+                );
+                persistMessages(sessionId, finalMsgs);
+                return finalMsgs;
+              });
+              setIsStreaming(false);
+            },
+            onError: (msg) => {
+              setError(msg);
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, content: msg, isError: true, isStreaming: false }
+                    : m
+                )
+              );
+              setIsStreaming(false);
+            },
+          }
         );
 
-        let accumulated = "";
-        for await (const chunk of parseSSEStream(response)) {
-          if (chunk.type === "metadata") {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
-              )
-            );
-          } else if (chunk.type === "text" || chunk.content) {
-            accumulated += chunk.content ?? chunk;
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id
-                  ? { ...m, content: accumulated, citations: extractCitations(accumulated) }
-                  : m
-              )
-            );
-          } else if (chunk.type === "sources") {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, sources: chunk.sources } : m
-              )
-            );
-          } else if (chunk.type === "done") {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
-              )
-            );
-          } else if (chunk.type === "error") {
-            throw new Error(chunk.message);
-          }
-        }
-
-        // Finalise streaming flag
-        setMessages((prev) => {
-          const finalMsgs = prev.map((m) =>
-            m.id === assistantMsg.id ? { ...m, isStreaming: false } : m
-          );
-          persistMessages(sessionId, finalMsgs);
-          return finalMsgs;
-        });
+        // Store abort so stopStreaming() can cancel mid-stream
+        abortRef.current = { abort };
       } catch (err) {
         if (err.name === "AbortError") return;
 
@@ -175,7 +190,6 @@ export function useChat() {
               : m
           )
         );
-      } finally {
         setIsStreaming(false);
       }
     },
@@ -183,7 +197,7 @@ export function useChat() {
   );
 
   const stopStreaming = useCallback(() => {
-    abortRef.current?.abort();
+    if (abortRef.current?.abort) abortRef.current.abort();
     setIsStreaming(false);
     setMessages((prev) =>
       prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m))

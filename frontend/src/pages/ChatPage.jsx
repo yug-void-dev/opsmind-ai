@@ -139,7 +139,7 @@ export default function ChatPage() {
                 <BookOpen size={13} />Sources
                 {activeSources.length > 0 && <span className="ml-0.5 w-4 h-4 bg-violet-600 rounded-full text-[9px] flex items-center justify-center text-white">{activeSources.length}</span>}
               </button>
-              <button onClick={() => navigate("/settings")} className="p-2 rounded-lg" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <button onClick={() => navigate("/admin/settings")} className="p-2 rounded-lg" style={{ color: "rgba(255,255,255,0.3)" }}>
                 <Settings size={15} />
               </button>
             </div>

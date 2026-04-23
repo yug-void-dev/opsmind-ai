@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react"
-import axios from "axios"
+import api from "../utils/api"
 
 export const AuthContext = createContext(null)
 
@@ -15,49 +15,45 @@ export const AuthProvider = ({ children }) => {
     if (savedToken && savedUser) {
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
-      // Set axios default header
-      axios.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`
+      // api.js interceptor picks up token from localStorage automatically
     }
     setLoading(false)
   }, [])
 
   const login = async ({ email, password }) => {
     try {
-      const response = await axios.post("/api/auth/login", { email, password });
-      // The backend uses success(res, {token, user}) which wraps result in 'data'
-      const { token, user } = response.data.data;
+      // api interceptor unwraps { success, data, message } → response.data = inner data
+      const response = await api.post("/api/auth/login", { email, password });
+      const { token, user } = response.data;
       setToken(token);
       setUser(user);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return { success: true, user };
     } catch (error) {
       console.error("Login error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Login failed"
+        message: error.message || "Login failed"
       };
     }
   }
 
   const register = async (formData) => {
     try {
-      const response = await axios.post("/api/auth/register", formData);
-      const { token, user } = response.data.data;
+      const response = await api.post("/api/auth/register", formData);
+      const { token, user } = response.data;
 
       setToken(token);
       setUser(user);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       return { success: true, user };
     } catch (error) {
       console.error("Registration error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Registration failed"
+        message: error.message || "Registration failed"
       };
     }
   }
@@ -67,44 +63,43 @@ export const AuthProvider = ({ children }) => {
     setToken(null)
     localStorage.removeItem("token")
     localStorage.removeItem("user")
-    delete axios.defaults.headers.common["Authorization"];
   }
 
   const forgotPassword = async (email) => {
     try {
-      const response = await axios.post("/api/auth/forgot-password", { email });
-      return { success: true, message: response.data.message };
+      const response = await api.post("/api/auth/forgot-password", { email });
+      return { success: true, message: response.data?._message || "OTP sent" };
     } catch (error) {
       console.error("Forgot password error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Something went wrong"
+        message: error.message || "Something went wrong"
       };
     }
   };
 
   const verifyOTP = async (email, otp) => {
     try {
-      const response = await axios.post("/api/auth/verify-otp", { email, otp });
-      return { success: true, message: response.data.message };
+      const response = await api.post("/api/auth/verify-otp", { email, otp });
+      return { success: true, message: response.data?._message || "OTP verified" };
     } catch (error) {
       console.error("OTP verification error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Invalid or expired OTP"
+        message: error.message || "Invalid or expired OTP"
       };
     }
   };
 
   const resetPassword = async (email, otp, newPassword) => {
     try {
-      const response = await axios.post("/api/auth/reset-password", { email, otp, newPassword });
-      return { success: true, message: response.data.message };
+      const response = await api.post("/api/auth/reset-password", { email, otp, newPassword });
+      return { success: true, message: response.data?._message || "Password reset" };
     } catch (error) {
       console.error("Password reset error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Reset failed"
+        message: error.message || "Reset failed"
       };
     }
   };

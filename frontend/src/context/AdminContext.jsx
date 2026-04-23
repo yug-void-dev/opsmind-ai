@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import showToast from '../components/ui/Toast';
 
 export const AdminContext = createContext();
@@ -13,31 +13,30 @@ export const AdminProvider = ({ children }) => {
 
   const fetchStats = useCallback(async (signal) => {
     try {
-      const res = await axios.get('/api/admin/stats', { signal });
-      setStats(res.data.data);
+      const res = await api.get('/api/admin/stats', { signal });
+      setStats(res.data);
     } catch (err) {
-      if (axios.isCancel(err)) return;
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin stats:', err);
-      // Don't show toast here as it might be a background refresh failure
     }
   }, []);
 
   const fetchMetrics = useCallback(async (days = 30, signal) => {
     try {
-      const res = await axios.get(`/api/admin/analytics?days=${days}`, { signal });
-      setMetrics(res.data.data);
+      const res = await api.get(`/api/admin/analytics?days=${days}`, { signal });
+      setMetrics(res.data);
     } catch (err) {
-      if (axios.isCancel(err)) return;
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin analytics:', err);
     }
   }, []);
 
   const fetchActivities = useCallback(async (signal) => {
     try {
-      const res = await axios.get('/api/admin/activities', { signal });
-      setActivities(res.data.data);
+      const res = await api.get('/api/admin/activities', { signal });
+      setActivities(res.data);
     } catch (err) {
-      if (axios.isCancel(err)) return;
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error('Failed to fetch admin activities:', err);
     }
   }, []);

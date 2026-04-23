@@ -25,6 +25,10 @@ const registerSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(72).required(),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('password'))
+    .required()
+    .messages({ 'any.only': 'Passwords do not match', 'any.required': 'Please confirm your password' }),
   role: Joi.string().valid('user', 'admin').default('user'),
 });
 

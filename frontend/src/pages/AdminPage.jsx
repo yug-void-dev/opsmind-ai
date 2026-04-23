@@ -18,7 +18,7 @@ import { EmbeddingProgress } from "../components/admin/EmbeddingProgress";
 import showToast from "../components/ui/Toast";
 import useAuth from "../hooks/useAuth";
 import { UserCardGrid } from "../components/admin/UserCard";
-import axios from "axios";
+import api from "../utils/api";
 import useAdmin from "../hooks/useAdmin";
 import { NotificationContext } from "../context/NotificationContext";
 import { useContext } from "react";
@@ -767,12 +767,12 @@ export function AdminUpload() {
     // Only show the loading spinner on the very first fetch
     if (initialFetch.current) setLoading(true);
     try {
-      const res = await axios.get("/api/documents?limit=100");
-      const docsArray = Array.isArray(res.data.data) ? res.data.data : (res.data.data?.documents || []);
+      const res = await api.get("/api/documents?limit=100");
+      const docsArray = Array.isArray(res.data) ? res.data : (res.data?.documents || []);
       const mapped = docsArray.map(mapDocumentToItem);
       setItems(mapped);
     } catch (err) {
-      if (err.response?.status !== 429) console.error(err);
+      if (err.statusCode !== 429) console.error(err);
     } finally {
       if (initialFetch.current) {
         setLoading(false);
@@ -799,14 +799,14 @@ export function AdminUpload() {
       const fd = new FormData();
       fd.append("file", f);
       try {
-        await axios.post("/api/documents/upload", fd, {
+        await api.post("/api/documents/upload", fd, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         showToast.updateSuccess(toastId, `${f.name} uploaded — embedding in progress...`);
         await fetchRecent();
       } catch (err) {
         console.error(err);
-        const errMsg = err.response?.data?.message || `Failed to upload ${f.name}`;
+        const errMsg = err.message || `Failed to upload ${f.name}`;
         showToast.updateError(toastId, errMsg);
       }
     }
@@ -846,11 +846,11 @@ export function AdminDocuments() {
     // Only block UI with spinner on the first load; background refreshes are silent
     if (initialFetch.current) setLoading(true);
     try {
-      const res = await axios.get("/api/documents?limit=100");
-      const docsArray = Array.isArray(res.data.data) ? res.data.data : (res.data.data?.documents || []);
+      const res = await api.get("/api/documents?limit=100");
+      const docsArray = Array.isArray(res.data) ? res.data : (res.data?.documents || []);
       setItems(docsArray.map(mapDocumentToItem));
     } catch (err) {
-      if (err.response?.status !== 429) {
+      if (err.statusCode !== 429) {
         console.error(err);
         if (initialFetch.current) showToast.error("Failed to load documents");
       }
@@ -881,7 +881,7 @@ export function AdminDocuments() {
     if (!doc.id) return;
 
     try {
-      await axios.delete(`/api/documents/${doc.id}`);
+      await api.delete(`/api/documents/${doc.id}`);
       showToast.success(`${doc.title} deleted successfully`);
       fetchDocs();
     } catch (err) {
@@ -935,8 +935,8 @@ export function AdminPipeline() {
 
   const fetchDocs = useCallback(async () => {
     try {
-      const res = await axios.get("/api/admin/documents?limit=100");
-      const docsArray = res.data.data?.documents || res.data.data || [];
+      const res = await api.get("/api/admin/documents?limit=100");
+      const docsArray = res.data?.documents || res.data || [];
       
       const processing = docsArray
         .filter(d => d.status === "processing" || d.status === "failed" || d.status === "reindexing")
@@ -1071,8 +1071,8 @@ export function AdminUsers() {
   const fetchUsers = useCallback(async (pageNum, signal) => {
     if (initialFetch.current || pageNum !== page) setLoading(true);
     try {
-      const res = await axios.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
-      const rawUsers = res.data.data || [];
+      const res = await api.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
+      const rawUsers = res.data || [];
       
       // Map backend User model to UserCard prop structure
       const mapped = rawUsers
@@ -1092,7 +1092,7 @@ export function AdminUsers() {
       setUsers(mapped);
       setHasMore(rawUsers.length === limit);
     } catch (err) {
-      if (axios.isCancel(err)) return;
+      if (err.name === 'CanceledError' || err.name === 'AbortError') return;
       console.error("Failed to fetch users:", err);
       showToast.error("Failed to load users");
     } finally {
@@ -1118,12 +1118,12 @@ export function AdminUsers() {
 
   const handleToggleStatus = async (userId) => {
     try {
-      await axios.patch(`/api/admin/users/${userId}/toggle`);
+      await api.patch(`/api/admin/users/${userId}/toggle`);
       showToast.success("User status updated");
       fetchUsers(page);
     } catch (err) {
       console.error(err);
-      showToast.error(err.response?.data?.message || "Failed to update status");
+      showToast.error(err.message || "Failed to update status");
     }
   };
 
@@ -1159,28 +1159,28 @@ export function AdminUsers() {
             onDelete={async (id) => {
                if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
                try {
-                 await axios.delete(`/api/admin/users/${id}`);
+                 await api.delete(`/api/admin/users/${id}`);
                  showToast.success("User deleted successfully");
                  fetchUsers(page);
                } catch (err) {
-                 showToast.error(err.response?.data?.message || "Failed to delete user");
+                 showToast.error(err.message || "Failed to delete user");
                }
             }}
             onRoleChange={async (id, newRole) => {
               try {
-                await axios.patch(`/api/admin/users/${id}/role`, { role: newRole });
+                await api.patch(`/api/admin/users/${id}/role`, { role: newRole });
                 showToast.success(`User role updated to ${newRole}`);
                 fetchUsers(page);
               } catch (err) {
-                showToast.error("Failed to update role");
+                showToast.error(err.message || "Failed to update role");
               }
             }}
             onResetPassword={async (id) => {
               try {
-                const res = await axios.post(`/api/admin/users/${id}/reset-password`);
-                showToast.success(res.data.message);
+                const res = await api.post(`/api/admin/users/${id}/reset-password`);
+                showToast.success(res.data?._message || "Password reset email sent");
               } catch (err) {
-                showToast.error("Failed to reset password");
+                showToast.error(err.message || "Failed to reset password");
               }
             }}
             searchQuery={searchVal}

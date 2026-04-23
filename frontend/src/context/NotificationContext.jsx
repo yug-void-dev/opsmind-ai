@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { io } from "socket.io-client";
-import axios from "axios";
+import api from "../utils/api";
 import { AuthContext } from "./AuthContext";
 import showToast from "../components/ui/Toast";
 
@@ -19,9 +19,10 @@ export const NotificationProvider = ({ children }) => {
     
     setLoading(true);
     try {
-      const response = await axios.get("/api/notifications");
-      setNotifications(response.data.data.notifications);
-      setUnreadCount(response.data.data.unreadCount);
+      // api interceptor unwraps envelope → response.data = { notifications, unreadCount }
+      const response = await api.get("/api/notifications");
+      setNotifications(response.data.notifications ?? []);
+      setUnreadCount(response.data.unreadCount ?? 0);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
@@ -69,7 +70,7 @@ export const NotificationProvider = ({ children }) => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`/api/notifications/${id}/read`);
+      await api.patch(`/api/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
@@ -81,7 +82,7 @@ export const NotificationProvider = ({ children }) => {
 
   const markAllAsRead = async () => {
     try {
-      await axios.patch("/api/notifications/read-all");
+      await api.patch("/api/notifications/read-all");
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (error) {
