@@ -13,7 +13,6 @@ import AdminPage, {
 } from "./pages/AdminPage";
 import { AdminProvider } from "./context/AdminContext";
 import { NotificationProvider } from "./context/NotificationContext";
-import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
 
 import useAuth from "./hooks/useAuth";
@@ -37,10 +36,20 @@ function ProtectedRoute({ children, adminOnly = false }) {
   }
 
   if (adminOnly && user.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   return children;
+}
+
+/* ── RootRedirect ──
+   Redirects users based on their role. */
+function RootRedirect() {
+  const { user } = useAuth();
+  if (user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Navigate to="/chat" replace />;
 }
 
 export default function App() {
@@ -56,11 +65,11 @@ export default function App() {
         {/* Admin — nested layout with Outlet */}
         <Route path="/admin" element={
           <ProtectedRoute adminOnly={true}>
-            <AdminProvider>
-              <NotificationProvider>
+            <NotificationProvider>
+              <AdminProvider>
                 <AdminPage />
-              </NotificationProvider>
-            </AdminProvider>
+              </AdminProvider>
+            </NotificationProvider>
           </ProtectedRoute>
         }>
           <Route index element={<AdminOverview />} />
@@ -73,7 +82,11 @@ export default function App() {
         </Route>
 
         {/* Default */}
-        <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <RootRedirect />
+          </ProtectedRoute>
+        } />
         <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

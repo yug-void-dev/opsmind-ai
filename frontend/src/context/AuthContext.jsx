@@ -42,16 +42,18 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const register = async (formData) => {
+  const register = async (formData, autoLogin = true) => {
     try {
       const response = await axios.post("/api/auth/register", formData);
       const { token, user } = response.data.data;
 
-      setToken(token);
-      setUser(user);
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      if (autoLogin) {
+        setToken(token);
+        setUser(user);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
       return { success: true, user };
     } catch (error) {
       console.error("Registration error:", error);

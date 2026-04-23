@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, MessageSquare, Trash2, Brain, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Brain, ChevronRight, Search, LogOut } from "lucide-react";
+import useAuth from "../../hooks/useAuth";
 
 export default function ChatSidebar({ sessions = [], activeSessionId, onNewChat, onLoadSession, onDeleteSession, collapsed, onToggleCollapse }) {
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredId, setHoveredId] = useState(null);
 
-  const filtered = sessions.filter((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
+  const filtered = safeSessions.filter((s) => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const grouped = filtered.reduce((acc, session) => {
-    const diff = (Date.now() - new Date(session.createdAt)) / (1000 * 60 * 60 * 24);
+    if (!session || !session._id) return acc;
+    const dateStr = session.updatedAt || session.createdAt || new Date();
+    const date = new Date(dateStr);
+    const timestamp = isNaN(date.getTime()) ? Date.now() : date.getTime();
+    const diff = (Date.now() - timestamp) / (1000 * 60 * 60 * 24);
     const group = diff < 1 ? "Today" : diff < 7 ? "This Week" : "Older";
     if (!acc[group]) acc[group] = [];
     acc[group].push(session);
@@ -17,176 +24,240 @@ export default function ChatSidebar({ sessions = [], activeSessionId, onNewChat,
   }, {});
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 64 : 260 }}
-      transition={{ duration: 0.25, ease: "easeInOut" }}
-      className="h-full flex flex-col border-r overflow-hidden relative flex-shrink-0"
-      style={{
-        background: "rgba(255,255,255,0.03)",
-        backdropFilter: "blur(32px)",
-        WebkitBackdropFilter: "blur(32px)",
-        borderColor: "rgba(255,255,255,0.07)",
-      }}
-    >
-      {/* Header */}
-      <div
-        className="flex items-center justify-between p-4 border-b"
-        style={{ borderColor: "rgba(255,255,255,0.06)" }}
+    <div className="relative h-full flex-shrink-0">
+      <motion.aside
+        animate={{ width: collapsed ? 72 : 260 }}
+        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+        className="h-full flex flex-col overflow-hidden rounded-3xl relative"
+        style={{
+          background: "rgba(255,255,255,0.7)",
+          backdropFilter: "blur(24px)",
+          border: "1.5px solid rgba(255,255,255,0.8)",
+          boxShadow: "0 8px 32px rgba(108,99,255,0.08)",
+        }}
       >
+        {/* Header */}
+        <div
+          className="flex items-center px-4 pt-8 pb-6 flex-shrink-0"
+          style={{ borderBottom: "1px solid rgba(0,0,0,0.05)", minHeight: 88 }}
+        >
+          <motion.div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <motion.div
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg,#7c6fff,#34d4e0)", boxShadow: "0 4px 12px rgba(124,111,255,0.25)" }}
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Brain size={16} className="text-white" />
+            </motion.div>
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.22 }}
+                  className="overflow-hidden whitespace-nowrap"
+                >
+                  <p className="font-bold text-sm leading-tight" style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55", letterSpacing: "0.05em" }}>OpsMind AI</p>
+                  <p className="text-xs" style={{ color: "#5a5880" }}>Chat Assistant</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+
+        {/* New Chat */}
+        <div className="p-3">
+          <button
+            onClick={onNewChat}
+            className={`w-full flex items-center gap-2.5 rounded-xl py-2.5 px-3 text-sm font-bold transition-all text-white ${collapsed ? "justify-center px-0" : ""}`}
+            style={{
+              background: "linear-gradient(135deg,#7c6fff 0%,#34d4e0 100%)",
+              boxShadow: "0 4px 12px rgba(124,111,255,0.25)",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 6px 20px rgba(124,111,255,0.35)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(124,111,255,0.25)"; }}
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            {!collapsed && <span>New Chat</span>}
+          </button>
+        </div>
+
+        {/* Search */}
         {!collapsed && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-3 pb-2">
             <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              className="flex items-center gap-2 rounded-xl px-3 py-2"
               style={{
-                background: "linear-gradient(135deg,rgba(139,92,246,0.7) 0%,rgba(99,102,241,0.7) 100%)",
-                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(255,255,255,0.5)",
+                border: "1.5px solid rgba(124,111,255,0.1)",
               }}
             >
-              <Brain size={14} className="text-white" />
+              <Search size={13} style={{ color: "#3d3b56" }} />
+              <input
+                type="text"
+                placeholder="Search chats…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent text-xs outline-none w-full"
+                style={{ color: "#2d2b55" }}
+              />
             </div>
-            <span className="text-sm font-bold tracking-wide" style={{ color: "rgba(255,255,255,0.85)" }}>OpsMind AI</span>
           </motion.div>
         )}
-        <button
-          onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg transition-colors ml-auto"
-          style={{ color: "rgba(255,255,255,0.35)" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.35)"; }}
-        >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-        </button>
-      </div>
 
-      {/* New Chat */}
-      <div className="p-3">
-        <button
-          onClick={onNewChat}
-          className={`w-full flex items-center gap-2.5 rounded-xl py-2.5 px-3 text-sm font-medium transition-all text-white ${collapsed ? "justify-center px-0" : ""}`}
-          style={{
-            background: "linear-gradient(135deg,rgba(139,92,246,0.7) 0%,rgba(99,102,241,0.65) 100%)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "1px solid rgba(139,92,246,0.4)",
-            boxShadow: "0 4px 16px rgba(139,92,246,0.2)",
-          }}
-        >
-          <Plus size={16} />
-          {!collapsed && <span>New Chat</span>}
-        </button>
-      </div>
+        {/* Session list */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-4 custom-scrollbar no-scrollbar">
+          {!collapsed && safeSessions.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-40 text-center opacity-30 px-6">
+              <MessageSquare size={32} className="mb-3" />
+              <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">No recent chats yet</p>
+            </div>
+          )}
 
-      {/* Search */}
-      {!collapsed && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-3 pb-2">
-          <div
-            className="flex items-center gap-2 rounded-lg px-3 py-2"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
-            <Search size={13} style={{ color: "rgba(255,255,255,0.25)" }} />
-            <input
-              type="text"
-              placeholder="Search chats…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent text-xs outline-none w-full"
-              style={{ color: "rgba(255,255,255,0.65)", "::placeholder": { color: "rgba(255,255,255,0.2)" } }}
-            />
-          </div>
-        </motion.div>
-      )}
-
-      {/* Session list */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-4 custom-scrollbar">
-        {!collapsed && Object.entries(grouped).map(([group, groupSessions]) => (
-          <div key={group} className="mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest px-2 mb-1 pt-2" style={{ color: "rgba(255,255,255,0.2)" }}>{group}</p>
-            <AnimatePresence>
-              {groupSessions.map((session) => (
-                <motion.div
-                  key={session.id}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  className="relative"
-                  onMouseEnter={() => setHoveredId(session.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                >
-                  <button
-                    onClick={() => onLoadSession(session.id)}
-                    className="w-full text-left flex items-start gap-2.5 rounded-lg px-3 py-2.5 mb-0.5 transition-all text-xs"
-                    style={
-                      activeSessionId === session.id
-                        ? {
-                            background: "rgba(139,92,246,0.18)",
-                            border: "1px solid rgba(139,92,246,0.28)",
-                            color: "rgba(196,181,253,1)",
-                            backdropFilter: "blur(8px)",
-                          }
-                        : {
-                            background: "transparent",
-                            border: "1px solid transparent",
-                            color: "rgba(255,255,255,0.4)",
-                          }
-                    }
-                    onMouseEnter={(e) => {
-                      if (activeSessionId !== session.id) {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeSessionId !== session.id) {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.4)";
-                      }
-                    }}
+          {!collapsed && Object.entries(grouped).map(([group, groupSessions]) => (
+            <div key={group} className="mb-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.1em] px-3 mb-1 pt-2" style={{ color: "#9ca3af", fontFamily: "'Rajdhani', sans-serif" }}>{group}</p>
+              <AnimatePresence>
+                {groupSessions.map((session) => (
+                  <motion.div
+                    key={session._id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -8 }}
+                    className="relative group/item"
+                    onMouseEnter={() => setHoveredId(session._id)}
+                    onMouseLeave={() => setHoveredId(null)}
                   >
-                    <MessageSquare size={13} className="mt-0.5 shrink-0 opacity-70" />
-                    <span className="truncate leading-relaxed">{session.title}</span>
-                  </button>
-                  {hoveredId === session.id && (
                     <button
-                      onClick={(e) => { e.stopPropagation(); onDeleteSession(session.id); }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-all"
-                      style={{ color: "rgba(255,255,255,0.25)" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(248,113,113,0.9)"; e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.25)"; e.currentTarget.style.background = "transparent"; }}
+                      onClick={() => onLoadSession(session._id)}
+                      className="w-full text-left flex items-start gap-2.5 rounded-xl px-3 py-2.5 mb-1 transition-all text-[13px] font-medium"
+                      style={
+                        activeSessionId === session._id
+                          ? {
+                              background: "rgba(124,111,255,0.08)",
+                              border: "1px solid rgba(124,111,255,0.15)",
+                              color: "#6c63ff",
+                              boxShadow: "0 4px 12px rgba(124,111,255,0.08)",
+                            }
+                          : {
+                              background: "transparent",
+                              border: "1px solid transparent",
+                              color: "#5a5880",
+                            }
+                      }
                     >
-                      <Trash2 size={12} />
+                      <MessageSquare size={14} className={`mt-0.5 shrink-0 ${activeSessionId === session._id ? "text-[#7c6fff]" : "opacity-40"}`} />
+                      <span className="truncate leading-relaxed flex-1">{session.title}</span>
                     </button>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        ))}
+                    {hoveredId === session._id && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onDeleteSession(session._id); }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all opacity-0 group-hover/item:opacity-100"
+                        style={{ color: "#9ca3af" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = "#f472b6"; e.currentTarget.style.background = "rgba(244,114,182,0.1)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ))}
 
-        {collapsed && (
-          <div className="flex flex-col items-center gap-1 pt-2">
-            {sessions.slice(0, 8).map((session) => (
-              <button
-                key={session.id}
-                onClick={() => onLoadSession(session.id)}
-                title={session.title}
-                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
-                style={
-                  activeSessionId === session.id
-                    ? { background: "rgba(139,92,246,0.25)", color: "rgba(196,181,253,1)" }
-                    : { color: "rgba(255,255,255,0.25)" }
-                }
+          {collapsed && (
+            <div className="flex flex-col items-center gap-2 pt-4">
+              {safeSessions.slice(0, 8).map((session) => (
+                <button
+                  key={session._id}
+                  onClick={() => onLoadSession(session._id)}
+                  title={session.title}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm"
+                  style={
+                    activeSessionId === session._id
+                      ? { background: "rgba(124,111,255,0.15)", color: "#7c6fff", border: "1px solid rgba(124,111,255,0.2)" }
+                      : { background: "rgba(255,255,255,0.6)", color: "#9ca3af", border: "1px solid rgba(0,0,0,0.03)" }
+                  }
+                >
+                  <MessageSquare size={16} />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Logout Footer ── */}
+        <div
+          className="flex-shrink-0 px-2 py-3"
+          style={{ borderTop: "1px solid rgba(0,0,0,0.05)" }}
+        >
+          <AnimatePresence initial={false}>
+            {!collapsed && (
+              <motion.div
+                key="user-name"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="px-3 pb-2"
               >
-                <MessageSquare size={14} />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </motion.aside>
+                <p
+                  className="text-[10px] font-bold uppercase tracking-widest truncate"
+                  style={{ color: "#9ca3af", fontFamily: "'Rajdhani', sans-serif" }}
+                >
+                  {user?.name || user?.email || "User"}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            onClick={() => logout()}
+            whileHover={{ x: collapsed ? 0 : 4, backgroundColor: "rgba(244,114,182,0.08)" }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full h-11 flex items-center gap-3 px-3 rounded-xl transition-all duration-200"
+            style={{ color: "#f472b6", justifyContent: collapsed ? "center" : "flex-start" }}
+            title="Log out"
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.span
+                  key="logout-text"
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-sm font-semibold whitespace-nowrap overflow-hidden"
+                >
+                  Log out
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
+      </motion.aside>
+
+      {/* Floating Toggle Button */}
+      <motion.button
+        onClick={onToggleCollapse}
+        whileHover={{ scale: 1.15, backgroundColor: "rgba(255,255,255,1)", boxShadow: "0 8px 24px rgba(108,99,255,0.2)" }}
+        whileTap={{ scale: 0.9 }}
+        className="absolute -right-4 top-10 w-8 h-8 rounded-full flex items-center justify-center z-50"
+        style={{
+          background: "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(8px)",
+          border: "1.5px solid rgba(108,99,255,0.2)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          color: "#7c6fff",
+        }}
+      >
+        <motion.div animate={{ rotate: collapsed ? 0 : 180 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+          <ChevronRight size={18} strokeWidth={2.5} />
+        </motion.div>
+      </motion.button>
+    </div>
   );
 }

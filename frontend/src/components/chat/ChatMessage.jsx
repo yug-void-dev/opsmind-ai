@@ -7,7 +7,7 @@ function StreamingCursor() {
     <motion.span
       animate={{ opacity: [1, 0] }}
       transition={{ duration: 0.6, repeat: Infinity, ease: "linear" }}
-      className="inline-block w-0.5 h-4 bg-violet-400 ml-0.5 align-middle"
+      className="inline-block w-0.5 h-4 bg-[#7c6fff] ml-0.5 align-middle"
     />
   );
 }
@@ -18,12 +18,12 @@ function CitationBadge({ number, onClick }) {
       onClick={() => onClick(number)}
       className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full mx-0.5 align-middle transition-all"
       style={{
-        background: "rgba(139,92,246,0.2)",
-        border: "1px solid rgba(139,92,246,0.4)",
-        color: "rgba(196,181,253,1)",
+        background: "rgba(124,111,255,0.15)",
+        border: "1px solid rgba(124,111,255,0.3)",
+        color: "#7c6fff",
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.4)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(139,92,246,0.2)"; }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(124,111,255,0.3)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(124,111,255,0.15)"; }}
     >
       {number}
     </button>
@@ -38,8 +38,8 @@ function renderContent(text, onCitationClick) {
     return (
       <span key={i}>
         {part.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((chunk, j) => {
-          if (chunk.startsWith("**") && chunk.endsWith("**")) return <strong key={j} className="font-semibold text-white">{chunk.slice(2, -2)}</strong>;
-          if (chunk.startsWith("*") && chunk.endsWith("*")) return <em key={j} className="italic" style={{ color: "rgba(255,255,255,0.75)" }}>{chunk.slice(1, -1)}</em>;
+          if (chunk.startsWith("**") && chunk.endsWith("**")) return <strong key={j} className="font-bold" style={{ color: "#2d2b55" }}>{chunk.slice(2, -2)}</strong>;
+          if (chunk.startsWith("*") && chunk.endsWith("*")) return <em key={j} className="italic" style={{ color: "#5a5880" }}>{chunk.slice(1, -1)}</em>;
           return chunk;
         })}
       </span>
@@ -58,115 +58,113 @@ export default function ChatMessage({ message, onCitationClick }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} group`}
+      className={`flex gap-4 ${isUser ? "flex-row-reverse" : "flex-row"} group w-full`}
     >
       {/* Avatar */}
       <div
-        className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center mt-1"
+        className="w-9 h-9 rounded-2xl flex-shrink-0 flex items-center justify-center mt-1 shadow-sm"
         style={
           isUser
             ? {
-                background: "rgba(255,255,255,0.08)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.8)",
+                border: "1.5px solid rgba(0,0,0,0.04)",
               }
             : isHallucinationBlocked
             ? {
                 background: "rgba(245,158,11,0.15)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(245,158,11,0.25)",
+                border: "1.5px solid rgba(245,158,11,0.25)",
               }
             : isError
             ? {
                 background: "rgba(239,68,68,0.1)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(239,68,68,0.2)",
+                border: "1.5px solid rgba(239,68,68,0.2)",
               }
             : {
-                background: "linear-gradient(135deg,rgba(139,92,246,0.3) 0%,rgba(99,102,241,0.25) 100%)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(139,92,246,0.25)",
+                background: "linear-gradient(135deg,#7c6fff,#34d4e0)",
+                border: "1px solid rgba(255,255,255,0.2)",
               }
         }
       >
         {isUser ? (
-          <User size={15} style={{ color: "rgba(255,255,255,0.65)" }} />
+          <User size={16} style={{ color: "#5a5880" }} />
         ) : isHallucinationBlocked ? (
-          <AlertCircle size={15} className="text-amber-400" />
+          <AlertCircle size={16} className="text-amber-500" />
         ) : isError ? (
-          <AlertCircle size={15} className="text-red-400" />
+          <AlertCircle size={16} className="text-rose-500" />
         ) : (
-          <Bot size={15} className="text-violet-300" />
+          <Bot size={16} className="text-white" />
         )}
       </div>
 
       {/* Bubble */}
-      <div className={`max-w-[78%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-1`}>
+      <div className={`max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-2`}>
         <div
-          className="rounded-2xl px-4 py-3 text-sm leading-relaxed"
+          className="rounded-3xl px-5 py-3.5 text-sm leading-relaxed shadow-sm"
           style={
             isUser
               ? {
-                  background: "linear-gradient(135deg,rgba(139,92,246,0.55) 0%,rgba(99,102,241,0.5) 100%)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(139,92,246,0.35)",
-                  borderTopRightRadius: "4px",
-                  color: "rgba(255,255,255,0.92)",
-                  boxShadow: "0 4px 24px rgba(139,92,246,0.15)",
+                  background: "linear-gradient(135deg,#7c6fff 0%,#6366f1 100%)",
+                  border: "1.5px solid rgba(124,111,255,0.2)",
+                  borderTopRightRadius: "6px",
+                  color: "#fff",
+                  boxShadow: "0 4px 16px rgba(124,111,255,0.2)",
                 }
               : isHallucinationBlocked
               ? {
                   background: "rgba(245,158,11,0.08)",
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(245,158,11,0.22)",
-                  borderTopLeftRadius: "4px",
-                  color: "rgba(252,211,77,0.9)",
+                  border: "1.5px solid rgba(245,158,11,0.22)",
+                  borderTopLeftRadius: "6px",
+                  color: "#92400e",
                 }
               : isError
               ? {
                   background: "rgba(239,68,68,0.08)",
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(239,68,68,0.18)",
-                  borderTopLeftRadius: "4px",
-                  color: "rgba(252,165,165,0.9)",
+                  border: "1.5px solid rgba(239,68,68,0.18)",
+                  borderTopLeftRadius: "6px",
+                  color: "#991b1b",
                 }
               : {
-                  background: "rgba(255,255,255,0.05)",
+                  background: "rgba(255,255,255,0.75)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderTopLeftRadius: "4px",
-                  color: "rgba(255,255,255,0.8)",
+                  border: "1.5px solid rgba(255,255,255,0.8)",
+                  borderTopLeftRadius: "6px",
+                  color: "#2d2b55",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
                 }
           }
         >
           {isUser ? (
-            <p>{message.content}</p>
+            <p className="font-medium">{message.content}</p>
           ) : (
             <div>
               {isHallucinationBlocked && (
-                <div className="flex items-center gap-1.5 mb-1 opacity-60">
-                  <AlertCircle size={11} className="text-amber-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Security Guard</span>
+                <div className="flex items-center gap-1.5 mb-2 opacity-70">
+                  <AlertCircle size={12} className="text-amber-600" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600" style={{ fontFamily: "'Rajdhani', sans-serif" }}>Security Guard</span>
                 </div>
               )}
-              {message.content ? (
-                <p className="whitespace-pre-wrap">
+              {isError ? (
+                <div className="flex items-start gap-2 py-1 text-rose-600 font-medium">
+                  <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
+                  <p>{message.content || "An error occurred. Please try again."}</p>
+                </div>
+              ) : message.content ? (
+                <div className="space-y-1 whitespace-pre-wrap">
                   {renderContent(displayText, onCitationClick)}
                   {message.isStreaming && <StreamingCursor />}
-                </p>
+                </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 py-1">
                   {[0, 0.2, 0.4].map((delay, i) => (
                     <motion.div
                       key={i}
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 1, repeat: Infinity, delay }}
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.2, repeat: Infinity, delay }}
                       className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: "rgba(139,92,246,0.7)" }}
+                      style={{ background: "#7c6fff" }}
                     />
                   ))}
                 </div>
@@ -177,39 +175,38 @@ export default function ChatMessage({ message, onCitationClick }) {
 
         {/* Source chips */}
         {!isUser && message.sources?.length > 0 && !message.isStreaming && (
-          <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap gap-1.5 px-1">
+          <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap gap-2 px-1">
             {message.sources.map((source, i) => (
               <button
                 key={i}
-                onClick={() => onCitationClick(i + 1, source)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] transition-all"
+                onClick={() => onCitationClick(i + 1, source, message.sources)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all shadow-sm"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "rgba(255,255,255,0.45)",
+                  background: "rgba(255,255,255,0.8)",
+                  border: "1.5px solid rgba(124,111,255,0.1)",
+                  color: "#5a5880",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(139,92,246,0.12)";
-                  e.currentTarget.style.border = "1px solid rgba(139,92,246,0.28)";
-                  e.currentTarget.style.color = "rgba(196,181,253,0.9)";
+                  e.currentTarget.style.background = "rgba(124,111,255,0.1)";
+                  e.currentTarget.style.borderColor = "rgba(124,111,255,0.3)";
+                  e.currentTarget.style.color = "#7c6fff";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                  e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
-                  e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.8)";
+                  e.currentTarget.style.borderColor = "rgba(124,111,255,0.1)";
+                  e.currentTarget.style.color = "#5a5880";
                 }}
               >
                 <ExternalLink size={10} />
-                <span className="truncate max-w-[160px]">{source.filename}</span>
-                {source.page && <span style={{ color: "rgba(255,255,255,0.25)" }}>p.{source.page}</span>}
+                <span className="truncate max-w-[140px] uppercase tracking-wider" style={{ fontFamily: "'Rajdhani', sans-serif" }}>{source.filename}</span>
+                {source.page && <span className="opacity-40">p.{source.page}</span>}
               </button>
             ))}
           </motion.div>
         )}
 
         {/* Timestamp */}
-        <span className="text-[10px] px-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "rgba(255,255,255,0.2)" }}>
+        <span className="text-[10px] font-bold px-2 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider" style={{ color: "#9ca3af", fontFamily: "'Rajdhani', sans-serif" }}>
           {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>
       </div>

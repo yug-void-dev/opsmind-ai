@@ -292,7 +292,19 @@ function ActivityRow({ icon: Icon, color, title, sub, time, delay = 0 }) {
 /* ════════ ADMIN OVERVIEW ════════ */
 function AdminOverview() {
   const navigate = useNavigate();
-  const { stats, activities, loading } = useAdmin();
+  const { stats, activities, activityPagination, fetchActivities, loading } = useAdmin();
+
+  const handleNextPage = () => {
+    if (activityPagination?.page < activityPagination?.totalPages) {
+      fetchActivities(activityPagination.page + 1, activityPagination.limit);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (activityPagination?.page > 1) {
+      fetchActivities(activityPagination.page - 1, activityPagination.limit);
+    }
+  };
 
   const statConfig = [
     { icon: Files, label: "Documents indexed", value: stats?.documents?.total || 0, delta: "", color: "#7c6fff", delay: 0 },
@@ -306,23 +318,30 @@ function AdminOverview() {
     { icon: TrendingUp, title: "View Analytics", desc: "Audit AI performance", path: "/admin/analytics" },
     { icon: Settings, title: "System Settings", desc: "Configure guardrails", path: "/admin/settings" },
   ];
-  const mappedActivities = activities?.length > 0 
+  const mappedActivities = activities?.length > 0
     ? activities.map(a => {
-        const config = getActivityConfig(a);
-        return {
-          ...config,
-          time: formatRelativeTime(a.createdAt)
-        };
-      })
+      const config = getActivityConfig(a);
+      return {
+        ...config,
+        time: formatRelativeTime(a.createdAt)
+      };
+    })
     : [
-        { icon: AlertCircle, color: "#9ca3af", title: "No recent activity", sub: "Real-time logs will appear here", time: "-" }
-      ];
+      { icon: AlertCircle, color: "#9ca3af", title: "No recent activity", sub: "Real-time logs will appear here", time: "-" }
+    ];
   const health = [
     { label: "Database (MongoDB)", pct: 100, color: "#7c6fff" },
     { label: "Gemini Embedding", pct: 100, color: "#34d4e0" },
     { label: "RAG Answer Rate", pct: parseFloat(stats?.queries?.answerRate) || 100, color: "#c084fc" },
     { label: "Cache Efficiency", pct: stats?.cache?.hits > 0 ? Math.round((stats.cache.hits / (stats.cache.hits + stats.cache.misses)) * 100) : 100, color: "#f472b6" },
   ];
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className="space-y-10">
@@ -331,7 +350,7 @@ function AdminOverview() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="text-3xl font-bold mb-1.5"
           style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55", letterSpacing: "0.03em" }}>
-          Good morning, {useAuth().user?.name || "Admin"} 👋
+          {getGreeting()}, {useAuth().user?.name || "Admin"} 👋
         </motion.h1>
         <motion.p className="text-sm" style={{ color: "#5a5880" }}>Here's what's happening with OpsMind AI today.</motion.p>
       </div>
@@ -352,9 +371,33 @@ function AdminOverview() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
         <div className="xl:col-span-2">
           <SectionHeader title="Recent Activity" />
-          <div className="rounded-3xl p-2 space-y-1"
+          <div className="rounded-3xl p-2 space-y-1 flex flex-col"
             style={{ background: "rgba(255,255,255,0.35)", backdropFilter: "blur(10px)", border: "1.5px solid rgba(255,255,255,0.6)" }}>
-            {mappedActivities.map((a, i) => <ActivityRow key={i} {...a} delay={0.2 + i * 0.05} />)}
+            <div className="flex-1 space-y-1 min-h-[300px]">
+              {mappedActivities.map((a, i) => <ActivityRow key={i} {...a} delay={0.2 + i * 0.05} />)}
+            </div>
+
+            {activityPagination?.totalPages > 1 && (
+              <div className="flex justify-between items-center px-4 py-3 mt-2 border-t border-black/5">
+                <button
+                  onClick={handlePrevPage}
+                  disabled={activityPagination.page === 1}
+                  className="p-1 rounded-lg text-[#5a5880] hover:bg-[#7c6fff]/10 disabled:opacity-30 transition-all"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <span className="text-xs font-bold" style={{ color: "#5a5880", fontFamily: "'Rajdhani',sans-serif" }}>
+                  Page {activityPagination.page} of {activityPagination.totalPages}
+                </span>
+                <button
+                  onClick={handleNextPage}
+                  disabled={activityPagination.page === activityPagination.totalPages}
+                  className="p-1 rounded-lg text-[#5a5880] hover:bg-[#7c6fff]/10 disabled:opacity-30 transition-all"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -399,7 +442,7 @@ export default function AdminPage() {
   const notifRef = useRef(null);
 
   const { user, logout: authLogout } = useAuth();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useContext(NotificationContext);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteAll } = useContext(NotificationContext);
 
   const handleLogout = () => {
     authLogout();
@@ -666,8 +709,8 @@ export default function AdminPage() {
                   <div className="absolute top-0 left-4 right-4 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(108,99,255,0.25),transparent)" }} />
                   <div className="flex justify-between items-center px-2 mb-3">
                     <p className="text-xs font-bold" style={{ color: "#7c6fff", fontFamily: "'Rajdhani',sans-serif", letterSpacing: "0.08em" }}>NOTIFICATIONS</p>
-                    {unreadCount > 0 && (
-                      <button onClick={markAllAsRead} className="text-[10px] font-bold hover:underline" style={{ color: "#5a5880" }}>Clear all</button>
+                    {notifications.length > 0 && (
+                      <button onClick={deleteAll} className="text-[10px] font-bold hover:underline" style={{ color: "#5a5880" }}>Clear all</button>
                     )}
                   </div>
                   <div className="max-h-[320px] overflow-y-auto no-scrollbar">
@@ -676,7 +719,7 @@ export default function AdminPage() {
                         const dotColor = n.type === 'document_indexed' ? '#7c6fff' : n.type === 'user_registered' ? '#c084fc' : n.type === 'document_failed' ? '#ef4444' : '#34d4e0';
                         return (
                           <motion.div key={n._id || i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.06 }} 
+                            transition={{ delay: i * 0.06 }}
                             whileHover={{ backgroundColor: "rgba(124,111,255,0.07)" }}
                             onClick={() => !n.isRead && markAsRead(n._id)}
                             className="flex items-start gap-2.5 px-2.5 py-2.5 rounded-xl transition-colors cursor-pointer relative">
@@ -937,7 +980,7 @@ export function AdminPipeline() {
     try {
       const res = await axios.get("/api/admin/documents?limit=100");
       const docsArray = res.data.data?.documents || res.data.data || [];
-      
+
       const processing = docsArray
         .filter(d => d.status === "processing" || d.status === "failed" || d.status === "reindexing")
         .map(d => ({
@@ -947,7 +990,7 @@ export function AdminPipeline() {
           badge: d.status.charAt(0).toUpperCase() + d.status.slice(1),
           progress: d.status === "ready" ? 100 : d.status === "failed" ? 0 : 45
         }));
-      
+
       setItems(processing);
     } catch (err) {
       console.error(err);
@@ -973,7 +1016,7 @@ export function AdminPipeline() {
       <SectionHeader title="Ingestion Pipeline" color="#34d4e0" />
       <div className="grid gap-4">
         {loading ? (
-           <div className="flex justify-center py-10"><Activity className="animate-spin text-teal-500" /></div>
+          <div className="flex justify-center py-10"><Activity className="animate-spin text-teal-500" /></div>
         ) : filtered.length === 0 ? (
           <p className="text-center py-10 text-sm text-gray-500">No active background tasks</p>
         ) : (
@@ -992,9 +1035,9 @@ export function AdminPipeline() {
         <h3 className="text-xl font-bold mb-4" style={{ fontFamily: "'Rajdhani',sans-serif", color: "#2d2b55" }}>System Background Tasks</h3>
         <p className="text-sm text-gray-500 mb-6">These are the background jobs currently handled by the embedding engine.</p>
         {!loading && items.length === 0 && (
-           <div className="p-8 rounded-3xl bg-white/40 border border-teal-100 text-center text-sm text-teal-600">
-             Pipeline is currently idle. All documents are synchronized.
-           </div>
+          <div className="p-8 rounded-3xl bg-white/40 border border-teal-100 text-center text-sm text-teal-600">
+            Pipeline is currently idle. All documents are synchronized.
+          </div>
         )}
       </div>
     </div>
@@ -1026,7 +1069,7 @@ export function AdminAnalytics() {
         <div className="grid gap-4">
           {(() => {
             const queries = metrics?.topUnansweredQueries || [];
-            const filtered = queries.filter(q => 
+            const filtered = queries.filter(q =>
               !searchVal || q._id?.toLowerCase().includes(searchVal.toLowerCase())
             );
 
@@ -1073,7 +1116,7 @@ export function AdminUsers() {
     try {
       const res = await axios.get(`/api/admin/users?role=user&page=${pageNum}&limit=${limit}`, { signal });
       const rawUsers = res.data.data || [];
-      
+
       // Map backend User model to UserCard prop structure
       const mapped = rawUsers
         .filter(u => u.role !== 'admin')
@@ -1088,7 +1131,7 @@ export function AdminUsers() {
           lastActive: u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : "Never",
           avatar: u.avatar || null
         }));
-      
+
       setUsers(mapped);
       setHasMore(rawUsers.length === limit);
     } catch (err) {
@@ -1104,7 +1147,7 @@ export function AdminUsers() {
   useEffect(() => {
     const controller = new AbortController();
     fetchUsers(page, controller.signal);
-    
+
     // Auto-refresh interval (scoped within the effect)
     const interval = setInterval(() => {
       fetchUsers(page, controller.signal);
@@ -1136,7 +1179,7 @@ export function AdminUsers() {
             Manage employee accounts, assign roles, monitor activity, and control system access.
           </p>
         </div>
-        <motion.button 
+        <motion.button
           onClick={() => fetchUsers(page)} disabled={loading}
           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-white border border-pink-100 shadow-sm text-pink-500"
@@ -1152,19 +1195,19 @@ export function AdminUsers() {
         </div>
       ) : (
         <>
-          <UserCardGrid 
-            users={users} 
+          <UserCardGrid
+            users={users}
             onStatusToggle={handleToggleStatus}
             onViewActivity={(id) => navigate(`/admin/analytics?user=${id}`)}
             onDelete={async (id) => {
-               if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-               try {
-                 await axios.delete(`/api/admin/users/${id}`);
-                 showToast.success("User deleted successfully");
-                 fetchUsers(page);
-               } catch (err) {
-                 showToast.error(err.response?.data?.message || "Failed to delete user");
-               }
+              if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+              try {
+                await axios.delete(`/api/admin/users/${id}`);
+                showToast.success("User deleted successfully");
+                fetchUsers(page);
+              } catch (err) {
+                showToast.error(err.response?.data?.message || "Failed to delete user");
+              }
             }}
             onRoleChange={async (id, newRole) => {
               try {
@@ -1197,7 +1240,7 @@ export function AdminUsers() {
               >
                 <ChevronLeft size={20} />
               </motion.button>
-              
+
               <div className="px-6 py-2 rounded-2xl bg-white/50 backdrop-blur-md border border-pink-100 text-sm font-bold text-pink-500 shadow-sm">
                 Page {page}
               </div>

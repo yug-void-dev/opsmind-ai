@@ -152,8 +152,8 @@ function Alert({ error, success }) {
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
       className={`rounded-xl p-3 flex items-start gap-3 text-sm font-medium ${
-        error 
-          ? "bg-red-50 border border-red-100 text-red-600" 
+        error
+          ? "bg-red-50 border border-red-100 text-red-600"
           : "bg-green-50 border border-green-100 text-green-600"
       }`}
     >
@@ -170,7 +170,7 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  
+
   // Forgot Password Steps
   const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
   const [forgotEmail, setForgotEmail] = useState("");
@@ -183,7 +183,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (authenticatedUser) {
       if (authenticatedUser.role === "admin") navigate("/admin", { replace: true });
-      else navigate("/", { replace: true }); // Or dashboard
+      else navigate("/chat", { replace: true });
     }
   }, [authenticatedUser, navigate]);
 
@@ -252,15 +252,12 @@ export default function AuthPage() {
     if (result.success) {
       showToast.success("Success! Redirecting...");
       const targetUser = result.user;
-      
-      // Delay navigation slightly so they see the success toast
+
       setTimeout(() => {
         if (targetUser?.role === "admin") {
           navigate("/admin");
         } else {
-          // If they land here and are NOT admin, where should they go?
-          // For now, let's say root, but App.jsx needs to handle root differently
-          navigate("/"); 
+          navigate("/chat");
         }
       }, 1000);
     } else {
@@ -280,20 +277,14 @@ export default function AuthPage() {
     }
 
     setIsLoading(true);
-    const result = await register(data);
+    const result = await register(data, false);
     setIsLoading(false);
 
     if (result.success) {
-      showToast.success("Account created! Redirecting...");
-      const targetUser = result.user;
-      
+      showToast.success("Account created! Please sign in.");
       setTimeout(() => {
-        if (targetUser?.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-      }, 1000);
+        setMode("login");
+      }, 1500);
     } else {
       showToast.error(result.message);
     }
@@ -1018,8 +1009,8 @@ export default function AuthPage() {
                       }}
                     >
                       <TW text={
-                        forgotStep === 1 ? "Reset Password 🔐" : 
-                        forgotStep === 2 ? "Verify Email 📧" : 
+                        forgotStep === 1 ? "Reset Password 🔐" :
+                        forgotStep === 2 ? "Verify Email 📧" :
                         "Choose New Password 🔑"
                       } />
                     </h2>

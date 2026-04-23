@@ -83,9 +83,9 @@ api.interceptors.response.use(
     ) {
       // Preserve backend message for toast notifications without breaking data access
       response.data._message = response.data.message;
-      response.data = response.data.data;
+      return response.data.data; // Return the inner data directly
     }
-    return response;
+    return response.data; // Fallback to just data if envelope not present
   },
   (error) => {
     // Network error — no response received from server at all
@@ -339,6 +339,8 @@ export const streamQuery = (query, options = {}, callbacks = {}) => {
     ...(options.tags?.length > 0 && { tags: options.tags }),
   });
 
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   fetch(`${BASE_URL}/api/query/stream`, {
     method: "POST",
     headers: {
@@ -350,6 +352,7 @@ export const streamQuery = (query, options = {}, callbacks = {}) => {
     signal: controller.signal,
   })
     .then(async (response) => {
+      clearTimeout(timeoutId);
       // Non-2xx means the stream never started (e.g. auth error, rate limit)
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
@@ -415,13 +418,22 @@ export const streamQuery = (query, options = {}, callbacks = {}) => {
       }
     })
     .catch((err) => {
-      // AbortError = caller cancelled intentionally — not an error
-      if (err.name === "AbortError") return;
+      clearTimeout(timeoutId);
+      if (err.name === "AbortError") {
+        // Only call onError if this wasn't a user-initiated stop
+        if (!controller.isManualAbort) {
+          onError?.("Request timed out or was interrupted. Please retry.");
+        }
+        return;
+      }
       onError?.(err.message || "Stream connection failed");
     });
 
-  // Return an abort function so the caller (e.g. useChat hook) can cancel
-  return () => controller.abort();
+  // Return an abort function so the caller can cancel
+  return () => {
+    controller.isManualAbort = true;
+    controller.abort();
+  };
 };
 
 // ══════════════════════════════════════════════════════════════════════════════

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
 import { Pagination } from "./Pagination";
 import { StatusBadge } from "../ui/Badge";
 

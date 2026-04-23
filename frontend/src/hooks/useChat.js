@@ -1,199 +1,269 @@
-import { useState, useCallback, useRef } from "react";
-import { parseSSEStream, extractCitations } from "../utils/streamParser";
-import api from "../utils/api";
-
-const STORAGE_KEY = "opsmind_chat_sessions";
-
-function loadSessions() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveSessions(sessions) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-}
+import { useState, useCallback, useRef, useEffect } from "react";
+import { streamQuery, chatsApi } from "../utils/api";
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
 export function useChat() {
-  const [sessions, setSessions] = useState(loadSessions);
+  const [sessions, setSessions] = useState([]);
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState(null);
-  const abortRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
-  // ── Session helpers ──────────────────────────────────────────────────────
-  const createSession = useCallback((firstMessage) => {
-    const id = generateId();
-    const title =
-      firstMessage.slice(0, 50) + (firstMessage.length > 50 ? "…" : "");
-    const session = { id, title, createdAt: new Date().toISOString(), messageCount: 0 };
-    setSessions((prev) => {
-      const updated = [session, ...prev];
-      saveSessions(updated);
-      return updated;
-    });
-    return id;
+  // Refs for values needed in async callbacks without stale closures
+  const abortRef = useRef(null);
+  const activeSessionIdRef = useRef(null);
+  const messagesRef = useRef([]);
+
+  // Keep refs in sync with state
+  useEffect(() => { activeSessionIdRef.current = activeSessionId; }, [activeSessionId]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+
+  // ── Session Management ───────────────────────────────────────────────────
+
+  const refreshSessions = useCallback(async () => {
+    try {
+      const response = await chatsApi.list();
+      setSessions(Array.isArray(response) ? response : []);
+    } catch (err) {
+      console.error("Failed to refresh sessions:", err);
+    }
   }, []);
 
-  const loadSession = useCallback(
-    (sessionId) => {
+  // 1. Fetch sessions on mount
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setLoading(true);
+        const response = await chatsApi.list();
+        setSessions(Array.isArray(response) ? response : []);
+      } catch (err) {
+        console.error("Failed to fetch sessions:", err);
+        setError("Could not load chat history.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSessions();
+  }, []);
+
+  // 2. Load a specific session's messages
+  const loadSession = useCallback(async (sessionId) => {
+    if (!sessionId) return;
+    try {
+      setLoading(true);
       setActiveSessionId(sessionId);
-      const stored = loadSessions();
-      const session = stored.find((s) => s.id === sessionId);
-      setMessages(session?.messages || []);
+      const response = await chatsApi.getById(sessionId);
+      // Normalize messages from backend — add a client-side id for keying
+      const normalized = (response.messages || []).map((m) => ({
+        ...m,
+        id: generateId(),
+      }));
+      setMessages(normalized);
+    } catch (err) {
+      console.error("Failed to load session:", err);
+      setError("Could not load messages.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 3. Delete session
+  const deleteSession = useCallback(
+    async (sessionId) => {
+      try {
+        await chatsApi.delete(sessionId);
+        setSessions((prev) => prev.filter((s) => s._id !== sessionId));
+        if (activeSessionIdRef.current === sessionId) {
+          setActiveSessionId(null);
+          setMessages([]);
+        }
+      } catch (err) {
+        console.error("Failed to delete session:", err);
+      }
     },
     []
   );
 
-  const deleteSession = useCallback((sessionId) => {
-    setSessions((prev) => {
-      const updated = prev.filter((s) => s.id !== sessionId);
-      saveSessions(updated);
-      return updated;
-    });
-    if (activeSessionId === sessionId) {
-      setActiveSessionId(null);
-      setMessages([]);
-    }
-  }, [activeSessionId]);
-
-  const persistMessages = useCallback((sessionId, msgs) => {
-    setSessions((prev) => {
-      const updated = prev.map((s) =>
-        s.id === sessionId
-          ? { ...s, messages: msgs, messageCount: msgs.length }
-          : s
-      );
-      saveSessions(updated);
-      return updated;
-    });
+  // 4. Clear current chat (start new chat without clearing history)
+  const clearChat = useCallback(() => {
+    setActiveSessionId(null);
+    setMessages([]);
+    setError(null);
   }, []);
 
-  // ── Sending a message ────────────────────────────────────────────────────
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  // ── Messaging Logic ─────────────────────────────────────────────────────
+
   const sendMessage = useCallback(
     async (text) => {
-      if (!text.trim() || isStreaming) return;
+      if (!text?.trim() || isStreaming) return;
       setError(null);
 
-      let sessionId = activeSessionId;
-      if (!sessionId) {
-        sessionId = createSession(text);
-        setActiveSessionId(sessionId);
-      }
+      const userMsgId = generateId();
+      const assistantMsgId = generateId();
 
       const userMsg = {
-        id: generateId(),
+        id: userMsgId,
         role: "user",
-        content: text,
+        content: text.trim(),
         timestamp: new Date().toISOString(),
       };
 
       const assistantMsg = {
-        id: generateId(),
+        id: assistantMsgId,
         role: "assistant",
         content: "",
-        citations: [],
+        sources: [],
         isStreaming: true,
         timestamp: new Date().toISOString(),
       };
 
-      const nextMessages = [...messages, userMsg, assistantMsg];
-      setMessages(nextMessages);
+      setMessages((prev) => [...prev, userMsg, assistantMsg]);
       setIsStreaming(true);
 
-      try {
-        abortRef.current = new AbortController();
+      // These are captured in closures for the SSE callbacks
+      let fullAnswer = "";
+      let finalSources = [];
+      let wasAnswered = true;
 
-        const response = await api.post(
-          "/chat/stream",
-          {
-            message: text,
-            sessionId,
-            history: messages.map((m) => ({ role: m.role, content: m.content })),
+      const abort = streamQuery(
+        text.trim(),
+        {},
+        {
+          onMetadata: (meta) => {
+            if (meta.answered !== undefined) {
+              wasAnswered = meta.answered;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId ? { ...m, answered: meta.answered } : m
+                )
+              );
+            }
           },
-          { signal: abortRef.current.signal, responseType: "stream" }
-        );
 
-        let accumulated = "";
-        for await (const chunk of parseSSEStream(response)) {
-          if (chunk.type === "metadata") {
+          onSources: (sources) => {
+            finalSources = sources;
             setMessages((prev) =>
               prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
+                m.id === assistantMsgId ? { ...m, sources } : m
               )
             );
-          } else if (chunk.type === "text" || chunk.content) {
-            accumulated += chunk.content ?? chunk;
+          },
+
+          onChunk: (token) => {
+            fullAnswer += token;
             setMessages((prev) =>
               prev.map((m) =>
-                m.id === assistantMsg.id
-                  ? { ...m, content: accumulated, citations: extractCitations(accumulated) }
+                m.id === assistantMsgId ? { ...m, content: fullAnswer } : m
+              )
+            );
+          },
+
+          onDone: async (data) => {
+            if (data?.answered !== undefined) wasAnswered = data.answered;
+
+            // Use the authoritative sources from the done event (backend may have cleared them
+            // if the LLM said "I don't know" after generation)
+            const authoritativeSources = data?.sources ?? finalSources;
+            wasAnswered = data?.answered ?? wasAnswered;
+
+            // 1. Finalize message state
+            const finalAssistantMsg = {
+              id: assistantMsgId,
+              role: "assistant",
+              content: fullAnswer || data?.answer || "",
+              sources: authoritativeSources,
+              answered: wasAnswered,
+              isStreaming: false,
+              timestamp: new Date().toISOString(),
+            };
+
+            setIsStreaming(false);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMsgId ? finalAssistantMsg : m
+              )
+            );
+
+            // 2. Persist to backend using current ref values (avoids stale closure)
+            const currentSessionId = activeSessionIdRef.current;
+            const currentMessages = messagesRef.current;
+
+            const allMessages = currentMessages.map((m) => {
+              const resolved = m.id === assistantMsgId ? finalAssistantMsg : m;
+              return {
+                role: resolved.role,
+                content: resolved.content || "",
+                sources: (resolved.sources || []).map((s) => ({
+                  documentId: s.documentId ? String(s.documentId) : undefined,
+                  filename: s.filename || s.documentName || "",
+                  page: s.page || s.pageNumber || null,
+                  score: s.score || s.relevanceScore || null,
+                  snippet: s.snippet || "",
+                })),
+                answered: resolved.answered !== false,
+              };
+            });
+
+            try {
+              const payload = {
+                _id: currentSessionId || undefined,
+                title: currentSessionId
+                  ? undefined
+                  : text.trim().slice(0, 60) + (text.trim().length > 60 ? "..." : ""),
+                messages: allMessages,
+              };
+
+              const saveRes = await chatsApi.save(payload);
+
+              if (saveRes?._id) {
+                if (!currentSessionId) {
+                  setActiveSessionId(saveRes._id);
+                }
+                // Always refresh session list after save
+                refreshSessions();
+              }
+            } catch (err) {
+              console.error("[useChat] Failed to persist chat:", err);
+            }
+          },
+
+          onError: (msg) => {
+            const errMsg = msg || "Streaming interrupted. Please retry.";
+            setError(errMsg);
+            setIsStreaming(false);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMsgId
+                  ? { ...m, content: errMsg, isError: true, isStreaming: false }
                   : m
               )
             );
-          } else if (chunk.type === "sources") {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, sources: chunk.sources } : m
-              )
-            );
-          } else if (chunk.type === "done") {
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsg.id ? { ...m, answered: chunk.answered ?? true } : m
-              )
-            );
-          } else if (chunk.type === "error") {
-            throw new Error(chunk.message);
-          }
+          },
         }
+      );
 
-        // Finalise streaming flag
-        setMessages((prev) => {
-          const finalMsgs = prev.map((m) =>
-            m.id === assistantMsg.id ? { ...m, isStreaming: false } : m
-          );
-          persistMessages(sessionId, finalMsgs);
-          return finalMsgs;
-        });
-      } catch (err) {
-        if (err.name === "AbortError") return;
-
-        const errMsg = err.message || "Something went wrong. Please try again.";
-        setError(errMsg);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantMsg.id
-              ? { ...m, content: errMsg, isError: true, isStreaming: false }
-              : m
-          )
-        );
-      } finally {
-        setIsStreaming(false);
-      }
+      abortRef.current = abort;
     },
-    [activeSessionId, createSession, isStreaming, messages, persistMessages]
+    [isStreaming, refreshSessions]
   );
 
   const stopStreaming = useCallback(() => {
-    abortRef.current?.abort();
+    if (abortRef.current) {
+      abortRef.current();
+      abortRef.current = null;
+    }
     setIsStreaming(false);
     setMessages((prev) =>
       prev.map((m) => (m.isStreaming ? { ...m, isStreaming: false } : m))
     );
-  }, []);
-
-  const clearChat = useCallback(() => {
-    setMessages([]);
-    setActiveSessionId(null);
-    setError(null);
   }, []);
 
   return {
@@ -202,12 +272,13 @@ export function useChat() {
     messages,
     isStreaming,
     error,
+    loading,
     sendMessage,
     stopStreaming,
     loadSession,
     deleteSession,
     clearChat,
-    createSession,
-    setActiveSessionId,
+    clearError,
+    refreshSessions,
   };
 }

@@ -57,7 +57,7 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount((prev) => prev + 1);
       
       // Real-time toast for immediate feedback
-      showToast(notification.title, "info");
+      showToast.info(notification.title);
     });
 
     setSocket(newSocket);
@@ -89,12 +89,24 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const deleteAll = async () => {
+    try {
+      await axios.delete("/api/notifications/all");
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Error deleting all notifications:", error);
+    }
+  };
+
   const value = {
     notifications,
     unreadCount,
     loading,
+    socket,
     markAsRead,
     markAllAsRead,
+    deleteAll,
     fetchNotifications
   };
 
