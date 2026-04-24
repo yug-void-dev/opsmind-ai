@@ -13,14 +13,14 @@ OpsMind AI follows a modern decoupled architecture, ensuring scalability and per
 ```mermaid
 graph TD
     User((User))
-    
+
     subgraph "Frontend (React 19 + Vite)"
         UI[Glassmorphic UI]
         Chat[AI Chat Interface]
         Admin[Dashboard & Pipeline Monitoring]
         Three[3D Robot & Particle Backgrounds]
     end
-    
+
     subgraph "Backend (Node.js + Express)"
         API[Express API]
         Auth[Firebase + JWT Auth]
@@ -29,7 +29,7 @@ graph TD
         Retrieval[Hybrid Search: Vector + Keyword]
         LLM[Gemini/Groq Answer Generation]
     end
-    
+
     subgraph "Database (MongoDB Atlas)"
         DB[(MongoDB)]
         VectorSearch[Atlas Vector Search Index]
@@ -137,8 +137,3 @@ For more specific details on the implementation of each layer, please refer to t
 
 - [Frontend Documentation](file:///c:/Users/rajat/OneDrive/Desktop/Coding/Empty/internship/projects/ApsMind_AI/opsmind-ai/frontend/README.md)
 - [Backend Documentation](file:///c:/Users/rajat/OneDrive/Desktop/Coding/Empty/internship/projects/ApsMind_AI/opsmind-ai/backend/README.md)
-
----
-
-## 🔒 License
-Built by **Antigravity** for OpsMind AI. Standard Enterprise License.
