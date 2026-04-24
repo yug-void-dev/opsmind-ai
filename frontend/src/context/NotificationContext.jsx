@@ -44,7 +44,8 @@ export const NotificationProvider = ({ children }) => {
       return;
     }
 
-    const newSocket = io("/", {
+    const socketUrl = import.meta.env.VITE_BACKEND_URL || "/";
+    const newSocket = io(socketUrl, {
       auth: { token },
       transports: ['websocket', 'polling']
     });
