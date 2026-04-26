@@ -12,6 +12,7 @@ services:
     env: node
     region: oregon
     plan: free
+    rootDir: backend
 
     buildCommand: npm install
     startCommand: node src/server.js
@@ -89,4 +90,3 @@ services:
 # NOTE: No 'disk:' block — persistent disk is a paid feature.
 # PDFs are automatically deleted from disk after processing.
 # All document content (chunks + embeddings) lives in MongoDB Atlas.
-
