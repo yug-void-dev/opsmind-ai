@@ -221,6 +221,7 @@ const query = async (req, res, next) => {
       } catch (streamErr) {
         logger.error(`[Query] Streaming error: ${streamErr.message}`);
         sseWrite(res, 'error', { message: 'Streaming interrupted. Please retry.' });
+        return res.end();
       }
 
       // 4. Send completion event with full answer for client-side state

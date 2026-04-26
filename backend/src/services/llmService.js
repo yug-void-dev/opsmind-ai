@@ -230,6 +230,7 @@ const streamWithGroq = async (prompt, onChunk) => {
     temperature: appConfig.llmTemperature,
     max_tokens: appConfig.llmMaxTokens,
     stream: true,
+    stream_options: { include_usage: true },
   });
 
   let fullText = '';
@@ -237,7 +238,7 @@ const streamWithGroq = async (prompt, onChunk) => {
   let completionTokens = 0;
 
   for await (const chunk of stream) {
-    const text = chunk.choices[0]?.delta?.content || '';
+    const text = chunk.choices?.[0]?.delta?.content || '';
     if (text) {
       fullText += text;
       onChunk(text);
@@ -293,7 +294,14 @@ const rewriteQuery = async (originalQuery) => {
 const generateAnswer = async (query, chunks) => {
   const prompt = buildRAGPrompt(query, chunks);
   logger.debug(`[LLM] Generating answer (provider: ${appConfig.llmProvider})`);
-  return generateWithProvider(prompt);
+  
+  try {
+    return await generateWithProvider(prompt);
+  } catch (err) {
+    logger.warn(`[LLM] Primary provider failed: ${err.message}. Attempting fallback...`);
+    const fallbackProvider = appConfig.llmProvider === 'groq' ? 'gemini' : 'groq';
+    return await generateWithProvider(prompt, { provider: fallbackProvider });
+  }
 };
 
 /**
@@ -304,10 +312,18 @@ const streamAnswer = async (query, chunks, onChunk) => {
   const prompt = buildRAGPrompt(query, chunks);
   logger.debug(`[LLM] Streaming answer (provider: ${appConfig.llmProvider})`);
 
-  if (appConfig.llmProvider === 'groq') {
-    return streamWithGroq(prompt, onChunk);
+  try {
+    if (appConfig.llmProvider === 'groq') {
+      return await streamWithGroq(prompt, onChunk);
+    }
+    return await streamWithGemini(prompt, onChunk);
+  } catch (err) {
+    logger.warn(`[LLM] Primary provider failed: ${err.message}. Attempting fallback...`);
+    if (appConfig.llmProvider === 'groq') {
+      return await streamWithGemini(prompt, onChunk);
+    }
+    return await streamWithGroq(prompt, onChunk);
   }
-  return streamWithGemini(prompt, onChunk);
 };
 
 module.exports = {
