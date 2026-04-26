@@ -13,6 +13,28 @@ The application is successfully deployed in production and can be accessed here:
 - **Backend API (Render):** `https://opsmind-ai-backend-quwl.onrender.com`
 
 ---
+## 🔑 Demo Access (For Reviewers)
+
+To explore the platform, use the following credentials:
+
+### 👑 Admin Access
+Email: admin@opsmind.ai
+Password: Admin@12345
+
+👉 Admin can:
+- Upload SOPs
+- Manage documents
+- View analytics
+- Control users
+
+---
+
+### 👤 User Access
+
+👉 You can also register a new user account to explore the **end-user experience**:
+- Ask questions from SOPs
+- View citations
+- Use chat system
 
 ## 🏗 System Architecture
 
