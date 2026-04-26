@@ -6,9 +6,17 @@ OpsMind AI is a full-stack, enterprise-grade AI platform designed to transform s
 
 ---
 
+## 🌐 Live Deployment
+
+The application is successfully deployed in production and can be accessed here:
+- **Frontend App (Vercel):** [https://opsmind-ai-nine.vercel.app](https://opsmind-ai-nine.vercel.app)
+- **Backend API (Render):** `https://opsmind-ai-backend-quwl.onrender.com`
+
+---
+
 ## 🏗 System Architecture
 
-OpsMind AI follows a modern decoupled architecture, ensuring scalability and performance across the entire pipeline.
+OpsMind AI follows a modern decoupled cloud architecture, ensuring scalability and performance across the entire pipeline.
 
 ```mermaid
 graph TD
