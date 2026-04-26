@@ -237,9 +237,9 @@ const rerankWithLLM = async (query, candidates) => {
  */
 const applyThresholdGate = (chunks, threshold = appConfig.similarityThreshold) => {
   return chunks.filter((c) => {
-    // If reranking ran and gave a very low score, reject regardless of vector similarity
-    // We use a lower threshold (0.05) to allow partially relevant results through for the LLM to judge
-    if (c.rerankScore !== undefined && c.rerankScore < 0.05) return false;
+    // If reranking ran and gave a low score, reject. 
+    // We increase threshold to 0.30 to ensure real relevance.
+    if (c.rerankScore !== undefined && c.rerankScore < 0.30) return false;
 
     const score = c.vectorScore ?? c._bestScore ?? c.hybridScore ?? 0;
     return score >= threshold;

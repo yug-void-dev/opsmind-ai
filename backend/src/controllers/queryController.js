@@ -25,7 +25,7 @@ const { success, badRequest } = require('../utils/apiResponse');
 const logger = require('../utils/logger');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const NO_ANSWER_TEXT = "I don't know based on the provided SOP documents.";
+const NO_ANSWER_TEXT = "I don't know based on the provided documents.";
 const CACHE_TTL_SECONDS = 1800; // 30 minutes
 
 // ─── Citation Builder ─────────────────────────────────────────────────────────
@@ -225,7 +225,14 @@ const query = async (req, res, next) => {
 
       // 4. Send completion event with full answer for client-side state
       const responseTime = Date.now() - startTime;
-      const isAnswered = fullAnswer && !fullAnswer.startsWith("I don't know");
+      
+      // Robust detection: if AI says it doesn't know, we hide sources
+      const lowerAnswer = fullAnswer.toLowerCase();
+      const isAnswered = fullAnswer && 
+        !lowerAnswer.includes("i don't know") && 
+        !lowerAnswer.includes("no information") &&
+        !lowerAnswer.includes("not mentioned in the provided context");
+
       sseWrite(res, 'done', {
         answer: fullAnswer,
         sources: isAnswered ? sources : [],
@@ -244,7 +251,7 @@ const query = async (req, res, next) => {
         chunks,
         topScore,
         tokenUsage,
-        answered: true,
+        answered: isAnswered,
         retrievalDebug,
         req,
       });
@@ -256,10 +263,16 @@ const query = async (req, res, next) => {
     const { text: answer, usage: tokenUsage } = await generateAnswer(sanitizedQuery, chunks);
     const responseTime = Date.now() - startTime;
 
+    const lowerAnswer = answer.toLowerCase();
+    const isAnswered = answer && 
+      !lowerAnswer.includes("i don't know") && 
+      !lowerAnswer.includes("no information") &&
+      !lowerAnswer.includes("not mentioned in the provided context");
+
     const responseData = {
       answer,
-      sources,
-      answered: true,
+      sources: isAnswered ? sources : [],
+      answered: isAnswered,
       chunksRetrieved: chunks.length,
       queryRewritten: rewrittenQuery !== sanitizedQuery ? rewrittenQuery : null,
       responseTimeMs: responseTime,
@@ -279,7 +292,7 @@ const query = async (req, res, next) => {
       chunks,
       topScore,
       tokenUsage,
-      answered: true,
+      answered: isAnswered,
       retrievalDebug,
       req,
     });

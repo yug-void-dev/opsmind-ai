@@ -41,7 +41,10 @@ const chunkSchema = new mongoose.Schema(
 
 // Regular indexes
 chunkSchema.index({ documentId: 1 });
-chunkSchema.index({ documentName: 'text', text: 'text' }); // Keyword search
+chunkSchema.index(
+  { documentName: 'text', text: 'text' },
+  { weights: { documentName: 10, text: 1 }, name: 'TextIndex' }
+); // Keyword search
 chunkSchema.index({ tags: 1 });
 
 /**

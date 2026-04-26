@@ -102,7 +102,7 @@ export function useChat() {
   // ── Messaging Logic ─────────────────────────────────────────────────────
 
   const sendMessage = useCallback(
-    async (text) => {
+    async (text, options = {}) => {
       if (!text?.trim() || isStreaming) return;
       setError(null);
 
@@ -135,7 +135,7 @@ export function useChat() {
 
       const abort = streamQuery(
         text.trim(),
-        {},
+        options,
         {
           onMetadata: (meta) => {
             if (meta.answered !== undefined) {

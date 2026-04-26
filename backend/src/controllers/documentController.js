@@ -177,6 +177,20 @@ const runProcessingPipeline = async (docRecord, tags, userId, startTime) => {
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     logger.info(`[Pipeline] ✅ Complete [${docRecord._id}] in ${elapsed}s`);
 
+    // ── Phase 5: Clean up uploaded file from disk ─────────────────────────
+    // All content is now in MongoDB (chunks + embeddings). The original PDF
+    // is no longer needed. Deleting it keeps the server stateless, which is
+    // required for free-tier hosting (no persistent disk).
+    try {
+      if (docRecord.filePath && fs.existsSync(docRecord.filePath)) {
+        fs.unlinkSync(docRecord.filePath);
+        logger.info(`[Pipeline] Temporary PDF deleted from disk: ${docRecord.filePath}`);
+      }
+    } catch (cleanupErr) {
+      // Non-fatal — log and continue
+      logger.warn(`[Pipeline] Could not delete temp file: ${cleanupErr.message}`);
+    }
+
     // Flush cache since new document changes retrieval results
     cache.flush();
 
@@ -327,7 +341,7 @@ const reindexDocument = async (req, res, next) => {
     if (!doc.filePath || !fs.existsSync(doc.filePath)) {
       return badRequest(
         res,
-        'Original file not found on disk. Please re-upload the document.'
+        'Original file no longer on disk (it was cleaned up after indexing to save space). Please delete this document and re-upload the PDF to reindex it.'
       );
     }
 

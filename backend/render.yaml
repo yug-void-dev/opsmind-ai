@@ -1,6 +1,9 @@
 # ══════════════════════════════════════════════════════════════
-# OpsMind AI — Render.com Deployment Blueprint
+# OpsMind AI — Render.com Deployment Blueprint (Free Tier)
 # Docs: https://render.com/docs/blueprint-spec
+# ══════════════════════════════════════════════════════════════
+# ⚠️  Before deploying, set these secrets in the Render Dashboard:
+#     MONGODB_URI, GEMINI_API_KEY, JWT_SECRET (auto-generated)
 # ══════════════════════════════════════════════════════════════
 
 services:
@@ -8,7 +11,7 @@ services:
     name: opsmind-ai-backend
     env: node
     region: oregon
-    plan: starter
+    plan: free
 
     buildCommand: npm install
     startCommand: node src/server.js
@@ -27,33 +30,33 @@ services:
       - key: LOG_LEVEL
         value: warn
 
-      # ── Secrets (set manually in Render dashboard) ──
+      # ── Secrets (set manually in Render dashboard) ──────────────
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
-        generateValue: true       # Render auto-generates a secure value
+        generateValue: true
       - key: GEMINI_API_KEY
         sync: false
       - key: GROQ_API_KEY
-        sync: false               # Optional — only if LLM_PROVIDER=groq
+        sync: false
 
-      # ── LLM Config ──
+      # ── LLM Config ──────────────────────────────────────────────
       - key: LLM_PROVIDER
         value: gemini
       - key: EMBEDDING_PROVIDER
         value: gemini
 
-      # ── Atlas Vector Search ──
+      # ── Atlas Vector Search ──────────────────────────────────────
       - key: VECTOR_INDEX_NAME
         value: vector_index
 
-      # ── CORS — update to your frontend domain ──
+      # ── CORS — update to your deployed frontend URL ──────────────
       - key: ALLOWED_ORIGINS
-        value: "http://localhost:3000"   # Change to your frontend URL
+        value: "https://your-frontend.vercel.app"   # ← Change this to your Vercel/Netlify URL
 
-      # ── RAG Tuning ──
+      # ── RAG Tuning ───────────────────────────────────────────────
       - key: SIMILARITY_THRESHOLD
-        value: "0.70"
+        value: "0.78"
       - key: TOP_K_RESULTS
         value: "5"
       - key: CHUNK_SIZE
@@ -67,20 +70,23 @@ services:
       - key: RERANK_FINAL_N
         value: "5"
 
-      # ── Upload & Cache ──
+      # ── Upload & Cache ───────────────────────────────────────────
       - key: MAX_FILE_SIZE_MB
         value: "50"
       - key: CACHE_TTL
         value: "3600"
 
-      # ── Rate Limiting ──
+      # ── Rate Limiting ────────────────────────────────────────────
       - key: RATE_LIMIT_WINDOW_MS
         value: "900000"
       - key: RATE_LIMIT_MAX
         value: "200"
 
-    # Persistent disk for uploaded PDFs
-    disk:
-      name: opsmind-uploads
-      mountPath: /app/uploads
-      sizeGB: 10
+      # ── Temp Upload Dir (ephemeral /tmp — no persistent disk needed) ──
+      - key: UPLOAD_DIR
+        value: "/tmp/opsmind-uploads"
+
+# NOTE: No 'disk:' block — persistent disk is a paid feature.
+# PDFs are automatically deleted from disk after processing.
+# All document content (chunks + embeddings) lives in MongoDB Atlas.
+

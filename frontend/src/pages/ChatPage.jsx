@@ -4,11 +4,12 @@ import { Brain, BookOpen, Sparkles, AlertTriangle, X } from "lucide-react";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatMessage from "../components/chat/ChatMessage";
 import ChatInput from "../components/chat/ChatInput";
-import SourcesPanel from "../components/chat/SourcesPanel"; 
+import SourcesPanel from "../components/chat/SourcesPanel";
 import { useChat } from "../hooks/useChat";
 import { useDocuments } from "../hooks/useDocuments";
 import useAuth from "../hooks/useAuth";
 import * as THREE from "three";
+import api from "../utils/api";
 
 const DEFAULT_PROMPTS = [
   { icon: "📋", text: "How do I process a customer refund?" },
@@ -27,7 +28,8 @@ function EmptyState({ onPrompt, documents = [], loading = false }) {
         return {
           icon: icons[i % icons.length],
           text: `Tell me about ${name}`,
-          fullQuery: `Can you give me a summary and key points from the document "${name}"?`
+          fullQuery: `Can you give me a summary and key points from the document "${name}"?`,
+          documentId: doc._id
         };
       });
     }
@@ -69,7 +71,7 @@ function EmptyState({ onPrompt, documents = [], loading = false }) {
             transition={{ delay: 0.1 + i * 0.07 }}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onPrompt(p.fullQuery || p.text)}
+            onClick={() => onPrompt(p.fullQuery || p.text, p.documentId)}
             className="flex items-start gap-2.5 p-3.5 rounded-xl text-left text-xs transition-all shadow-sm"
             style={{
               background: "rgba(255,255,255,0.7)",
@@ -175,17 +177,17 @@ function MeshBackground() {
     const animate = () => {
       raf = requestAnimationFrame(animate);
       t += 0.005;
-      
+
       dots.rotation.y = t * 0.05;
       dots.rotation.x = t * 0.02;
-      
+
       // Parallax
       dots.position.x += (mouse.current.x * 0.5 - dots.position.x) * 0.05;
       dots.position.y += (mouse.current.y * 0.5 - dots.position.y) * 0.05;
-      
+
       lines.rotation.y = t * 0.03;
       lines.position.x += (mouse.current.x * 0.3 - lines.position.x) * 0.05;
-      
+
       renderer.render(scene, camera);
     };
     animate();
@@ -209,17 +211,17 @@ function MeshBackground() {
 }
 
 export default function ChatPage() {
-  const { 
-    sessions, 
-    activeSessionId, 
-    messages, 
-    isStreaming, 
-    error, 
+  const {
+    sessions,
+    activeSessionId,
+    messages,
+    isStreaming,
+    error,
     loading,
-    sendMessage: hookSendMessage, 
-    stopStreaming, 
-    loadSession, 
-    deleteSession, 
+    sendMessage: hookSendMessage,
+    stopStreaming,
+    loadSession,
+    deleteSession,
     clearChat,
     clearError
   } = useChat();
@@ -232,8 +234,8 @@ export default function ChatPage() {
   const [activeCitation, setActiveCitation] = useState(null);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => { 
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
@@ -283,10 +285,10 @@ export default function ChatPage() {
   };
 
   // Wrap sendMessage to clear sources when a new message is sent
-  const sendMessage = (text) => {
+  const sendMessage = (text, docId = null) => {
     setActiveSources([]);
     setActiveCitation(null);
-    hookSendMessage(text);
+    hookSendMessage(text, docId ? { documentId: docId } : {});
   };
 
   const handleNewChat = () => {
@@ -320,19 +322,19 @@ export default function ChatPage() {
         style={{ backgroundImage: "radial-gradient(circle,rgba(124,111,255,0.08) 1px,transparent 1px)", backgroundSize: "40px 40px", zIndex: 0 }} />
 
       <div className="relative z-10 flex w-full h-full p-3 sm:p-4 gap-3 sm:gap-4">
-        <ChatSidebar 
-          sessions={sessions} 
-          activeSessionId={activeSessionId} 
-          onNewChat={handleNewChat} 
-          onLoadSession={loadSession} 
-          onDeleteSession={deleteSession} 
-          collapsed={sidebarCollapsed} 
-          onToggleCollapse={() => setSidebarCollapsed((v) => !v)} 
+        <ChatSidebar
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          onNewChat={handleNewChat}
+          onLoadSession={loadSession}
+          onDeleteSession={deleteSession}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
         />
 
         <div className="flex-1 flex flex-col min-w-0 rounded-3xl overflow-hidden shadow-sm"
           style={{ background: "rgba(255,255,255,0.45)", backdropFilter: "blur(20px)", border: "1.5px solid rgba(255,255,255,0.7)" }}>
-          
+
           {/* Top bar */}
           <header
             className="flex items-center justify-between px-6 py-4 border-b sticky top-0 z-20"
@@ -379,7 +381,7 @@ export default function ChatPage() {
                 <p className="text-xs font-bold uppercase tracking-widest text-[#9ca3af]">Loading Messages...</p>
               </div>
             ) : messages.length === 0 ? (
-              <EmptyState onPrompt={(text) => sendMessage(text)} documents={docs} loading={docsLoading} />
+              <EmptyState onPrompt={(text, docId) => sendMessage(text, docId)} documents={docs} loading={docsLoading} />
             ) : (
               <>{messages.map((msg) => <ChatMessage key={msg.id} message={msg} onCitationClick={handleCitationClick} />)}<div ref={messagesEndRef} /></>
             )}

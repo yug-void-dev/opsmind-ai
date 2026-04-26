@@ -23,7 +23,7 @@ module.exports = {
   keywordResultsLimit: parseInt(process.env.KEYWORD_RESULTS_LIMIT) || 10,
 
   // Cosine similarity threshold — below this → "I don't know"
-  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD) || 0.70,
+  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD) || 0.78,
 
   // Hybrid search weights (must sum to 1.0)
   hybridVectorWeight: parseFloat(process.env.HYBRID_VECTOR_WEIGHT) || 0.70,
@@ -48,7 +48,7 @@ module.exports = {
   llmTopP: parseFloat(process.env.LLM_TOP_P) || 0.85,
 
   // ─── Anti-Hallucination System Prompt ───────────────────────────────────────
-  ragSystemPrompt: `You are OpsMind AI, a precise Enterprise SOP Knowledge Agent.
+  ragSystemPrompt: `You are OpsMind AI, a precise Enterprise Knowledge Assistant specializing in SOPs and internal documentation.
 
 ══════════════════════════════════════════
 ABSOLUTE RULES — NEVER VIOLATE THESE:
@@ -61,7 +61,7 @@ Even if you know the answer from training, you MUST NOT use it.
 
 RULE 2 — MANDATORY "I DON'T KNOW" RESPONSE:
 If the answer cannot be found in the provided [CONTEXT], respond with EXACTLY:
-"I don't know based on the provided SOP documents."
+"I don't know based on the provided documents."
 Do NOT say "typically", "usually", "in general", or answer from general knowledge.
 
 RULE 3 — NO SPECULATION OR INFERENCE:
@@ -103,7 +103,8 @@ Rules:
 2. Add domain-specific keywords that would likely appear in the relevant document type
 3. Convert vague questions to specific, keyword-rich queries
 4. Keep it concise (max 2 sentences)
-5. Return ONLY the rewritten query — no explanation, no preamble
+5. If a term is in quotes or appears to be a specific document name/ID (like "dsa", "SOP-101"), PRESERVE IT and do not over-expand.
+6. Return ONLY the rewritten query — no explanation, no preamble
 
 Examples:
 Input: "what do I do when sick?"
@@ -133,11 +134,11 @@ Document Passage:
 """
 
 Scoring Rules (0-10):
-- 10: Passage directly and completely answers the question (e.g., contains the name if asked "who")
+- 10: Passage directly and completely answers the question
 - 7-9: Passage contains the main answer or strong evidence
 - 4-6: Passage is related and likely contains the answer in context
-- 1-3: Passage mentions the topic but is vague or only peripherally related
-- 0: Passage is completely irrelevant
+- 1-3: Passage mentions the topic but is only peripherally related
+- 0: Passage is completely irrelevant. If the passage is about a completely different topic, YOU MUST GIVE 0.
 
 Respond with ONLY a JSON object (no markdown, no explanation):
 {"score": <number 0-10>, "reason": "<15 words max>"}`,

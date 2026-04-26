@@ -78,9 +78,10 @@ const formatContext = (chunks) => {
 const buildRAGPrompt = (query, chunks) => {
   const isMultiDoc = detectMultiDoc(chunks);
   const contextBlock = formatContext(chunks);
+  const uniqueDocs = [...new Set(chunks.map((c) => c.documentName))];
 
   const multiDocNote = isMultiDoc
-    ? `\n${appConfig.multiDocPrompt.replace('{numSources}', new Set(chunks.map((c) => c.documentName)).size)}\n`
+    ? `\n${appConfig.multiDocPrompt.replace('{numSources}', uniqueDocs.length)}\n`
     : '';
 
   return `${appConfig.ragSystemPrompt}
@@ -88,6 +89,8 @@ ${multiDocNote}
 ══════════════════════════════════════════
 [CONTEXT — USE ONLY THIS INFORMATION]
 ══════════════════════════════════════════
+Documents available in context: ${uniqueDocs.join(', ')}
+
 ${contextBlock}
 ══════════════════════════════════════════
 [END OF CONTEXT]
