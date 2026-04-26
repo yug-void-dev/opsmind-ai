@@ -54,7 +54,17 @@ app.use(
 const rawOrigins = process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:5173';
 const allowedOrigins = rawOrigins === '*'
   ? '*'
-  : rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+  : rawOrigins.split(',').map((o) => {
+      const trimmed = o.trim();
+      try {
+        // Robustness: if user accidentally includes a path (e.g. /login) or trailing slash,
+        // extract just the origin (e.g., https://example.com)
+        return new URL(trimmed).origin;
+      } catch (e) {
+        // Fallback for localhost without http:// or just return trimmed
+        return trimmed.replace(/\/+$/, '');
+      }
+    }).filter(Boolean);
 
 app.use(
   cors({

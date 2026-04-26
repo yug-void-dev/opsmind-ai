@@ -53,7 +53,7 @@ services:
 
       # ── CORS — update to your deployed frontend URL ──────────────
       - key: ALLOWED_ORIGINS
-        value: "https://your-frontend.vercel.app"   # ← Change this to your Vercel/Netlify URL
+        value: "https://opsmind-ai-nine.vercel.app"
 
       # ── RAG Tuning ───────────────────────────────────────────────
       - key: SIMILARITY_THRESHOLD
