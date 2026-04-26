@@ -130,7 +130,7 @@ const query = async (req, res, next) => {
     if (tags?.length > 0) filters.tags = Array.isArray(tags) ? tags : [tags];
 
     const { chunks, hasRelevantResults, debug: retrievalDebug } =
-      await retrieveRelevantChunks(queryEmbedding, rewrittenQuery, filters);
+      await retrieveRelevantChunks(queryEmbedding, rewrittenQuery, filters, sanitizedQuery);
 
     // ── Step 6: Anti-Hallucination Gate ───────────────────────────────────
     if (!hasRelevantResults || chunks.length === 0) {

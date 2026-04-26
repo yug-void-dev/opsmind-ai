@@ -214,8 +214,17 @@ const listDocuments = async (req, res, next) => {
     const { page = 1, limit = 20, status, tags, search } = req.query;
     const filter = {};
 
-    // Regular users see only their own documents
-    if (req.user.role !== 'admin') filter.uploadedBy = req.user._id;
+    // Regular users see their own documents + all admin-uploaded (Global) documents
+    if (req.user.role !== 'admin') {
+      const User = require('../models/User');
+      const admins = await User.find({ role: 'admin' }).select('_id');
+      const adminIds = admins.map((a) => a._id);
+      
+      filter.$or = [
+        { uploadedBy: req.user._id },
+        { uploadedBy: { $in: adminIds } }
+      ];
+    }
     if (status) filter.status = status;
     if (tags) filter.tags = { $in: tags.split(',').map((t) => t.trim()) };
     if (search) filter.$text = { $search: search };
@@ -250,12 +259,14 @@ const getDocument = async (req, res, next) => {
 
     if (!doc) return notFound(res, 'Document not found');
 
-    // Access control: user can only see own documents
-    if (
-      req.user.role !== 'admin' &&
-      doc.uploadedBy._id.toString() !== req.user._id.toString()
-    ) {
-      return notFound(res, 'Document not found');
+    // Access control: user can only see own documents or admin-uploaded ones
+    if (req.user.role !== 'admin') {
+      const isOwner = doc.uploadedBy._id.toString() === req.user._id.toString();
+      const isFromAdmin = doc.uploadedBy.role === 'admin';
+      
+      if (!isOwner && !isFromAdmin) {
+        return notFound(res, 'Document not found');
+      }
     }
 
     return success(res, doc);

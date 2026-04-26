@@ -93,13 +93,14 @@ OUTPUT FORMAT:
 5. End with: Confidence: HIGH | MEDIUM | LOW — [reason]`,
 
   // ─── Query Rewriting Prompt ──────────────────────────────────────────────────
-  queryRewritePrompt: `You are a search query optimizer for an Enterprise SOP document retrieval system.
+  queryRewritePrompt: `You are a search query optimizer for a Knowledge Retrieval System.
+The system contains SOPs, which can be either Enterprise Standard Operating Procedures OR Personal Statements of Purpose (e.g., for visa/university applications).
 
-Your task: Rewrite the user question to maximize retrieval accuracy from SOP documents.
+Your task: Rewrite the user question to maximize retrieval accuracy from these documents.
 
 Rules:
-1. Expand abbreviations (e.g. "HR" → "Human Resources")
-2. Add domain-specific terminology that would appear in SOP documents
+1. Expand abbreviations (e.g. "HR" → "Human Resources", "SOP" → "Statement of Purpose")
+2. Add domain-specific keywords that would likely appear in the relevant document type
 3. Convert vague questions to specific, keyword-rich queries
 4. Keep it concise (max 2 sentences)
 5. Return ONLY the rewritten query — no explanation, no preamble
@@ -108,17 +109,21 @@ Examples:
 Input: "what do I do when sick?"
 Output: "employee sick leave procedure illness notification reporting manager HR policy"
 
-Input: "how to get access?"
-Output: "system access request procedure IT onboarding user account provisioning approval"
+Input: "Who is applying in this document?"
+Output: "applicant name identity candidate profile student background information"
+
+Input: "what is the refund policy?"
+Output: "cancellation refund terms reimbursement procedure financial policy"
 
 Now rewrite this query:
 INPUT: {query}
 OUTPUT:`,
 
   // ─── Re-Ranking Prompt ───────────────────────────────────────────────────────
-  rerankPrompt: `You are a relevance judge for an SOP document retrieval system.
+  rerankPrompt: `You are a relevance judge for a Knowledge Retrieval System (SOPs and Statements of Purpose).
 
 Given a user question and a document passage, score the passage's relevance.
+Pay close attention to names, dates, and specific entities.
 
 User Question: {question}
 
@@ -127,12 +132,12 @@ Document Passage:
 {passage}
 """
 
-Score on 0-10:
-- 10: Passage directly and completely answers the question
-- 7-9: Passage contains the main answer with minor gaps
-- 4-6: Passage is related but only partially answers
-- 1-3: Passage mentions the topic but doesn't answer
-- 0: Passage is irrelevant
+Scoring Rules (0-10):
+- 10: Passage directly and completely answers the question (e.g., contains the name if asked "who")
+- 7-9: Passage contains the main answer or strong evidence
+- 4-6: Passage is related and likely contains the answer in context
+- 1-3: Passage mentions the topic but is vague or only peripherally related
+- 0: Passage is completely irrelevant
 
 Respond with ONLY a JSON object (no markdown, no explanation):
 {"score": <number 0-10>, "reason": "<15 words max>"}`,

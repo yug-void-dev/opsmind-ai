@@ -195,7 +195,7 @@ const rerankWithLLM = async (query, candidates) => {
   const scorePromises = candidates.map(async (chunk, idx) => {
     const prompt = appConfig.rerankPrompt
       .replace('{question}', query)
-      .replace('{passage}', chunk.text.slice(0, 600));
+      .replace('{passage}', chunk.text.slice(0, 1000));
 
     try {
       const result = await generateWithProvider(prompt, { maxTokens: 60, temperature: 0 });
@@ -238,8 +238,8 @@ const rerankWithLLM = async (query, candidates) => {
 const applyThresholdGate = (chunks, threshold = appConfig.similarityThreshold) => {
   return chunks.filter((c) => {
     // If reranking ran and gave a very low score, reject regardless of vector similarity
-    // (This prevents MongoDB chunks being returned for unrelated questions)
-    if (c.rerankScore !== undefined && c.rerankScore < 0.15) return false;
+    // We use a lower threshold (0.05) to allow partially relevant results through for the LLM to judge
+    if (c.rerankScore !== undefined && c.rerankScore < 0.05) return false;
 
     const score = c.vectorScore ?? c._bestScore ?? c.hybridScore ?? 0;
     return score >= threshold;
@@ -269,12 +269,14 @@ const buildPreFilter = (filters) => {
  * Vector + Keyword → RRF → LLM Re-rank → Threshold Gate
  *
  * @param {number[]} queryEmbedding
- * @param {string} queryText
+ * @param {string} queryText - Rewritten/expanded query for retrieval
  * @param {object} filters
+ * @param {string} originalQuery - Original user question for re-ranking
  * @returns {{ chunks, hasRelevantResults, debug }}
  */
-const retrieveRelevantChunks = async (queryEmbedding, queryText, filters = {}) => {
+const retrieveRelevantChunks = async (queryEmbedding, queryText, filters = {}, originalQuery = null) => {
   const debug = { stages: {} };
+  const queryForRerank = originalQuery || queryText;
 
   // ── Stage 1 & 2: Run vector + keyword search in parallel ──
   const [vectorResult, keywordResult] = await Promise.allSettled([
@@ -303,7 +305,7 @@ const retrieveRelevantChunks = async (queryEmbedding, queryText, filters = {}) =
   // ── Stage 4: LLM Re-Ranking ──
   let rerankedChunks = fusedChunks;
   if (appConfig.rerankEnabled && fusedChunks.length > 0) {
-    rerankedChunks = await rerankWithLLM(queryText, fusedChunks);
+    rerankedChunks = await rerankWithLLM(queryForRerank, fusedChunks);
     rerankedChunks = rerankedChunks.slice(0, appConfig.rerankFinalN);
   } else {
     rerankedChunks = fusedChunks.slice(0, appConfig.topKResults);
