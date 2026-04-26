@@ -187,9 +187,16 @@ export function useChat() {
 
             setIsStreaming(false);
             setMessages((prev) =>
-              prev.map((m) =>
-                m.id === assistantMsgId ? finalAssistantMsg : m
-              )
+              prev.map((m) => {
+                if (m.id === assistantMsgId) {
+                  // If an error already occurred during streaming, preserve the error state
+                  if (m.isError) {
+                    return { ...m, isStreaming: false };
+                  }
+                  return finalAssistantMsg;
+                }
+                return m;
+              })
             );
 
             // 2. Persist to backend using current ref values (avoids stale closure)
