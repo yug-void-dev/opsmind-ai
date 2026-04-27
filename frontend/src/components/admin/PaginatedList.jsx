@@ -45,9 +45,9 @@ export function PaginatedList({ title, icon: Icon, color, description, items, pe
           style={{ background: `linear-gradient(90deg,transparent,${color}60,transparent)` }} />
         <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
           style={{ background: `radial-gradient(circle,${color}18,transparent 70%)` }} />
-        <div className="flex items-center gap-4">
+        <div className="flex items-start sm:items-center gap-4">
           <motion.div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center"
+            className="w-14 h-14 flex-shrink-0 rounded-2xl flex items-center justify-center"
             style={{ background: `${color}18`, border: `1.5px solid ${color}35` }}
             animate={{ boxShadow: [`0 0 0px ${color}00`, `0 0 20px ${color}45`, `0 0 0px ${color}00`] }}
             transition={{ duration: 3, repeat: Infinity }}
@@ -101,7 +101,7 @@ export function PaginatedList({ title, icon: Icon, color, description, items, pe
                     initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.35, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
                     whileHover={{ x: 3 }}
-                    className="flex items-center gap-4 p-4 rounded-xl transition-all duration-200 cursor-default group"
+                    className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 p-4 rounded-xl transition-all duration-200 cursor-default group"
                     style={{
                       background: "rgba(255,255,255,0.55)",
                       border: "1.5px solid rgba(255,255,255,0.7)",

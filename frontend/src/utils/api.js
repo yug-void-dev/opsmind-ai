@@ -45,7 +45,7 @@ import axios from "axios";
 // ─── Base URL ─────────────────────────────────────────────────────────────────
 // Vite proxy rewrites /api → http://localhost:5000 in dev.
 // In production, VITE_API_URL must point to the deployed backend.
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "https://opsmind-ai-backend-quwl.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "" : "https://opsmind-ai-backend-quwl.onrender.com");
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 const api = axios.create({

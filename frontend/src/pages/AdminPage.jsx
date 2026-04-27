@@ -597,7 +597,7 @@ export default function AdminPage() {
 
   /* ════════ RENDER ════════ */
   return (
-    <div className="h-screen w-screen flex p-3 sm:p-4 gap-3 sm:gap-4 overflow-hidden"
+    <div className="h-screen w-full flex p-3 sm:p-4 gap-3 sm:gap-4 overflow-hidden"
       style={{ background: "linear-gradient(145deg,#f5f3ff 0%,#edf9fb 42%,#f8f0ff 100%)", fontFamily: "'DM Sans',sans-serif" }}>
 
       <MeshBackground />
@@ -747,7 +747,7 @@ export default function AdminPage() {
         </motion.header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 no-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}
               initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}

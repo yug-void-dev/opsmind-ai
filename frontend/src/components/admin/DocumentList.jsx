@@ -38,7 +38,7 @@ export function DocumentList({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl p-8 mb-6 relative overflow-hidden"
+        className="rounded-3xl p-5 sm:p-8 mb-6 relative overflow-hidden"
         style={{
           background: "rgba(255,255,255,0.6)",
           backdropFilter: "blur(20px)",
@@ -90,7 +90,7 @@ export function DocumentList({
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="flex items-center gap-4 p-5 rounded-2xl group transition-all duration-300"
+                  className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl group transition-all duration-300"
                   style={{
                     background: "rgba(255,255,255,0.5)",
                     border: "1.5px solid rgba(255,255,255,0.6)",

@@ -40,17 +40,17 @@ function EmptyState({ onPrompt, documents = [], loading = false }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center h-full px-8 text-center"
+      className="flex flex-col items-center justify-center min-h-full py-12 px-8 text-center"
     >
-      <div className="relative mb-6">
-        <div className="absolute inset-0 rounded-3xl bg-[#7c6fff]/20 blur-2xl scale-150" />
+      <div className="mb-6">
         <div
-          className="relative w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg"
+          className="w-20 h-20 rounded-3xl flex items-center justify-center"
           style={{
-            background: "rgba(255,255,255,0.8)",
+            background: "rgba(255,255,255,0.85)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
             border: "1px solid rgba(124,111,255,0.25)",
+            boxShadow: "0 8px 32px rgba(124,111,255,0.18), 0 2px 8px rgba(124,111,255,0.1)",
           }}
         >
           <Brain size={34} className="text-[#7c6fff]" />
@@ -228,7 +228,7 @@ export default function ChatPage() {
   const { user } = useAuth();
   const [docs, setDocs] = useState([]);
   const [docsLoading, setDocsLoading] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.innerWidth < 900);
   const [showSources, setShowSources] = useState(false);
   const [activeSources, setActiveSources] = useState([]);
   const [activeCitation, setActiveCitation] = useState(null);
@@ -237,6 +237,17 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Auto-collapse sidebar on small screens
+  useEffect(() => {
+    const handleResize = () => {
+      const isSmall = window.innerWidth < 900;
+      setSidebarCollapsed(isSmall);
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Run on mount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchStarterDocs = async () => {

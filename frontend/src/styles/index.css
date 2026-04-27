@@ -38,3 +38,252 @@
 .Toastify__toast.glass-toast.warning {
   border-left: 4px solid #f59e0b !important;
 }
+
+/* ── Toastify Responsive: prevent full-width toast on small screens ── */
+@media (max-width: 768px) {
+  .Toastify__toast-container {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0 1rem !important;
+    top: 1rem !important;
+    pointer-events: none !important;
+  }
+
+  .Toastify__toast-container--top-left,
+  .Toastify__toast-container--top-center,
+  .Toastify__toast-container--top-right {
+    top: 1rem !important;
+    transform: none !important;
+  }
+
+  .Toastify__toast {
+    margin-bottom: 0.5rem !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    pointer-events: auto !important;
+  }
+}
+
+
+/* ════════ GLOBAL RESPONSIVE FOUNDATION ════════ */
+
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ════════════════════════════════════════════════
+   CHAT PAGE RESPONSIVENESS
+   Layout: [Sidebar | Chat Panel | Sources Panel]
+   The sidebar auto-collapses to 72px icon-only on screens < 900px
+   via a React useEffect resize listener in ChatPage.jsx.
+   CSS here only handles padding, overflow, and prompt card layout.
+════════════════════════════════════════════════ */
+
+/* Prevent the whole chat page from ever producing a horizontal scrollbar */
+.flex.h-screen.overflow-hidden.relative {
+  overflow: hidden !important;
+}
+
+@media (max-width: 900px) {
+  /* Tighten outer padding on tablet/mobile */
+  .relative.z-10.flex.w-full.h-full {
+    padding: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Ensure the chat main panel fills remaining space */
+  .relative.z-10.flex.w-full.h-full > div.flex-1.flex.flex-col.min-w-0 {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Shrink chat header padding */
+  .flex-1.flex.flex-col.min-w-0 header {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+  }
+
+  /* Shrink message area horizontal padding */
+  .flex-1.overflow-y-auto.px-6.py-8 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  /* Sources panel: compress width on tablet but keep as column */
+  .relative.z-10.flex.w-full.h-full > aside.w-80 {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+}
+
+/* On small phones, Sources Panel becomes a fixed overlay drawer so it
+   doesn't push the chat panel off-screen. It slides in from the right
+   on top of the chat area with a backdrop. */
+@media (max-width: 700px) {
+  .relative.z-10.flex.w-full.h-full > aside.w-80 {
+    position: fixed !important;
+    top: 0.375rem !important;
+    right: 0.375rem !important;
+    bottom: 0.375rem !important;
+    width: calc(100vw - 80px - 1rem) !important;
+    max-width: 320px !important;
+    min-width: 0 !important;
+    z-index: 50 !important;
+    border-radius: 2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Further tighten on small phones */
+  .relative.z-10.flex.w-full.h-full {
+    padding: 0.375rem !important;
+    gap: 0.375rem !important;
+  }
+
+  /* Sources panel is handled as fixed overlay at ≤700px — no width rules needed here */
+
+  /* Message bubbles: use more available width */
+  .max-w-\[85\%\] {
+    max-width: 92% !important;
+  }
+
+  /* FIX: EmptyState prompt cards - 2-col is too narrow on small phones.
+     Switch to single column so text renders cleanly without overflow. */
+  .grid.grid-cols-2.gap-3.w-full.max-w-md {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
+
+  /* Reduce empty-state section horizontal padding */
+  .flex.flex-col.items-center.justify-center.h-full.px-8.text-center {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Prevent iOS Safari auto-zoom when tapping inputs */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+
+/* ════════════════════════════════════════════════
+   ADMIN PAGE RESPONSIVENESS
+   Layout: [Desktop Sidebar hidden at lg] | Main Content
+   AdminPage already has:
+     - hidden lg:block for desktop sidebar  
+     - lg:hidden hamburger for mobile
+   We just need to ensure content area scales.
+════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  /* Admin overview stat cards: 2 column on tablet */
+  .grid.grid-cols-2.xl\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Quick actions: 2 columns on tablet */
+  .grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Admin outer padding reduction */
+  .h-screen.w-screen.flex.p-3 {
+    padding: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stat cards: single column on mobile */
+  .grid.grid-cols-2.xl\\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Quick actions: single column on mobile */
+  .grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Activity + Health: single column on mobile */
+  .grid.grid-cols-1.xl\\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Admin main content padding on mobile */
+  .flex-1.flex.flex-col.min-w-0.relative.z-10 {
+    min-width: 0 !important;
+  }
+
+  /* Admin topbar search box hidden on small mobile */
+  .hidden.sm\\:flex.items-center.gap-2.px-3 {
+    display: none !important;
+  }
+}
+
+
+/* ════════════════════════════════════════════════
+   AUTH PAGE RESPONSIVENESS
+   Layout: [Left Panel (lg:flex hidden)] | [Right Form Panel]
+   AuthPage has: hidden lg:flex w-1/2 for left panel
+   On mobile, only the right form panel is shown (w-1/2 becomes w-full).
+════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  /* Left robot panel hidden below lg (already in JSX via hidden lg:flex)
+     Right panel should take full width */
+  .min-h-screen.w-full.flex.overflow-hidden > div.hidden.lg\\:flex {
+    display: none !important;
+  }
+
+  /* The form panel (right side) stretches to fill full width */
+  .min-h-screen.w-full.flex.overflow-hidden > div:not(.hidden) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Auth form container: reduce padding for very small phones */
+  .min-h-screen.w-full.flex.overflow-hidden {
+    padding: 0 !important;
+  }
+
+  /* Form card inner container */
+  .w-full.max-w-md {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+  }
+}
+
+
+/* ════════════════════════════════════════════════
+   GENERAL RESPONSIVE UTILITIES
+════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* General text clamping for headings */
+  .text-3xl {
+    font-size: clamp(1.25rem, 4vw, 1.875rem) !important;
+  }
+
+  .text-2xl {
+    font-size: clamp(1.1rem, 3.5vw, 1.5rem) !important;
+  }
+}
