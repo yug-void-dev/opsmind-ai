@@ -159,11 +159,14 @@ const listChats = async (req, res, next) => {
 
     // Return chats WITH messages (frontend needs them for chat continuation)
     // but strip heavy source data from list view for performance
-    const chats = rawChats.map((c) => ({
-      ...c,
-      messageCount: c.messages.length,
-      lastMessage: c.messages[c.messages.length - 1]?.content?.slice(0, 120) || '',
-    }));
+    const chats = rawChats.map((c) => {
+      const msgs = Array.isArray(c.messages) ? c.messages : [];
+      return {
+        ...c,
+        messageCount: msgs.length,
+        lastMessage: msgs.length > 0 ? (msgs[msgs.length - 1].content || '').toString().slice(0, 120) : '',
+      };
+    });
 
     return success(res, chats, 'Chats retrieved', 200);
   } catch (err) {
