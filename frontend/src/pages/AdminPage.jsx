@@ -527,7 +527,7 @@ export default function AdminPage() {
         {isMobile && <button onClick={() => setMobileOpen(false)} style={{ color: "#5a5880" }}><X size={18} /></button>}
       </div>
 
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 space-y-1 no-scrollbar">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 space-y-1 no-scrollbar min-h-0">
         {NAV_ITEMS.map(({ icon: Icon, label, path, end }) => (
           <NavLink key={path} to={path} end={end} className="block">
             {({ isActive }) => (

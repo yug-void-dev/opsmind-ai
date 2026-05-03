@@ -134,7 +134,7 @@ export default function ChatSidebar({ sessions = [], activeSessionId, onNewChat,
         )}
 
         {/* Session List */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-4 no-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 pb-4 no-scrollbar min-h-0">
           {/* Expanded: show full session titles grouped by date */}
           {!eff && safeSessions.length === 0 && (
             <div className="flex flex-col items-center justify-center h-40 text-center opacity-30 px-6">

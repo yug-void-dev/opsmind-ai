@@ -332,7 +332,7 @@ export default function ChatPage() {
       <div className="fixed inset-0 pointer-events-none"
         style={{ backgroundImage: "radial-gradient(circle,rgba(124,111,255,0.08) 1px,transparent 1px)", backgroundSize: "40px 40px", zIndex: 0 }} />
 
-      <div className="relative z-10 flex w-full h-full p-3 sm:p-4 gap-3 sm:gap-4">
+      <div className="relative z-10 flex w-full h-full p-3 sm:p-4 gap-3 sm:gap-4 min-h-0">
         <ChatSidebar
           sessions={sessions}
           activeSessionId={activeSessionId}
