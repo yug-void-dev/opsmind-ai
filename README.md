@@ -41,7 +41,7 @@ Password: Admin@12345
 OpsMind AI follows a modern decoupled cloud architecture, ensuring scalability and performance across the entire pipeline.
 
 ```mermaid
-graph TD
+graph Td
     User((User))
 
     subgraph "Frontend (React 19 + Vite)"
