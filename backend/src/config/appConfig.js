@@ -23,7 +23,7 @@ module.exports = {
   keywordResultsLimit: parseInt(process.env.KEYWORD_RESULTS_LIMIT) || 10,
 
   // Cosine similarity threshold — below this → "I don't know"
-  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD) || 0.78,
+  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD) || 0.40,
 
   // Hybrid search weights (must sum to 1.0)
   hybridVectorWeight: parseFloat(process.env.HYBRID_VECTOR_WEIGHT) || 0.70,

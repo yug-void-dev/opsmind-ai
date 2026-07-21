@@ -126,7 +126,38 @@ const query = async (req, res, next) => {
 
     // ── Step 5: Hybrid Retrieval ───────────────────────────────────────────
     const filters = {};
-    if (documentId) filters.documentId = documentId;
+    if (documentId) {
+      filters.documentId = documentId;
+    } else {
+      // Auto-detect document name in user query (e.g. 'document "dsa"', 'dsa.pdf', 'summary of dsa')
+      try {
+        const Document = require('../models/Document');
+        const docs = await Document.find({ status: 'ready' }).select('_id name originalName').lean();
+        const lowerQuery = sanitizedQuery.toLowerCase();
+        
+        for (const doc of docs) {
+          const docName = doc.name.toLowerCase();
+          const origName = doc.originalName.toLowerCase();
+          const baseName = docName.replace(/\.[^/.]+$/, '');
+          
+          if (
+            lowerQuery.includes(`"${docName}"`) ||
+            lowerQuery.includes(`'${docName}'`) ||
+            lowerQuery.includes(`"${baseName}"`) ||
+            lowerQuery.includes(`'${baseName}'`) ||
+            lowerQuery.includes(`document ${baseName}`) ||
+            lowerQuery.includes(`document ${docName}`) ||
+            lowerQuery.includes(origName)
+          ) {
+            filters.documentId = doc._id.toString();
+            logger.info(`[Query] Auto-detected document filter: "${doc.name}" [${doc._id}]`);
+            break;
+          }
+        }
+      } catch (detectErr) {
+        logger.warn(`[Query] Document detection warning: ${detectErr.message}`);
+      }
+    }
     if (tags?.length > 0) filters.tags = Array.isArray(tags) ? tags : [tags];
 
     const { chunks, hasRelevantResults, debug: retrievalDebug } =

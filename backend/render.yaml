@@ -59,7 +59,7 @@ services:
 
       # ── RAG Tuning ───────────────────────────────────────────────
       - key: SIMILARITY_THRESHOLD
-        value: "0.78"
+        value: "0.40"
       - key: TOP_K_RESULTS
         value: "5"
       - key: CHUNK_SIZE

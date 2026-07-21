@@ -27,8 +27,53 @@ const logger = require('../utils/logger');
  * @param {object} filters
  * @returns {Array<Chunk & { vectorScore: number }>}
  */
+const { cosineSimilarity } = require('./embeddingService');
+
+/**
+ * Fallback in-memory vector search using cosine similarity.
+ * Used automatically if Atlas $vectorSearch index is missing, building, or returns 0 candidates.
+ */
+const fallbackVectorSearch = async (queryEmbedding, filters = {}) => {
+  try {
+    const query = {};
+    if (filters.documentId) {
+      const mongoose = require('mongoose');
+      query.documentId = typeof filters.documentId === 'string'
+        ? new mongoose.Types.ObjectId(filters.documentId)
+        : filters.documentId;
+    }
+    if (filters.tags?.length > 0) {
+      query.tags = { $in: filters.tags };
+    }
+
+    // Fetch chunks matching filter (limit 500 for memory safety)
+    const chunks = await Chunk.find(query).limit(500).lean();
+    if (!chunks || chunks.length === 0) return [];
+
+    // Compute exact cosine similarity
+    const scored = [];
+    for (const chunk of chunks) {
+      if (Array.isArray(chunk.embedding) && chunk.embedding.length > 0) {
+        const score = cosineSimilarity(queryEmbedding, chunk.embedding);
+        const { embedding, ...rest } = chunk;
+        scored.push({ ...rest, vectorScore: score });
+      }
+    }
+
+    scored.sort((a, b) => b.vectorScore - a.vectorScore);
+    const topCandidates = scored.slice(0, appConfig.rerankTopN);
+
+    logger.info(
+      `[Retrieval] Fallback in-memory vector search → ${topCandidates.length} candidates (top score: ${topCandidates[0]?.vectorScore?.toFixed(3) || 0})`
+    );
+    return topCandidates;
+  } catch (err) {
+    logger.error(`[Retrieval] Fallback vector search failed: ${err.message}`);
+    return [];
+  }
+};
+
 const vectorSearch = async (queryEmbedding, filters = {}) => {
-  // Build pre-filter — reduces candidate space before ANN search
   const preFilter = buildPreFilter(filters);
 
   const vectorSearchStage = {
@@ -36,9 +81,7 @@ const vectorSearch = async (queryEmbedding, filters = {}) => {
       index: appConfig.vectorIndexName,
       path: 'embedding',
       queryVector: queryEmbedding,
-      // numCandidates: how many ANN candidates to explore — higher = better recall, slower
       numCandidates: appConfig.vectorCandidates,
-      // limit: how many to return after ANN scoring
       limit: appConfig.rerankTopN,
       ...(preFilter && { filter: preFilter }),
     },
@@ -53,23 +96,21 @@ const vectorSearch = async (queryEmbedding, filters = {}) => {
     },
     {
       $project: {
-        embedding: 0, // Never return raw embedding vectors to application layer
+        embedding: 0,
       },
     },
   ];
 
   try {
     const results = await Chunk.aggregate(pipeline);
-    logger.debug(`[Retrieval] Vector search → ${results.length} candidates`);
-    return results;
+    logger.debug(`[Retrieval] Atlas vector search → ${results.length} candidates`);
+    if (results && results.length > 0) return results;
   } catch (err) {
-    // If vector index doesn't exist yet, fail gracefully
-    if (err.message?.includes('index') || err.message?.includes('$vectorSearch')) {
-      logger.error(`[Retrieval] Vector search failed — is the Atlas vector index created? Error: ${err.message}`);
-      return [];
-    }
-    throw err;
+    logger.warn(`[Retrieval] Atlas $vectorSearch unavailable (${err.message}). Using in-memory vector search fallback.`);
   }
+
+  // Fallback to in-memory vector search if Atlas vectorSearch returns 0 or errors
+  return fallbackVectorSearch(queryEmbedding, filters);
 };
 
 // ─── Step 2: Keyword Search ──────────────────────────────────────────────────
@@ -162,12 +203,18 @@ const reciprocalRankFusion = (vectorChunks, keywordChunks, topN) => {
   return Array.from(scores.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, topN)
-    .map(([id, rrfScore]) => ({
-      ...registry.get(id),
-      hybridScore: rrfScore,
-      // Retain the best raw similarity score for threshold gating
-      _bestScore: registry.get(id)?.vectorScore ?? 0,
-    }));
+    .map(([id, rrfScore]) => {
+      const item = registry.get(id);
+      const vecScore = typeof item?.vectorScore === 'number' ? item.vectorScore : 0;
+      const kwScore = typeof item?.keywordScore === 'number' ? item.keywordScore : 0;
+      const bestScore = vecScore > 0 ? vecScore : (kwScore > 0 ? 0.50 : 0);
+
+      return {
+        ...item,
+        hybridScore: rrfScore,
+        _bestScore: bestScore,
+      };
+    });
 };
 
 // ─── Step 4: LLM Re-Ranking ──────────────────────────────────────────────────
@@ -230,19 +277,21 @@ const rerankWithLLM = async (query, candidates) => {
 
 /**
  * Filter chunks that don't meet the minimum similarity threshold.
- * This is the PRIMARY anti-hallucination gate.
- *
- * We use vectorScore as the primary signal since it's the most reliable
- * measure of semantic relevance. HybridScore is used as fallback.
+ * Anti-hallucination gate with realistic thresholds for Enterprise RAG.
  */
 const applyThresholdGate = (chunks, threshold = appConfig.similarityThreshold) => {
   return chunks.filter((c) => {
-    // If reranking ran and gave a low score, reject. 
-    // We increase threshold to 0.30 to ensure real relevance.
-    if (c.rerankScore !== undefined && c.rerankScore < 0.30) return false;
+    // If LLM reranking scored the chunk < 0.20, reject as irrelevant
+    if (c.rerankScore !== undefined && c.rerankScore < 0.20) return false;
 
-    const score = c.vectorScore ?? c._bestScore ?? c.hybridScore ?? 0;
-    return score >= threshold;
+    const vecScore = typeof c.vectorScore === 'number' ? c.vectorScore : undefined;
+    const bestScore = typeof c._bestScore === 'number' && c._bestScore > 0 ? c._bestScore : undefined;
+    const hybridScore = typeof c.hybridScore === 'number' ? c.hybridScore : undefined;
+
+    const validScores = [vecScore, bestScore, hybridScore].filter((s) => s !== undefined);
+    const maxScore = validScores.length > 0 ? Math.max(...validScores) : 0;
+
+    return maxScore >= threshold || (typeof c.keywordScore === 'number' && c.keywordScore > 0);
   });
 };
 
