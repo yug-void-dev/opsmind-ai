@@ -205,12 +205,12 @@ html, body {
 
 @media (max-width: 1024px) {
   /* Admin overview stat cards: 2 column on tablet */
-  .grid.grid-cols-2.xl\\:grid-cols-4 {
+  [class*="xl:grid-cols-4"] {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   /* Quick actions: 2 columns on tablet */
-  .grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-4 {
+  [class*="md:grid-cols-2"][class*="xl:grid-cols-4"] {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
@@ -223,18 +223,18 @@ html, body {
 
 @media (max-width: 768px) {
   /* Stat cards: single column on mobile */
-  .grid.grid-cols-2.xl\\:grid-cols-4 {
+  [class*="xl:grid-cols-4"] {
     grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
     gap: 0.75rem !important;
   }
 
   /* Quick actions: single column on mobile */
-  .grid.grid-cols-1.md\\:grid-cols-2.xl\\:grid-cols-4 {
+  [class*="md:grid-cols-2"][class*="xl:grid-cols-4"] {
     grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
   }
 
   /* Activity + Health: single column on mobile */
-  .grid.grid-cols-1.xl\\:grid-cols-3 {
+  [class*="xl:grid-cols-3"] {
     grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
   }
 
@@ -244,7 +244,7 @@ html, body {
   }
 
   /* Admin topbar search box hidden on small mobile */
-  .hidden.sm\\:flex.items-center.gap-2.px-3 {
+  [class*="sm:flex"] {
     display: none !important;
   }
 }
@@ -260,7 +260,7 @@ html, body {
 @media (max-width: 1024px) {
   /* Left robot panel hidden below lg (already in JSX via hidden lg:flex)
      Right panel should take full width */
-  .min-h-screen.w-full.flex.overflow-hidden > div.hidden.lg\\:flex {
+  div[class*="lg:flex"] {
     display: none !important;
   }
 
