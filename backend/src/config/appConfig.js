@@ -5,7 +5,7 @@
 module.exports = {
   // ─── Provider Selection ─────────────────────────────────────────────────────
   llmProvider: process.env.LLM_PROVIDER || 'groq',
-  llmModel: process.env.GEMINI_MODEL || 'gemini-pro',
+  llmModel: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
   embeddingProvider: process.env.EMBEDDING_PROVIDER || 'gemini',
 
   // ─── MongoDB Atlas Vector Search ────────────────────────────────────────────

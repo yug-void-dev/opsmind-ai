@@ -43,7 +43,9 @@ services:
 
       # ── LLM Config ──────────────────────────────────────────────
       - key: LLM_PROVIDER
-        value: gemini
+        value: groq
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
       - key: EMBEDDING_PROVIDER
         value: gemini
 

@@ -155,10 +155,9 @@ const batchGenerateEmbeddings = async (texts, _ignored = 5, taskType = 'RETRIEVA
       }
     }
 
-    // Wait 65s between batches to fully reset the 60-second quota window
+    // Brief pause between batches (withRetry automatically handles 429 rate limits)
     if (batchIdx < totalBatches - 1) {
-      logger.info(`[Embedding] Quota pause: waiting 65s before next batch to reset rate limit window...`);
-      await sleep(65000);
+      await sleep(500);
     }
   }
 
