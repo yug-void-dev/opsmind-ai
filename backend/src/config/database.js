@@ -21,6 +21,11 @@ const MONGO_OPTIONS = {
 };
 
 const connectDB = async (retries = 3) => {
+  if (!process.env.MONGODB_URI) {
+    logger.error('❌ MONGODB_URI environment variable is not defined.');
+    process.exit(1);
+  }
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const conn = await mongoose.connect(process.env.MONGODB_URI, MONGO_OPTIONS);
@@ -34,8 +39,20 @@ const connectDB = async (retries = 3) => {
       return conn;
     } catch (err) {
       logger.error(`MongoDB connection attempt ${attempt}/${retries} failed: ${err.message}`);
+
+      if (err.message.includes('ENOTFOUND')) {
+        logger.error('DIAGNOSIS: DNS SRV resolution failed (ENOTFOUND).');
+        logger.error('   1. Please check MONGODB_URI in Render dashboard environment variables.');
+        logger.error('   2. Verify the Atlas cluster hostname in MONGODB_URI is spelled correctly and cluster is active.');
+        logger.error('   3. Ensure Network Access in MongoDB Atlas allows 0.0.0.0/0 (Anywhere).');
+      } else if (err.message.includes('ETIMEDOUT') || err.message.includes('selection timed out')) {
+        logger.error('📌 DIAGNOSIS: Connection timed out.');
+        logger.error('   1. Ensure MongoDB Atlas Network Access has 0.0.0.0/0 in IP Access List.');
+        logger.error('   2. Check database username and password in MONGODB_URI.');
+      }
+
       if (attempt === retries) {
-        logger.error('All MongoDB connection attempts exhausted. Exiting.');
+        logger.error('❌ All MongoDB connection attempts exhausted. Exiting process.');
         process.exit(1);
       }
       // Exponential backoff: 2s, 4s, 8s
