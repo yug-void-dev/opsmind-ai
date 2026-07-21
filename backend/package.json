@@ -38,7 +38,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-cache": "^5.1.2",
-    "nodemailer": "^8.0.5",
+    "nodemailer": "^9.0.3",
     "pdf-parse": "^1.1.1",
     "socket.io": "^4.8.3",
     "uuid": "^10.0.0",
@@ -48,16 +48,6 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.4",
     "supertest": "^7.0.0"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "forceExit": true,
-    "detectOpenHandles": true,
-    "testTimeout": 30000,
-    "collectCoverageFrom": [
-      "src/**/*.js"
-    ],
-    "coverageDirectory": "coverage"
   },
   "nodemonConfig": {
     "watch": [
