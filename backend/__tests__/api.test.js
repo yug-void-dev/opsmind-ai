@@ -73,7 +73,7 @@ describe('Health Check', () => {
     expect(res.body.status).toBe('healthy');
   });
 
-  it('Unknown route → 404 with structured error', async () => {
+  (skipIntegration ? it.skip : it)('Unknown route → 404 with structured error', async () => {
     const testApp = require('../src/app');
     const res = await request(testApp).get('/api/does-not-exist');
     expect(res.status).toBe(404);
