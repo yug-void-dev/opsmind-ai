@@ -207,10 +207,11 @@ const streamWithGemini = async (prompt, onChunk) => {
 
 const generateWithGroq = async (prompt, opts = {}) => {
   const groq = getGroqClient();
+  const modelName = opts.model || appConfig.groqModel;
 
   // Groq uses chat format — wrap prompt as user message
   const completion = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
+    model: modelName,
     messages: [
       // System message enforces rules at the API level
       {
@@ -237,6 +238,7 @@ const generateWithGroq = async (prompt, opts = {}) => {
 
 const streamWithGroq = async (prompt, onChunk) => {
   const groq = getGroqClient();
+  const modelName = appConfig.groqModel;
 
   // 90-second hard timeout — prevents infinite hang on Render free tier
   const controller = new AbortController();
@@ -248,7 +250,7 @@ const streamWithGroq = async (prompt, onChunk) => {
 
   try {
     const stream = await groq.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
+      model: modelName,
       messages: [
         { role: 'system', content: 'You are OpsMind AI. Follow all instructions EXACTLY.' },
         { role: 'user', content: prompt },
