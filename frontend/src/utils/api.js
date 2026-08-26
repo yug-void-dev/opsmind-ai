@@ -350,7 +350,9 @@ export const streamQuery = (query, options = {}, callbacks = {}) => {
     ...(options.tags?.length > 0 && { tags: options.tags }),
   });
 
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  // 120 s — must be longer than backend pipeline: rerank (10-20s) + LLM stream (10-30s)
+  // The previous 15 s timeout was the PRIMARY cause of "Streaming interrupted" errors.
+  const timeoutId = setTimeout(() => controller.abort(), 120_000);
 
   fetch(`${BASE_URL}/api/query/stream`, {
     method: "POST",
@@ -394,8 +396,17 @@ export const streamQuery = (query, options = {}, callbacks = {}) => {
         buffer = frames.pop() || "";
 
         for (const frame of frames) {
-          // Each SSE frame line looks like: "data: {...json...}"
-          const line = frame.replace(/^data:\s*/m, "").trim();
+          // Skip SSE keepalive comment lines (e.g. ": keepalive")
+          if (frame.trim().startsWith(":")) continue;
+
+          // Extract the data line — SSE frames may have multiple lines;
+          // we want the first line that starts with "data:"
+          const dataLine = frame
+            .split("\n")
+            .find((l) => l.startsWith("data:"));
+          if (!dataLine) continue;
+
+          const line = dataLine.slice(5).trim(); // strip "data:" prefix
           if (!line) continue;
 
           let event;
