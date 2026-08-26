@@ -160,21 +160,38 @@ const streamWithGemini = async (prompt, onChunk) => {
     },
   });
 
-  const result = await model.generateContentStream(prompt);
+  // 90-second hard timeout — prevents infinite hang on Render free tier
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90_000);
+
   let fullText = '';
   let promptTokens = 0;
 
-  for await (const chunk of result.stream) {
-    const text = chunk.text();
-    if (text) {
-      fullText += text;
-      onChunk(text);
+  try {
+    const result = await model.generateContentStream(prompt);
+
+    for await (const chunk of result.stream) {
+      if (controller.signal.aborted) break;
+      try {
+        const text = chunk.text();
+        if (text) {
+          fullText += text;
+          onChunk(text);
+        }
+      } catch (chunkErr) {
+        // A single bad chunk should not kill the whole stream
+        logger.warn(`[LLM:Gemini] Chunk decode error (skipped): ${chunkErr.message}`);
+      }
     }
+
+    // Aggregate usage from response (available after stream completes)
+    const finalResponse = await result.response;
+    promptTokens = finalResponse.usageMetadata?.promptTokenCount || 0;
+  } finally {
+    clearTimeout(timeoutId);
   }
 
-  // Aggregate usage from response (available after stream completes)
-  const finalResponse = await result.response;
-  promptTokens = finalResponse.usageMetadata?.promptTokenCount || 0;
+  if (!fullText) throw new Error('Gemini stream returned no content');
 
   return {
     text: fullText.trim(),
@@ -221,33 +238,56 @@ const generateWithGroq = async (prompt, opts = {}) => {
 const streamWithGroq = async (prompt, onChunk) => {
   const groq = getGroqClient();
 
-  const stream = await groq.chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: [
-      { role: 'system', content: 'You are OpsMind AI. Follow all instructions EXACTLY.' },
-      { role: 'user', content: prompt },
-    ],
-    temperature: appConfig.llmTemperature,
-    max_tokens: appConfig.llmMaxTokens,
-    stream: true,
-    stream_options: { include_usage: true },
-  });
+  // 90-second hard timeout — prevents infinite hang on Render free tier
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
   let fullText = '';
   let promptTokens = 0;
   let completionTokens = 0;
 
-  for await (const chunk of stream) {
-    const text = chunk.choices?.[0]?.delta?.content || '';
-    if (text) {
-      fullText += text;
-      onChunk(text);
-      completionTokens++;
+  try {
+    const stream = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        { role: 'system', content: 'You are OpsMind AI. Follow all instructions EXACTLY.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: appConfig.llmTemperature,
+      max_tokens: appConfig.llmMaxTokens,
+      stream: true,
+      stream_options: { include_usage: true },
+    }, { signal: controller.signal });
+
+    for await (const chunk of stream) {
+      if (controller.signal.aborted) break;
+      try {
+        const text = chunk.choices?.[0]?.delta?.content || '';
+        if (text) {
+          fullText += text;
+          onChunk(text);
+          completionTokens++;
+        }
+        if (chunk.usage) {
+          promptTokens = chunk.usage.prompt_tokens || 0;
+        }
+      } catch (chunkErr) {
+        // A single bad chunk should not kill the whole stream
+        logger.warn(`[LLM:Groq] Chunk decode error (skipped): ${chunkErr.message}`);
+      }
     }
-    if (chunk.usage) {
-      promptTokens = chunk.usage.prompt_tokens || 0;
+  } catch (err) {
+    // If we already received some content, treat as partial success
+    if (fullText.length > 0) {
+      logger.warn(`[LLM:Groq] Stream ended early: ${err.message}. Returning partial content.`);
+    } else {
+      throw err; // No content at all — propagate so fallback kicks in
     }
+  } finally {
+    clearTimeout(timeoutId);
   }
+
+  if (!fullText) throw new Error('Groq stream returned no content');
 
   return {
     text: fullText.trim(),

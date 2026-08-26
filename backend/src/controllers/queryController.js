@@ -83,7 +83,46 @@ const buildCitations = (chunks) => {
  * Events: 'metadata' | 'sources' | 'chunk' | 'done' | 'error'
  */
 const sseWrite = (res, type, payload) => {
-  res.write(`data: ${JSON.stringify({ type, ...payload })}\n\n`);
+  if (!res.writableEnded) {
+    res.write(`data: ${JSON.stringify({ type, ...payload })}\n\n`);
+  }
+};
+
+/**
+ * Set all required SSE headers and disable idle timeouts so that
+ * Render / Nginx / Cloudflare don't drop long-running streams.
+ *
+ * Also starts a keepalive heartbeat (SSE comment every 15 s) to
+ * prevent proxy-level "idle connection" timeouts on free-tier hosts.
+ *
+ * Returns a cleanup function — call it when streaming is complete.
+ */
+const setupSSE = (req, res) => {
+  // Disable Node/Express idle socket timeout for this connection
+  req.socket.setTimeout(0);
+  req.socket.setNoDelay(true);
+  req.socket.setKeepAlive(true);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');       // Disable Nginx proxy buffering
+  res.setHeader('Transfer-Encoding', 'chunked');  // Required by some proxy configs
+  res.flushHeaders();
+
+  // Send SSE comment (keepalive ping) every 15 s — keeps Render/Cloudflare happy
+  const heartbeat = setInterval(() => {
+    if (!res.writableEnded) {
+      res.write(': keepalive\n\n');
+    } else {
+      clearInterval(heartbeat);
+    }
+  }, 15_000);
+
+  // Cleanup if the client disconnects early
+  req.on('close', () => clearInterval(heartbeat));
+
+  return () => clearInterval(heartbeat);
 };
 
 // ─── Main Query Handler ───────────────────────────────────────────────────────
@@ -184,11 +223,7 @@ const query = async (req, res, next) => {
 
       // SSE no-answer
       if (stream) {
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('X-Accel-Buffering', 'no');
-        res.flushHeaders();
+        const stopHeartbeat = setupSSE(req, res);
 
         // Send metadata first to signal blocked hallucination
         sseWrite(res, 'metadata', {
@@ -204,7 +239,10 @@ const query = async (req, res, next) => {
           answered: false,
           responseTimeMs: responseTime,
         });
-        return res.end();
+
+        stopHeartbeat();
+        if (!res.writableEnded) res.end();
+        return;
       }
 
       return success(res, {
@@ -224,11 +262,9 @@ const query = async (req, res, next) => {
 
     // ── Step 8a: SSE Streaming Response ───────────────────────────────────
     if (stream) {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no'); // Disable Nginx buffering
-      res.flushHeaders();
+      // Set SSE headers, disable idle timeouts, start keepalive heartbeat.
+      // stopHeartbeat() MUST be called in the finally block below.
+      const stopHeartbeat = setupSSE(req, res);
 
       // 1. Send metadata (pipeline info, query info)
       sseWrite(res, 'metadata', {
@@ -240,9 +276,11 @@ const query = async (req, res, next) => {
       // 2. Send sources immediately (UI can render citations while text streams)
       sseWrite(res, 'sources', { sources });
 
-      // 3. Stream LLM tokens
+      // 3. Stream LLM tokens — always end the response in finally
       let fullAnswer = '';
       let tokenUsage = {};
+      let streamingError = null;
+
       try {
         const streamResult = await streamAnswer(sanitizedQuery, chunks, (token) => {
           sseWrite(res, 'chunk', { content: token });
@@ -250,18 +288,27 @@ const query = async (req, res, next) => {
         fullAnswer = streamResult.text;
         tokenUsage = streamResult.usage || {};
       } catch (streamErr) {
-        logger.error(`[Query] Streaming error: ${streamErr.message}`);
+        streamingError = streamErr;
+        logger.error(`[Query] Streaming error: ${streamErr.message}`, { stack: streamErr.stack });
+      } finally {
+        // Always stop the keepalive heartbeat regardless of success/failure
+        stopHeartbeat();
+      }
+
+      // If streaming failed, send error event and close
+      if (streamingError) {
         sseWrite(res, 'error', { message: 'Streaming interrupted. Please retry.' });
-        return res.end();
+        if (!res.writableEnded) res.end();
+        return;
       }
 
       // 4. Send completion event with full answer for client-side state
       const responseTime = Date.now() - startTime;
-      
+
       // Robust detection: if AI says it doesn't know, we hide sources
       const lowerAnswer = fullAnswer.toLowerCase();
-      const isAnswered = fullAnswer && 
-        !lowerAnswer.includes("i don't know") && 
+      const isAnswered = fullAnswer &&
+        !lowerAnswer.includes("i don't know") &&
         !lowerAnswer.includes("no information") &&
         !lowerAnswer.includes("not mentioned in the provided context");
 
@@ -272,10 +319,11 @@ const query = async (req, res, next) => {
         responseTimeMs: responseTime,
         tokenUsage,
       });
-      res.end();
 
-      // Post-stream analytics
-      await _postQueryAnalytics({
+      if (!res.writableEnded) res.end();
+
+      // Post-stream analytics (non-blocking)
+      _postQueryAnalytics({
         userId: req.user?._id,
         query: sanitizedQuery,
         rewrittenQuery,
@@ -286,7 +334,7 @@ const query = async (req, res, next) => {
         answered: isAnswered,
         retrievalDebug,
         req,
-      });
+      }).catch((err) => logger.warn(`[Query] Post-stream analytics failed: ${err.message}`));
 
       return;
     }
